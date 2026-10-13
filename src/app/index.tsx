@@ -3,7 +3,9 @@ import { Text, TouchableOpacity, View } from "react-native";
 export default function Index() {
     return (
         <View style={{ paddingHorizontal: 15 }}>
-            <View>Header</View>
+            <View>
+                <Text>Header</Text>
+            </View>
             <TouchableOpacity
                 style={{
                     alignSelf: "flex-start",
