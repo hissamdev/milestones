@@ -1,3 +1,4 @@
+import { createMilestone } from "@/utils/milestoneHelpers";
 import { SetStateAction, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
@@ -6,7 +7,21 @@ export default function CreateMS({
 }: {
     setShow: React.Dispatch<SetStateAction<boolean>>;
 }) {
+    const [emoji, setEmoji] = useState("");
     const [name, setName] = useState("");
+    const [desc, setDesc] = useState("");
+    const [type, setType] = useState<
+        "duration-counter" | "normal-counter" | "switch" | "select"
+    >("select");
+    const [error, setError] = useState("");
+
+    const handleCreateMilestone = async () => {
+        const res = await createMilestone(emoji, name, desc, type);
+        if (!res.success) {
+            setError(res.message);
+        }
+        setError(res.message);
+    };
 
     return (
         <TouchableOpacity
@@ -59,6 +74,8 @@ export default function CreateMS({
                         }}
                     ></View>
                     <TextInput
+                        value={name}
+                        onChangeText={(e) => setName(e)}
                         style={{
                             paddingVertical: 0,
                             paddingTop: 0,
@@ -72,6 +89,8 @@ export default function CreateMS({
                     ></TextInput>
                 </View>
                 <TextInput
+                    value={desc}
+                    onChangeText={(e) => setDesc(e)}
                     style={{
                         height: 55,
                         textAlignVertical: "top",
@@ -82,8 +101,82 @@ export default function CreateMS({
                         borderWidth: 1,
                         borderRadius: 4,
                     }}
-                    placeholder="Milestone name"
+                    placeholder="Enter milestone description"
                 ></TextInput>
+
+                <View
+                    style={{
+                        marginTop: 20,
+                        display: "flex",
+                        flexDirection: "row",
+                        gap: 10,
+                    }}
+                >
+                    <TouchableOpacity
+                        onPress={() => setType("duration-counter")}
+                        style={{
+                            paddingHorizontal: 12,
+                            paddingVertical: 4,
+                            borderColor: "black",
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            backgroundColor:
+                                type === "duration-counter"
+                                    ? "lightblue"
+                                    : "white",
+                        }}
+                    >
+                        <Text>Duration</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => setType("normal-counter")}
+                        style={{
+                            paddingHorizontal: 12,
+                            paddingVertical: 4,
+                            borderColor: "black",
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            backgroundColor:
+                                type === "normal-counter"
+                                    ? "lightblue"
+                                    : "white",
+                        }}
+                    >
+                        <Text>Counter</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => setType("switch")}
+                        style={{
+                            paddingHorizontal: 12,
+                            paddingVertical: 4,
+                            borderColor: "black",
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            backgroundColor:
+                                type === "switch" ? "lightblue" : "white",
+                        }}
+                    >
+                        <Text>Switch</Text>
+                    </TouchableOpacity>
+                </View>
+                <TouchableOpacity
+                    onPress={handleCreateMilestone}
+                    style={{
+                        marginTop: 20,
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderColor: "black",
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    }}
+                >
+                    <Text style={{ textAlign: "center" }}>
+                        Create Milestone
+                    </Text>
+                </TouchableOpacity>
+                <Text>{error}</Text>
             </TouchableOpacity>
         </TouchableOpacity>
     );

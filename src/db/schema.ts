@@ -6,7 +6,7 @@ export const milestones = s.sqliteTable("milestones", {
         .text("id")
         .primaryKey()
         .$defaultFn(() => Crypto.randomUUID()),
-    name: s.text("name").notNull().default(""),
+    name: s.text("name").notNull(),
     emoji: s.text("emoji"),
     desc: s.text("desc"),
     type: s.text("type").notNull(),
