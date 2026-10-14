@@ -1,8 +1,8 @@
 import { defineRelations } from "drizzle-orm";
-import { milestoneData, milestones } from "./schema";
+import { images, milestoneData, milestones } from "./schema";
 
 export const relations = defineRelations(
-    { milestones, milestoneData },
+    { milestones, milestoneData, images },
     (r) => ({
         milestones: {
             data: r.many.milestoneData(),
@@ -11,6 +11,13 @@ export const relations = defineRelations(
             milestone: r.one.milestones({
                 from: r.milestoneData.milestoneId,
                 to: r.milestones.id,
+            }),
+            image: r.many.images(),
+        },
+        images: {
+            data: r.one.milestoneData({
+                from: r.images.dataId,
+                to: r.milestoneData.id,
             }),
         },
     }),
