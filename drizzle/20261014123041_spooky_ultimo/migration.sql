@@ -14,7 +14,7 @@ CREATE TABLE `milestone_data` (
 	`start` integer,
 	`stop` integer,
 	`duration` integer,
-	`switch` text,
+	`switchToggle` text,
 	`note` text,
 	CONSTRAINT `fk_milestone_data_milestone_id_milestones_id_fk` FOREIGN KEY (`milestone_id`) REFERENCES `milestones`(`id`)
 );

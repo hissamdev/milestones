@@ -1,11 +1,14 @@
+import { MilestoneWithData } from "@/app";
 import { createMilestone } from "@/utils/milestoneHelpers";
 import { SetStateAction, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function CreateMS({
+    setMilestones,
     setShow,
 }: {
     setShow: React.Dispatch<SetStateAction<boolean>>;
+    setMilestones: React.Dispatch<SetStateAction<MilestoneWithData[]>>;
 }) {
     const [emoji, setEmoji] = useState("");
     const [name, setName] = useState("");
@@ -17,10 +20,18 @@ export default function CreateMS({
 
     const handleCreateMilestone = async () => {
         const res = await createMilestone(emoji, name, desc, type);
-        if (!res.success) {
+        if (!res.success || !res.data) {
             setError(res.message);
+            return;
         }
         setError(res.message);
+        setMilestones((prev) => [
+            {
+                ...res.data[0],
+                data: [],
+            },
+            ...prev,
+        ]);
     };
 
     return (
@@ -39,6 +50,7 @@ export default function CreateMS({
                 bottom: 0,
                 right: 0,
                 left: 0,
+                zIndex: 100,
             }}
         >
             <TouchableOpacity

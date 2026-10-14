@@ -41,7 +41,7 @@ export const milestoneData = s.sqliteTable("milestone_data", {
     duration: s.integer("duration"),
 
     // Yes/No
-    switch: s.text(),
+    switchToggle: s.text(),
 
     // Memorables
     note: s.text(),

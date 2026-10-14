@@ -14,7 +14,7 @@ export async function createMilestone(
     type: string,
 ) {
     try {
-        await db
+        const res = await db
             .insert(milestones)
             .values({
                 emoji,
@@ -27,6 +27,32 @@ export async function createMilestone(
         return {
             success: true,
             message: "Milestone created",
+            data: res,
+        };
+    } catch (err) {
+        console.error(err);
+        return {
+            success: false,
+            message: "Something went wrong",
+        };
+    }
+}
+
+export async function getMilestones() {
+    try {
+        const res = await db.query.milestones.findMany({
+            with: {
+                data: {
+                    orderBy: {
+                        createdAt: "desc",
+                    },
+                },
+            },
+        });
+        return {
+            success: true,
+            message: "Milestones retrieved",
+            data: res,
         };
     } catch (err) {
         console.error(err);

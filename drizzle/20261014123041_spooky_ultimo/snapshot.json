@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "e1d85a04-be04-45fd-a12b-082587055b3f",
+  "id": "57c6d95b-bfe6-4795-877e-344bf1f44c8c",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -134,7 +134,7 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "switch",
+      "name": "switchToggle",
       "entityType": "columns",
       "table": "milestone_data"
     },
