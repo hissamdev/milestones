@@ -1,6 +1,6 @@
 import CreateMS from "@/components/ui/CreateMS";
 import { db } from "@/db/client";
-import { milestoneData, milestones } from "@/db/schema";
+import { milestoneData, milestones } from "@/db/schema/milestones";
 import { getMilestones } from "@/utils/milestoneHelpers";
 import { useRouter } from "expo-router";
 import { Clock, Plus } from "lucide-react-native";
