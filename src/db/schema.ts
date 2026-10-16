@@ -1,11 +1,11 @@
+import { generateUuid } from "@/utils/helpers";
 import * as s from "drizzle-orm/sqlite-core";
-import * as Crypto from "expo-crypto";
 
 export const milestones = s.sqliteTable("milestones", {
     id: s
         .text("id")
         .primaryKey()
-        .$defaultFn(() => Crypto.randomUUID()),
+        .$defaultFn(() => generateUuid()),
     name: s.text("name").notNull(),
     emoji: s.text("emoji"),
     desc: s.text("desc"),
@@ -16,7 +16,7 @@ export const milestoneData = s.sqliteTable("milestone_data", {
     id: s
         .text("id")
         .primaryKey()
-        .$defaultFn(() => Crypto.randomUUID()),
+        .$defaultFn(() => generateUuid()),
     milestoneId: s
         .text("milestone_id")
         .notNull()

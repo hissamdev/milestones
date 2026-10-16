@@ -1,7 +1,11 @@
-import { Text } from "react-native";
+import CreateExercise from "@/components/ui/CreateExercise";
+import { Text, View } from "react-native";
 
 export default function Workouts() {
     return (
-        <Text>hi</Text>
-    )
+        <View style={{ flex: 1, position: "relative" }}>
+            <CreateExercise />
+            <Text>hi</Text>
+        </View>
+    );
 }
