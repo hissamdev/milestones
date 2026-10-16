@@ -14,7 +14,7 @@ export type MilestoneWithData = Milestone & {
     data: MilestoneData[];
 };
 
-export default function Index() {
+export default function Milestones() {
     const [showCreation, setShowCreation] = useState(false);
     const [milestones, setMilestones] = useState<MilestoneWithData[]>([]);
 
@@ -59,7 +59,7 @@ export default function Index() {
                 ),
             );
             router.push({
-                pathname: "/duration-controls",
+                pathname: "/(milestones)/duration-controls",
                 params: { id, dataId: res[0].id },
             });
             return;

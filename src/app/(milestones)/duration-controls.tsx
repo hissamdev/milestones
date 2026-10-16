@@ -1,4 +1,3 @@
-import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { Minus, Plus } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
@@ -128,7 +127,7 @@ export default function DurationControlls() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
             <View style={{ padding: 15, backgroundColor: "#FBF2EE", flex: 1 }}>
-                <Text>{id}</Text>
+                <Text>{id} and hi</Text>
                 <View
                     style={{
                         marginTop: 100,
@@ -189,14 +188,14 @@ export default function DurationControlls() {
                             gap: 20,
                         }}
                     >
-                        <Image
+                        {/* <Image
                             source={require("../../assets/images/bottle.png")}
                             style={{ width: 80, height: 80, borderRadius: 10 }}
                         />
                         <Image
                             source={require("../../assets/images/bottle.png")}
                             style={{ width: 80, height: 80, borderRadius: 10 }}
-                        />
+                        /> */}
                         <TouchableOpacity
                             style={{ width: 80, height: 80, borderRadius: 10 }}
                         >

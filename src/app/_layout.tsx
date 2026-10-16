@@ -1,10 +1,11 @@
 import { db, expoDb } from "@/db/client";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
-import { Stack } from "expo-router";
+import { Tabs } from "expo-router";
 import { Text } from "react-native";
 import migrations from "../../drizzle/migrations";
 
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { BookSearch, Weight } from "lucide-react-native";
 
 export default function RootLayout() {
     const { success, error } = useMigrations(db, migrations as any);
@@ -20,12 +21,23 @@ export default function RootLayout() {
     }
 
     return (
-        <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen
-                name="duration-controls"
-                options={{ headerShown: false }}
+        <Tabs>
+            <Tabs.Screen
+                name="(milestones)/milestones"
+                options={{
+                    title: "Milestones",
+                    tabBarIcon: () => <BookSearch />,
+                }}
             />
-        </Stack>
+            <Tabs.Screen
+                name="(workouts)/workouts"
+                options={{ title: "Workouts", tabBarIcon: () => <Weight /> }}
+            />
+
+            <Tabs.Screen
+                name="(milestones)/duration-controls"
+                options={{ href: null }}
+            />
+        </Tabs>
     );
 }
