@@ -24,7 +24,7 @@ export const sessions = s.sqliteTable("sessions", {
         .primaryKey()
         .$defaultFn(() => generateUuid()),
     workoutId: s
-        .text()
+        .text("workout_id")
         .notNull()
         .references(() => workouts.id),
     routineId: s.text().references(() => routines.id),
@@ -44,7 +44,7 @@ export const sessionData = s.sqliteTable("session_data", {
         .primaryKey()
         .$defaultFn(() => generateUuid()),
     sessionId: s
-        .text()
+        .text("session_id")
         .notNull()
         .references(() => sessions.id),
     exerciseId: s.text().references(() => exercises.id),
@@ -57,8 +57,8 @@ export const sessionData = s.sqliteTable("session_data", {
         .text("creation_day")
         .notNull()
         .$defaultFn(() => new Date().toDateString()),
-    restTime: s.integer(),
-    sequence: s.integer().notNull(),
+    restTime: s.integer("rest_time"),
+    sequence: s.integer("sequence").notNull(),
 });
 
 // Independent list of available exercises for autocomplete
@@ -77,9 +77,9 @@ export const exercises = s.sqliteTable("exercises", {
         .$defaultFn(() => new Date())
         .$onUpdateFn(() => new Date()),
 
-    name: s.text().notNull(),
-    icon: s.text(),
-    desc: s.text(),
+    name: s.text("name").notNull(),
+    icon: s.text("icon"),
+    desc: s.text("desc"),
 });
 
 export const routines = s.sqliteTable("routines", {
@@ -95,4 +95,18 @@ export const routines = s.sqliteTable("routines", {
         .text("creation_day")
         .notNull()
         .$defaultFn(() => new Date().toDateString()),
+});
+
+export const routineExercises = s.sqliteTable("routine_exercises", {
+    id: s
+        .text("id")
+        .primaryKey()
+        .$defaultFn(() => generateUuid()),
+    routineId: s
+        .text("routine_id")
+        .notNull()
+        .references(() => routines.id),
+    exerciseId: s.text("exercise_id").references(() => exercises.id),
+    restTime: s.integer("rest_time"),
+    sequence: s.integer("sequence").notNull(),
 });
