@@ -1,14 +1,15 @@
-import { defineRelations } from "drizzle-orm";
-import { images, milestoneData, milestones } from "./schema";
+import { defineRelationsPart } from "drizzle-orm";
+import { images, milestoneData, milestones } from "./milestones-schema";
 import {
     exercises,
     routines,
     sessionData,
     sessions,
+    standaloneExercises,
     workouts,
 } from "./workouts-schema";
 
-export const relations = defineRelations(
+export const milestoneRelations = defineRelationsPart(
     { milestones, milestoneData, images },
     (r) => ({
         milestones: {
@@ -30,11 +31,29 @@ export const relations = defineRelations(
     }),
 );
 
-export const workoutRelations = defineRelations(
-    { workouts, exercises, sessions, sessionData, routines },
+export const workoutRelations = defineRelationsPart(
+    {
+        workouts,
+        exercises,
+        sessions,
+        sessionData,
+        routines,
+        standaloneExercises,
+    },
     (r) => ({
         workouts: {
             sessions: r.many.sessions(),
+            standaloneExercises: r.many.standaloneExercises(),
+        },
+        standaloneExercises: {
+            workout: r.one.workouts({
+                from: r.standaloneExercises.workoutId,
+                to: r.workouts.id,
+            }),
+            exercise: r.one.exercises({
+                from: r.standaloneExercises.exerciseId,
+                to: r.exercises.id,
+            }),
         },
         sessions: {
             workout: r.one.workouts({
