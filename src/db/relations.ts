@@ -1,5 +1,5 @@
 import { defineRelationsPart } from "drizzle-orm";
-import { images, milestoneData, milestones } from "./milestones-schema";
+import { images, milestoneData, milestones } from "./schema/milestones";
 import {
     exercises,
     routines,
@@ -7,7 +7,7 @@ import {
     sessions,
     standaloneExercises,
     workouts,
-} from "./workouts-schema";
+} from "./schema/workouts";
 
 export const milestoneRelations = defineRelationsPart(
     { milestones, milestoneData, images },

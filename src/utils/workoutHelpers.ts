@@ -1,5 +1,5 @@
 import { db } from "@/db/client";
-import { workouts } from "@/db/workouts-schema";
+import { workouts } from "@/db/schema/workouts";
 
 export async function getCurrentDayWorkout() {
     try {
@@ -20,7 +20,7 @@ export async function getCurrentDayWorkout() {
         }
         return res;
     } catch (err) {
-        console.error("Something went wrong: Workouts");
+        console.error("Something went wrong: Workouts\n", err);
         return;
     }
 }
