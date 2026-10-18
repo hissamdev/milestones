@@ -1,5 +1,5 @@
 import { db } from "@/db/client";
-import { milestones } from "@/db/schema";
+import { milestones } from "@/db/schema/milestones";
 
 // type MilestoneCreate = {
 //     name: string;
