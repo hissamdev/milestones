@@ -2,7 +2,9 @@ import { defineRelationsPart } from "drizzle-orm";
 import { images, milestoneData, milestones } from "./schema/milestones";
 import {
     exercises,
+    routineDays,
     routines,
+    routineTemplates,
     sessionData,
     sessions,
     standaloneExercises,
@@ -35,10 +37,12 @@ export const workoutRelations = defineRelationsPart(
     {
         workouts,
         exercises,
+        standaloneExercises,
         sessions,
         sessionData,
         routines,
-        standaloneExercises,
+        routineDays,
+        routineTemplates,
     },
     (r) => ({
         workouts: {
@@ -74,6 +78,19 @@ export const workoutRelations = defineRelationsPart(
             exercise: r.one.exercises({
                 from: r.sessionData.exerciseId,
                 to: r.exercises.id,
+            }),
+        },
+        routines: {
+            routineDays: r.many.routineDays(),
+        },
+        routineDays: {
+            routine: r.one.routines({
+                from: r.routineDays.routineId,
+                to: r.routines.id,
+            }),
+            routineTemplate: r.one.routineTemplates({
+                from: r.routineDays.routineTemplateId,
+                to: r.routineTemplates.id,
             }),
         },
     }),

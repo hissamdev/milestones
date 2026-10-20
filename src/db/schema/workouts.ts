@@ -88,11 +88,11 @@ export const standaloneExercises = s.sqliteTable("standalone_exercises", {
         .primaryKey()
         .$defaultFn(() => generateUuid()),
     workoutId: s
-        .text()
+        .text("workout_id")
         .notNull()
         .references(() => workouts.id),
     exerciseId: s
-        .text()
+        .text("exercise_id")
         .notNull()
         .references(() => exercises.id),
     createdAt: s
@@ -103,7 +103,7 @@ export const standaloneExercises = s.sqliteTable("standalone_exercises", {
         .text("creation_day")
         .notNull()
         .$defaultFn(() => new Date().toDateString()),
-    repitition: s.integer().notNull(),
+    repitition: s.integer("repetition").notNull(),
 });
 
 export const routines = s.sqliteTable("routines", {
@@ -119,9 +119,10 @@ export const routines = s.sqliteTable("routines", {
         .text("creation_day")
         .notNull()
         .$defaultFn(() => new Date().toDateString()),
+    name: s.text().notNull(),
 });
 
-export const routineExercises = s.sqliteTable("routine_exercises", {
+export const routineDays = s.sqliteTable("routine_days", {
     id: s
         .text("id")
         .primaryKey()
@@ -130,7 +131,49 @@ export const routineExercises = s.sqliteTable("routine_exercises", {
         .text("routine_id")
         .notNull()
         .references(() => routines.id),
+    routineTemplateId: s
+        .text("routine_template_id")
+        .notNull()
+        .references(() => routineTemplates.id),
+    name: s.text("name").notNull(),
+});
+
+export const routineTemplates = s.sqliteTable("routine_templates", {
+    id: s
+        .text("id")
+        .primaryKey()
+        .$defaultFn(() => generateUuid()),
     exerciseId: s.text("exercise_id").references(() => exercises.id),
     restTime: s.integer("rest_time"),
     sequence: s.integer("sequence").notNull(),
+});
+
+export const routineDataMetadata = s.sqliteTable("routine_tl_data", {
+    id: s
+        .text("id")
+        .primaryKey()
+        .$defaultFn(() => generateUuid()),
+    routineId: s
+        .text("routine_id")
+        .notNull()
+        .references(() => routines.id),
+    interactionTime: s
+        .integer("interaction_time", { mode: "timestamp" })
+        .notNull()
+        .$defaultFn(() => new Date()), // Created when the user initiates a routine's workout, indicates a day of routine completion
+    completion: s.integer("completion").notNull(), // Percentage of a routine completed, calculated based on how many exercises from the template were done
+    isComplete: s.integer("is_complete", { mode: "boolean" }).notNull(), // Whether a routine is still ongoing
+});
+
+export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
+    id: s
+        .text("id")
+        .primaryKey()
+        .$defaultFn(() => generateUuid()),
+    routineId: s.text("routine_id").references(() => routines.id),
+    parentMetadataId: s
+        .text("parent_metadata_id")
+        .notNull()
+        .references(() => routineDataMetadata.id),
+    exerciseId: s.text("exercise_id").references(() => exercises.id),
 });
