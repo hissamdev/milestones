@@ -122,7 +122,7 @@ export const routines = s.sqliteTable("routines", {
     name: s.text().notNull(),
 });
 
-export const routineDays = s.sqliteTable("routine_days", {
+export const daysOtw = s.sqliteTable("days_otw", {
     id: s
         .text("id")
         .primaryKey()
@@ -133,9 +133,8 @@ export const routineDays = s.sqliteTable("routine_days", {
         .references(() => routines.id),
     routineTemplateId: s
         .text("routine_template_id")
-        .notNull()
         .references(() => routineTemplates.id),
-    name: s.text("name").notNull(),
+    dayTitle: s.text("day_title").notNull(),
 });
 
 export const routineTemplates = s.sqliteTable("routine_templates", {
