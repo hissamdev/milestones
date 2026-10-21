@@ -1,7 +1,7 @@
 import { SetStateAction } from "react";
 import { StyleProp, TouchableOpacity, ViewStyle } from "react-native";
 
-export default function Modal({
+export default function Popup({
     customStyles,
     setModal,
     children,

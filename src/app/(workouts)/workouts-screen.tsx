@@ -1,9 +1,10 @@
 import Routines from "@/components/sections/Routines";
 import CreateExercise from "@/components/ui/CreateExercise";
-import Modal from "@/components/ui/Modal";
+import Popup from "@/components/ui/Popup";
 import { exercises, workouts } from "@/db/schema/workouts";
 import { createRoutine } from "@/utils/routineHelpers";
 import { getCurrentDayWorkout } from "@/utils/workoutHelpers";
+import { useRouter } from "expo-router";
 import { Check } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
@@ -13,6 +14,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+("@/components/ui/Popup");
 
 type Workouts = typeof workouts.$inferSelect;
 type Exercise = typeof exercises.$inferSelect;
@@ -34,6 +36,7 @@ export default function Workouts() {
     } | null>({
         id: "id-1",
     });
+    const router = useRouter();
 
     useEffect(() => {
         const load = async () => {
@@ -69,11 +72,17 @@ export default function Workouts() {
 
     const handleCreateRoutine = async () => {
         const res = await createRoutine(routineName);
-        if (!res || !res.success) {
+        if (!res || !res.success || !res.data) {
             setUiMessage("There was an error, please try again later");
             return;
         }
         setUiMessage("Routine created");
+        router.push({
+            pathname: "/(workouts)/routines/edit-routine-screen",
+            params: {
+                routineId: res.data.id,
+            },
+        });
     };
 
     if (!workouts) return;
@@ -96,7 +105,7 @@ export default function Workouts() {
             <Text>{workouts?.creationDay}</Text>
             <Routines showModal={setShowCreateRoutine} />
             {showCreateRoutine && (
-                <Modal
+                <Popup
                     setModal={setShowCreateRoutine}
                     customStyles={{ padding: 30 }}
                 >
@@ -120,7 +129,7 @@ export default function Workouts() {
                             Create Routine
                         </Text>
                     </TouchableOpacity>
-                </Modal>
+                </Popup>
             )}
             <View>
                 <Text>Standalone Exercises</Text>
