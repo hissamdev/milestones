@@ -30,7 +30,7 @@ export default function RootLayout() {
                 }}
             />
             <Tabs.Screen
-                name="(workouts)/workouts"
+                name="(workouts)/workouts-screen"
                 options={{ title: "Workouts", tabBarIcon: () => <Weight /> }}
             />
 

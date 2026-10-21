@@ -1,15 +1,27 @@
+import Routines from "@/components/sections/Routines";
 import CreateExercise from "@/components/ui/CreateExercise";
+import Modal from "@/components/ui/Modal";
 import { exercises, workouts } from "@/db/schema/workouts";
+import { createRoutine } from "@/utils/routineHelpers";
 import { getCurrentDayWorkout } from "@/utils/workoutHelpers";
 import { Check } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { Pressable, Text, TouchableOpacity, View } from "react-native";
+import {
+    Pressable,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 type Workouts = typeof workouts.$inferSelect;
 type Exercise = typeof exercises.$inferSelect;
 
 export default function Workouts() {
     const [workouts, setWorkouts] = useState<Workouts | null>(null);
+    const [showCreateRoutine, setShowCreateRoutine] = useState(false);
+    const [routineName, setRoutineName] = useState("");
+    const [uiMessage, setUiMessage] = useState("");
     const [standaloneExercises, setStandaloneExercises] = useState([
         {
             id: "id-1",
@@ -55,6 +67,15 @@ export default function Workouts() {
         );
     };
 
+    const handleCreateRoutine = async () => {
+        const res = await createRoutine(routineName);
+        if (!res || !res.success) {
+            setUiMessage("There was an error, please try again later");
+            return;
+        }
+        setUiMessage("Routine created");
+    };
+
     if (!workouts) return;
     return (
         <View style={{ flex: 1, position: "relative", padding: 30 }}>
@@ -73,10 +94,38 @@ export default function Workouts() {
                 <Text>Create Property</Text>
             </TouchableOpacity> */}
             <Text>{workouts?.creationDay}</Text>
+            <Routines showModal={setShowCreateRoutine} />
+            {showCreateRoutine && (
+                <Modal
+                    setModal={setShowCreateRoutine}
+                    customStyles={{ padding: 30 }}
+                >
+                    <Text style={{ fontSize: 18, fontWeight: 500 }}>
+                        Create Routine
+                    </Text>
+                    <Text style={{ marginTop: 10, fontSize: 16 }}>
+                        Routine name
+                    </Text>
+                    <TextInput
+                        value={routineName}
+                        onChangeText={(t) => setRoutineName(t)}
+                        placeholder="e.g. Full body, Calisthenics, GYM"
+                        style={{ marginTop: 10, borderWidth: 1 }}
+                    />
+                    <TouchableOpacity
+                        onPress={() => createRoutine(routineName)}
+                        style={{ marginTop: "auto" }}
+                    >
+                        <Text style={{ textAlign: "center" }}>
+                            Create Routine
+                        </Text>
+                    </TouchableOpacity>
+                </Modal>
+            )}
             <View>
                 <Text>Standalone Exercises</Text>
                 <Pressable
-                    onPress={() => handleAddStandaloneExercise()}
+                    onPress={handleAddStandaloneExercise}
                     style={{
                         paddingHorizontal: 20,
                         paddingVertical: 6,
@@ -88,7 +137,7 @@ export default function Workouts() {
                 <View style={{ marginTop: 20 }}>
                     {standaloneExercises.map((e) => (
                         <TouchableOpacity
-                            onPress={() => handleExpand(e.id)}
+                            onPress={handleCreateRoutine}
                             key={e.id}
                             style={{
                                 padding: 15,
