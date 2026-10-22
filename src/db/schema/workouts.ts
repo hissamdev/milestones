@@ -58,7 +58,7 @@ export const sessionData = s.sqliteTable("session_data", {
         .notNull()
         .$defaultFn(() => new Date().toDateString()),
     restTime: s.integer("rest_time"),
-    sequence: s.integer("sequence").notNull(),
+    workoutSequence: s.integer("sequence").notNull(),
 });
 
 // Independent list of available exercises for autocomplete
@@ -77,7 +77,9 @@ export const exercises = s.sqliteTable("exercises", {
         .$defaultFn(() => new Date())
         .$onUpdateFn(() => new Date()),
 
-    name: s.text("name").notNull(),
+    name: s.text("name").notNull().unique(),
+    displayName: s.text("display_name").notNull(),
+    type: s.text("type").notNull(), // Duration or Reps
     icon: s.text("icon"),
     desc: s.text("desc"),
 });
@@ -133,6 +135,7 @@ export const daysOtw = s.sqliteTable("days_otw", {
         .references(() => routines.id),
     routineTemplateId: s
         .text("routine_template_id")
+        .notNull()
         .references(() => routineTemplates.id),
     dayTitle: s.text("day_title").notNull(),
 });
@@ -142,10 +145,25 @@ export const routineTemplates = s.sqliteTable("routine_templates", {
         .text("id")
         .primaryKey()
         .$defaultFn(() => generateUuid()),
-    exerciseId: s.text("exercise_id").references(() => exercises.id),
-    restTime: s.integer("rest_time"),
-    sequence: s.integer("sequence").notNull(),
+    restDay: s.integer({ mode: "boolean" }).notNull().default(false),
 });
+
+export const routineTemplateExercises = s.sqliteTable(
+    "routine_template_exercises",
+    {
+        id: s
+            .text("id")
+            .primaryKey()
+            .$defaultFn(() => generateUuid()),
+        templateId: s
+            .text("template_id")
+            .notNull()
+            .references(() => routineTemplates.id),
+        exerciseId: s.text("exercise_id").references(() => exercises.id),
+        restTime: s.integer("rest_time"),
+        sequence: s.integer("sequence").notNull(),
+    },
+);
 
 export const routineDataMetadata = s.sqliteTable("routine_tl_data", {
     id: s

@@ -1,19 +1,12 @@
 import Routines from "@/components/sections/Routines";
 import CreateExercise from "@/components/ui/CreateExercise";
-import Popup from "@/components/ui/Popup";
 import { exercises, workouts } from "@/db/schema/workouts";
 import { createRoutine } from "@/utils/routineHelpers";
 import { getCurrentDayWorkout } from "@/utils/workoutHelpers";
 import { useRouter } from "expo-router";
 import { Check } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import {
-    Pressable,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 ("@/components/ui/Popup");
 
 type Workouts = typeof workouts.$inferSelect;
@@ -21,7 +14,6 @@ type Exercise = typeof exercises.$inferSelect;
 
 export default function Workouts() {
     const [workouts, setWorkouts] = useState<Workouts | null>(null);
-    const [showCreateRoutine, setShowCreateRoutine] = useState(false);
     const [routineName, setRoutineName] = useState("");
     const [uiMessage, setUiMessage] = useState("");
     const [standaloneExercises, setStandaloneExercises] = useState([
@@ -103,34 +95,7 @@ export default function Workouts() {
                 <Text>Create Property</Text>
             </TouchableOpacity> */}
             <Text>{workouts?.creationDay}</Text>
-            <Routines showModal={setShowCreateRoutine} />
-            {showCreateRoutine && (
-                <Popup
-                    setModal={setShowCreateRoutine}
-                    customStyles={{ padding: 30 }}
-                >
-                    <Text style={{ fontSize: 18, fontWeight: 500 }}>
-                        Create Routine
-                    </Text>
-                    <Text style={{ marginTop: 10, fontSize: 16 }}>
-                        Routine name
-                    </Text>
-                    <TextInput
-                        value={routineName}
-                        onChangeText={(t) => setRoutineName(t)}
-                        placeholder="e.g. Full body, Calisthenics, GYM"
-                        style={{ marginTop: 10, borderWidth: 1 }}
-                    />
-                    <TouchableOpacity
-                        onPress={() => createRoutine(routineName)}
-                        style={{ marginTop: "auto" }}
-                    >
-                        <Text style={{ textAlign: "center" }}>
-                            Create Routine
-                        </Text>
-                    </TouchableOpacity>
-                </Popup>
-            )}
+            <Routines />
             <View>
                 <Text>Standalone Exercises</Text>
                 <Pressable

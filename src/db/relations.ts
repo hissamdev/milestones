@@ -4,6 +4,7 @@ import {
     daysOtw,
     exercises,
     routines,
+    routineTemplateExercises,
     routineTemplates,
     sessionData,
     sessions,
@@ -43,6 +44,7 @@ export const workoutRelations = defineRelationsPart(
         routines,
         daysOtw,
         routineTemplates,
+        routineTemplateExercises,
     },
     (r) => ({
         workouts: {
@@ -91,6 +93,19 @@ export const workoutRelations = defineRelationsPart(
             routineTemplate: r.one.routineTemplates({
                 from: r.daysOtw.routineTemplateId,
                 to: r.routineTemplates.id,
+            }),
+        },
+        routineTemplates: {
+            templateExercises: r.many.routineTemplateExercises(),
+        },
+        routineTemplateExercises: {
+            template: r.one.routineTemplates({
+                from: r.routineTemplateExercises.templateId,
+                to: r.routineTemplates.id,
+            }),
+            exercise: r.one.exercises({
+                from: r.routineTemplateExercises.exerciseId,
+                to: r.exercises.id,
             }),
         },
     }),

@@ -1,9 +1,9 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "b66ca459-b921-418c-b348-e99cdaa17159",
+  "id": "b68f37eb-dffa-4cc3-bb6a-99333f9f4f63",
   "prevIds": [
-    "57c6d95b-bfe6-4795-877e-344bf1f44c8c"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
     {
@@ -19,11 +19,27 @@
       "entityType": "tables"
     },
     {
+      "name": "days_otw",
+      "entityType": "tables"
+    },
+    {
       "name": "exercises",
       "entityType": "tables"
     },
     {
-      "name": "routine_exercises",
+      "name": "routine_tl_data",
+      "entityType": "tables"
+    },
+    {
+      "name": "routine_exercise_data",
+      "entityType": "tables"
+    },
+    {
+      "name": "routine_template_exercises",
+      "entityType": "tables"
+    },
+    {
+      "name": "routine_templates",
       "entityType": "tables"
     },
     {
@@ -234,6 +250,46 @@
       "generated": null,
       "name": "id",
       "entityType": "columns",
+      "table": "days_otw"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "routine_id",
+      "entityType": "columns",
+      "table": "days_otw"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "routine_template_id",
+      "entityType": "columns",
+      "table": "days_otw"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "day_title",
+      "entityType": "columns",
+      "table": "days_otw"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
       "table": "exercises"
     },
     {
@@ -268,6 +324,26 @@
     },
     {
       "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "display_name",
+      "entityType": "columns",
+      "table": "exercises"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "type",
+      "entityType": "columns",
+      "table": "exercises"
+    },
+    {
+      "type": "text",
       "notNull": false,
       "autoincrement": false,
       "default": null,
@@ -294,7 +370,7 @@
       "generated": null,
       "name": "id",
       "entityType": "columns",
-      "table": "routine_exercises"
+      "table": "routine_tl_data"
     },
     {
       "type": "text",
@@ -304,7 +380,67 @@
       "generated": null,
       "name": "routine_id",
       "entityType": "columns",
-      "table": "routine_exercises"
+      "table": "routine_tl_data"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "interaction_time",
+      "entityType": "columns",
+      "table": "routine_tl_data"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "completion",
+      "entityType": "columns",
+      "table": "routine_tl_data"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "is_complete",
+      "entityType": "columns",
+      "table": "routine_tl_data"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "routine_exercise_data"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "routine_id",
+      "entityType": "columns",
+      "table": "routine_exercise_data"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "parent_metadata_id",
+      "entityType": "columns",
+      "table": "routine_exercise_data"
     },
     {
       "type": "text",
@@ -314,7 +450,37 @@
       "generated": null,
       "name": "exercise_id",
       "entityType": "columns",
-      "table": "routine_exercises"
+      "table": "routine_exercise_data"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "routine_template_exercises"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "template_id",
+      "entityType": "columns",
+      "table": "routine_template_exercises"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "exercise_id",
+      "entityType": "columns",
+      "table": "routine_template_exercises"
     },
     {
       "type": "integer",
@@ -324,7 +490,7 @@
       "generated": null,
       "name": "rest_time",
       "entityType": "columns",
-      "table": "routine_exercises"
+      "table": "routine_template_exercises"
     },
     {
       "type": "integer",
@@ -334,7 +500,27 @@
       "generated": null,
       "name": "sequence",
       "entityType": "columns",
-      "table": "routine_exercises"
+      "table": "routine_template_exercises"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "routine_templates"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "false",
+      "generated": null,
+      "name": "restDay",
+      "entityType": "columns",
+      "table": "routine_templates"
     },
     {
       "type": "text",
@@ -363,6 +549,16 @@
       "default": null,
       "generated": null,
       "name": "creation_day",
+      "entityType": "columns",
+      "table": "routines"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "name",
       "entityType": "columns",
       "table": "routines"
     },
@@ -502,7 +698,7 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "workoutId",
+      "name": "workout_id",
       "entityType": "columns",
       "table": "standalone_exercises"
     },
@@ -512,7 +708,7 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "exerciseId",
+      "name": "exercise_id",
       "entityType": "columns",
       "table": "standalone_exercises"
     },
@@ -542,7 +738,7 @@
       "autoincrement": false,
       "default": null,
       "generated": null,
-      "name": "repitition",
+      "name": "repetition",
       "entityType": "columns",
       "table": "standalone_exercises"
     },
@@ -617,9 +813,69 @@
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "nameExplicit": false,
-      "name": "fk_routine_exercises_routine_id_routines_id_fk",
+      "name": "fk_days_otw_routine_id_routines_id_fk",
       "entityType": "fks",
-      "table": "routine_exercises"
+      "table": "days_otw"
+    },
+    {
+      "columns": [
+        "routine_template_id"
+      ],
+      "tableTo": "routine_templates",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "name": "fk_days_otw_routine_template_id_routine_templates_id_fk",
+      "entityType": "fks",
+      "table": "days_otw"
+    },
+    {
+      "columns": [
+        "routine_id"
+      ],
+      "tableTo": "routines",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "name": "fk_routine_tl_data_routine_id_routines_id_fk",
+      "entityType": "fks",
+      "table": "routine_tl_data"
+    },
+    {
+      "columns": [
+        "routine_id"
+      ],
+      "tableTo": "routines",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "name": "fk_routine_exercise_data_routine_id_routines_id_fk",
+      "entityType": "fks",
+      "table": "routine_exercise_data"
+    },
+    {
+      "columns": [
+        "parent_metadata_id"
+      ],
+      "tableTo": "routine_tl_data",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "name": "fk_routine_exercise_data_parent_metadata_id_routine_tl_data_id_fk",
+      "entityType": "fks",
+      "table": "routine_exercise_data"
     },
     {
       "columns": [
@@ -632,9 +888,39 @@
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "nameExplicit": false,
-      "name": "fk_routine_exercises_exercise_id_exercises_id_fk",
+      "name": "fk_routine_exercise_data_exercise_id_exercises_id_fk",
       "entityType": "fks",
-      "table": "routine_exercises"
+      "table": "routine_exercise_data"
+    },
+    {
+      "columns": [
+        "template_id"
+      ],
+      "tableTo": "routine_templates",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "name": "fk_routine_template_exercises_template_id_routine_templates_id_fk",
+      "entityType": "fks",
+      "table": "routine_template_exercises"
+    },
+    {
+      "columns": [
+        "exercise_id"
+      ],
+      "tableTo": "exercises",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "name": "fk_routine_template_exercises_exercise_id_exercises_id_fk",
+      "entityType": "fks",
+      "table": "routine_template_exercises"
     },
     {
       "columns": [
@@ -698,7 +984,7 @@
     },
     {
       "columns": [
-        "workoutId"
+        "workout_id"
       ],
       "tableTo": "workouts",
       "columnsTo": [
@@ -707,13 +993,13 @@
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "nameExplicit": false,
-      "name": "fk_standalone_exercises_workoutId_workouts_id_fk",
+      "name": "fk_standalone_exercises_workout_id_workouts_id_fk",
       "entityType": "fks",
       "table": "standalone_exercises"
     },
     {
       "columns": [
-        "exerciseId"
+        "exercise_id"
       ],
       "tableTo": "exercises",
       "columnsTo": [
@@ -722,7 +1008,7 @@
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "nameExplicit": false,
-      "name": "fk_standalone_exercises_exerciseId_exercises_id_fk",
+      "name": "fk_standalone_exercises_exercise_id_exercises_id_fk",
       "entityType": "fks",
       "table": "standalone_exercises"
     },
@@ -758,6 +1044,15 @@
         "id"
       ],
       "nameExplicit": false,
+      "name": "days_otw_pk",
+      "table": "days_otw",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
       "name": "exercises_pk",
       "table": "exercises",
       "entityType": "pks"
@@ -767,8 +1062,35 @@
         "id"
       ],
       "nameExplicit": false,
-      "name": "routine_exercises_pk",
-      "table": "routine_exercises",
+      "name": "routine_tl_data_pk",
+      "table": "routine_tl_data",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "routine_exercise_data_pk",
+      "table": "routine_exercise_data",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "routine_template_exercises_pk",
+      "table": "routine_template_exercises",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "routine_templates_pk",
+      "table": "routine_templates",
       "entityType": "pks"
     },
     {
@@ -815,6 +1137,15 @@
       "name": "workouts_pk",
       "table": "workouts",
       "entityType": "pks"
+    },
+    {
+      "columns": [
+        "name"
+      ],
+      "nameExplicit": false,
+      "name": "exercises_name_unique",
+      "entityType": "uniques",
+      "table": "exercises"
     }
   ],
   "renames": []
