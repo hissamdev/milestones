@@ -2,9 +2,15 @@ import Popup from "@/components/ui/Popup";
 import ExercisesPopup from "@/components/ui/popups/ExercisesPopup";
 import { getRoutineDays, insertRoutineExercise } from "@/utils/routineHelpers";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { SportShoe } from "lucide-react-native";
+import { EllipsisVertical, Minus, Plus, SportShoe } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 type DayTemplateTEE = {
     id: string;
@@ -66,7 +72,7 @@ export default function EditRoutineScreen() {
             render: "Fri",
         },
     ];
-    const [selectedDay, setSelectedDay] = useState("Sat");
+    const [selectedDay, setSelectedDay] = useState("sat");
     const [fetchedDays, setFetchedDays] = useState<DayTemplateTEE[]>([]);
     const [fetchedCurrentDay, setFetchedCurrentDay] =
         useState<DayTemplateTEE | null>(null);
@@ -133,14 +139,13 @@ export default function EditRoutineScreen() {
     };
 
     const handleUpdateCurrentDay = async (newDay: string) => {
-        setSelectedDay(newDay);
-        const getDays = await getRoutineDays(routineId);
-        if (!getDays || !getDays.success || !getDays.data) {
-            return;
-        }
-        setFetchedDays(getDays.data);
+        // const getDays = await getRoutineDays(routineId);
+        // if (!getDays || !getDays.success || !getDays.data) {
+        //     return;
+        // }
+        // setFetchedDays(getDays.data);
 
-        const findCurrentDay = getDays.data.find(
+        const findCurrentDay = fetchedDays.find(
             (day) => day.dayTitle === newDay.toLocaleLowerCase(),
         );
         if (!findCurrentDay) {
@@ -148,9 +153,11 @@ export default function EditRoutineScreen() {
             return;
         }
         setFetchedCurrentDay(findCurrentDay);
-        console.log("Updated current day");
+        setSelectedDay(newDay);
     };
-
+    if (!fetchedCurrentDay || fetchedCurrentDay.dayTitle !== selectedDay) {
+        console.log("Empty found");
+    }
     return (
         <>
             <ScrollView>
@@ -220,16 +227,126 @@ export default function EditRoutineScreen() {
                                     Add your first exercise
                                 </Text>
                             ) : (
-                                fetchedCurrentDay.routineTemplate?.templateExercises.map(
-                                    (t) => (
-                                        <View key={t.id}>
-                                            <Text>
-                                                {t.exercise?.displayName}{" "}
-                                                {t.sequence}
-                                            </Text>
-                                        </View>
-                                    ),
-                                )
+                                <View style={{ display: "flex", gap: 10 }}>
+                                    {fetchedCurrentDay.routineTemplate?.templateExercises.map(
+                                        (t) => (
+                                            <View
+                                                key={t.id}
+                                                style={{
+                                                    display: "flex",
+                                                    flexDirection: "row",
+                                                    gap: 10,
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                            "space-between",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <TouchableOpacity>
+                                                        <Text>
+                                                            <EllipsisVertical
+                                                                size={18}
+                                                            />
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                    <Text>{t.sequence}</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        height: 50,
+                                                        display: "flex",
+                                                        flexDirection: "row",
+                                                        justifyContent:
+                                                            "space-between",
+                                                        flex: 1,
+                                                        borderWidth: 1,
+                                                        borderRadius: 3,
+                                                    }}
+                                                >
+                                                    <Text
+                                                        style={{
+                                                            marginLeft: 40,
+                                                            marginVertical:
+                                                                "auto",
+                                                        }}
+                                                    >
+                                                        {
+                                                            t.exercise
+                                                                ?.displayName
+                                                        }
+                                                    </Text>
+                                                    <View
+                                                        style={{
+                                                            display: "flex",
+                                                            flexDirection:
+                                                                "row",
+                                                            alignItems:
+                                                                "center",
+                                                        }}
+                                                    >
+                                                        <Text
+                                                            style={{
+                                                                marginRight: 30,
+                                                            }}
+                                                        >
+                                                            43s
+                                                        </Text>
+                                                        <TouchableOpacity
+                                                            style={{
+                                                                display: "flex",
+                                                                justifyContent:
+                                                                    "center",
+                                                                alignItems:
+                                                                    "center",
+                                                                paddingHorizontal: 12,
+                                                                alignSelf:
+                                                                    "stretch",
+                                                                backgroundColor:
+                                                                    "darkred",
+                                                            }}
+                                                        >
+                                                            <Text>
+                                                                <Minus
+                                                                    color="white"
+                                                                    strokeWidth={
+                                                                        1
+                                                                    }
+                                                                />
+                                                            </Text>
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity
+                                                            style={{
+                                                                display: "flex",
+                                                                justifyContent:
+                                                                    "center",
+                                                                alignItems:
+                                                                    "center",
+                                                                paddingHorizontal: 12,
+                                                                alignSelf:
+                                                                    "stretch",
+                                                                backgroundColor:
+                                                                    "limegreen",
+                                                            }}
+                                                        >
+                                                            <Text>
+                                                                <Plus
+                                                                    color="white"
+                                                                    strokeWidth={
+                                                                        1
+                                                                    }
+                                                                />
+                                                            </Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        ),
+                                    )}
+                                </View>
                             )}
                         </View>
                     </View>
@@ -263,3 +380,10 @@ export default function EditRoutineScreen() {
         </>
     );
 }
+
+const styles = StyleSheet.create({
+    flexRow: {
+        display: "flex",
+        flexDirection: "row",
+    },
+});
