@@ -76,18 +76,6 @@ export default function EditRoutineScreen() {
     const [fetchedDays, setFetchedDays] = useState<DayTemplateTEE[]>([]);
     const [fetchedCurrentDay, setFetchedCurrentDay] =
         useState<DayTemplateTEE | null>(null);
-    const [template, setTemplate] = useState<
-        {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            displayName: string;
-            type: string;
-            icon: string | null;
-            desc: string | null;
-        }[]
-    >([]);
     const [showExercises, setShowExercises] = useState(false);
     const { routineId }: { routineId: string } = useLocalSearchParams();
     const router = useRouter();
@@ -155,6 +143,40 @@ export default function EditRoutineScreen() {
         setFetchedCurrentDay(findCurrentDay);
         setSelectedDay(newDay);
     };
+    const handleUpdateAmount = (templateExerciseId: string) => {
+        const newNum = 1;
+        const findCurrentDay = fetchedDays.find(
+            (day) => day.dayTitle === selectedDay.toLocaleLowerCase(),
+        );
+        if (!findCurrentDay) {
+            setFetchedCurrentDay(null);
+            return;
+        }
+        setFetchedCurrentDay((prev) => {
+            if (!prev || !prev.routineTemplate) return null;
+            console.log("Updating amount for", templateExerciseId);
+            return {
+                ...prev,
+                routineTemplate: {
+                    ...prev.routineTemplate,
+                    templateExercises:
+                        prev.routineTemplate!.templateExercises.map((t) =>
+                            t.id === templateExerciseId
+                                ? {
+                                      ...t,
+                                      displayAmount: t.displayAmount
+                                          ? t.displayAmount + 1
+                                          : 1,
+                                  }
+                                : {
+                                      ...t,
+                                  },
+                        ),
+                },
+            };
+        });
+    };
+
     if (!fetchedCurrentDay || fetchedCurrentDay.dayTitle !== selectedDay) {
         console.log("Empty found");
     }
@@ -293,7 +315,9 @@ export default function EditRoutineScreen() {
                                                                 marginRight: 30,
                                                             }}
                                                         >
-                                                            43s
+                                                            {t.displayAmount
+                                                                ? t.displayAmount
+                                                                : "Null"}
                                                         </Text>
                                                         <TouchableOpacity
                                                             style={{
@@ -319,6 +343,11 @@ export default function EditRoutineScreen() {
                                                             </Text>
                                                         </TouchableOpacity>
                                                         <TouchableOpacity
+                                                            onPress={() =>
+                                                                handleUpdateAmount(
+                                                                    t.id,
+                                                                )
+                                                            }
                                                             style={{
                                                                 display: "flex",
                                                                 justifyContent:

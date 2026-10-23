@@ -10,14 +10,14 @@ export async function getExercises() {
     }
 }
 
-export async function createExercise(name: string, desc: string) {
+export async function createExercise(name: string, desc: string, type: string) {
     try {
         const res = await db
             .insert(exercises)
             .values({
                 name: name.trim().toLowerCase(),
                 displayName: name,
-                type: "duration",
+                type,
                 desc,
             })
             .returning();

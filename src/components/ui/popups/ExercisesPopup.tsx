@@ -21,6 +21,9 @@ export default function ExercisesPopup({
     const [showCreate, setShowCreate] = useState(false);
     const [exerciseName, setExerciseName] = useState("");
     const [exerciseDesc, setExerciseDesc] = useState("");
+    const [exerciseType, setExerciseType] = useState<"reps" | "duration">(
+        "reps",
+    );
     useEffect(() => {
         const load = async () => {
             const res = await getExercises();
@@ -32,7 +35,11 @@ export default function ExercisesPopup({
     }, []);
 
     const handleCreate = async () => {
-        const res = await createExercise(exerciseName, exerciseDesc);
+        const res = await createExercise(
+            exerciseName,
+            exerciseDesc,
+            exerciseType,
+        );
         if (!res) {
             console.error("Something went wrong");
             return;
@@ -87,6 +94,40 @@ export default function ExercisesPopup({
                             onChangeText={(t) => setExerciseDesc(t)}
                             style={{ borderWidth: 1 }}
                         />
+                        <Text style={{ marginTop: 20 }}>Exercise type</Text>
+                        <View
+                            style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: 5,
+                            }}
+                        >
+                            <TouchableOpacity
+                                onPress={() => setExerciseType("reps")}
+                                style={{
+                                    paddingVertical: 6,
+                                    flex: 1,
+                                    borderWidth: 1,
+                                }}
+                            >
+                                <Text style={{ textAlign: "center" }}>
+                                    Repetition
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setExerciseType("duration")}
+                                style={{
+                                    paddingVertical: 6,
+                                    flex: 1,
+                                    borderWidth: 1,
+                                }}
+                            >
+                                <Text style={{ textAlign: "center" }}>
+                                    Duration
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                         <View
                             style={{
                                 marginTop: 20,
