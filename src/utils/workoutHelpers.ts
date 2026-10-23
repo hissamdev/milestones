@@ -1,5 +1,6 @@
 import { db } from "@/db/client";
 import { workouts } from "@/db/schema/workouts";
+import { generateUuid } from "./helpers";
 
 export async function getCurrentDayWorkout() {
     try {
@@ -10,7 +11,12 @@ export async function getCurrentDayWorkout() {
         });
         if (!res) {
             try {
-                const create = await db.insert(workouts).values({}).returning();
+                const create = await db
+                    .insert(workouts)
+                    .values({
+                        id: generateUuid(),
+                    })
+                    .returning();
 
                 return create[0];
             } catch (err) {

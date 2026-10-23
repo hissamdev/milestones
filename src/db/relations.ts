@@ -97,6 +97,7 @@ export const workoutRelations = defineRelationsPart(
             routineTemplate: r.one.routineTemplates({
                 from: r.daysOtw.routineTemplateId,
                 to: r.routineTemplates.id,
+                optional: false,
             }),
         },
         routineTemplates: {

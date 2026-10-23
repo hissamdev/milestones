@@ -1,11 +1,7 @@
-import { generateUuid } from "@/utils/helpers";
 import * as s from "drizzle-orm/sqlite-core";
 
 export const workouts = s.sqliteTable("workouts", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     createdAt: s
         .integer("created_at", { mode: "timestamp" })
         .notNull()
@@ -19,10 +15,7 @@ export const workouts = s.sqliteTable("workouts", {
 });
 
 export const sessions = s.sqliteTable("sessions", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     workoutId: s
         .text("workout_id")
         .notNull()
@@ -39,10 +32,7 @@ export const sessions = s.sqliteTable("sessions", {
 });
 
 export const sessionData = s.sqliteTable("session_data", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     sessionId: s
         .text("session_id")
         .notNull()
@@ -63,10 +53,7 @@ export const sessionData = s.sqliteTable("session_data", {
 
 // Independent list of available exercises for autocomplete
 export const exercises = s.sqliteTable("exercises", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     createdAt: s
         .integer("created_at", { mode: "timestamp" })
         .notNull()
@@ -85,10 +72,7 @@ export const exercises = s.sqliteTable("exercises", {
 });
 
 export const standaloneExercises = s.sqliteTable("standalone_exercises", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     workoutId: s
         .text("workout_id")
         .notNull()
@@ -109,10 +93,7 @@ export const standaloneExercises = s.sqliteTable("standalone_exercises", {
 });
 
 export const routines = s.sqliteTable("routines", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     createdAt: s
         .integer("created_at", { mode: "timestamp" })
         .notNull()
@@ -125,10 +106,7 @@ export const routines = s.sqliteTable("routines", {
 });
 
 export const daysOtw = s.sqliteTable("days_otw", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     routineId: s
         .text("routine_id")
         .notNull()
@@ -141,20 +119,14 @@ export const daysOtw = s.sqliteTable("days_otw", {
 });
 
 export const routineTemplates = s.sqliteTable("routine_templates", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     restDay: s.integer({ mode: "boolean" }).notNull().default(false),
 });
 
 export const routineTemplateExercises = s.sqliteTable(
     "routine_template_exercises",
     {
-        id: s
-            .text("id")
-            .primaryKey()
-            .$defaultFn(() => generateUuid()),
+        id: s.text("id").primaryKey(),
         templateId: s
             .text("template_id")
             .notNull()
@@ -163,17 +135,14 @@ export const routineTemplateExercises = s.sqliteTable(
             .text("exercise_id")
             .notNull()
             .references(() => exercises.id),
-        displayAmount: s.integer("display_amount"), // Number of Seconds or Reps. The exercise key contains the type of duration or reps
+        displayAmount: s.integer("display_amount").notNull().default(0), // Number of Seconds or Reps. The exercise key contains the type of duration or reps
         displayRestAmount: s.integer("rest_time"),
         sequence: s.integer("sequence").notNull(),
     },
 );
 
 export const routineDataMetadata = s.sqliteTable("routine_tl_data", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     routineId: s
         .text("routine_id")
         .notNull()
@@ -187,10 +156,7 @@ export const routineDataMetadata = s.sqliteTable("routine_tl_data", {
 });
 
 export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
-    id: s
-        .text("id")
-        .primaryKey()
-        .$defaultFn(() => generateUuid()),
+    id: s.text("id").primaryKey(),
     routineId: s.text("routine_id").references(() => routines.id),
     parentMetadataId: s
         .text("parent_metadata_id")

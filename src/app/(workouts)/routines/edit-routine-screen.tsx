@@ -1,8 +1,13 @@
+import EditExercises from "@/components/sections/EditExercises";
 import Popup from "@/components/ui/Popup";
 import ExercisesPopup from "@/components/ui/popups/ExercisesPopup";
-import { getRoutineDays, insertRoutineExercise } from "@/utils/routineHelpers";
+import {
+    getRoutineDays,
+    insertRoutineExercise,
+    updateAmount,
+} from "@/utils/routineHelpers";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { EllipsisVertical, Minus, Plus, SportShoe } from "lucide-react-native";
+import { SportShoe } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
     ScrollView,
@@ -12,7 +17,7 @@ import {
     View,
 } from "react-native";
 
-type DayTemplateTEE = {
+export type DayTemplateTEE = {
     id: string;
     routineId: string;
     routineTemplateId: string;
@@ -38,7 +43,7 @@ type DayTemplateTEE = {
                 icon: string | null;
             } | null;
         }[];
-    } | null;
+    };
 };
 
 export default function EditRoutineScreen() {
@@ -143,43 +148,75 @@ export default function EditRoutineScreen() {
         setFetchedCurrentDay(findCurrentDay);
         setSelectedDay(newDay);
     };
-    const handleUpdateAmount = (templateExerciseId: string) => {
-        const newNum = 1;
-        const findCurrentDay = fetchedDays.find(
-            (day) => day.dayTitle === selectedDay.toLocaleLowerCase(),
+    const handleUpdateAmount = async (
+        templateExerciseId: string,
+        mode: "add" | "subtract",
+    ) => {
+        const currentDay = fetchedDays.find((d) => d.dayTitle === selectedDay);
+        if (!currentDay) return;
+
+        const exactExercise = currentDay.routineTemplate.templateExercises.find(
+            (te) => te.id === templateExerciseId,
         );
-        if (!findCurrentDay) {
-            setFetchedCurrentDay(null);
+
+        if (!exactExercise) {
             return;
         }
-        setFetchedCurrentDay((prev) => {
-            if (!prev || !prev.routineTemplate) return null;
-            console.log("Updating amount for", templateExerciseId);
-            return {
-                ...prev,
-                routineTemplate: {
-                    ...prev.routineTemplate,
-                    templateExercises:
-                        prev.routineTemplate!.templateExercises.map((t) =>
-                            t.id === templateExerciseId
-                                ? {
-                                      ...t,
-                                      displayAmount: t.displayAmount
-                                          ? t.displayAmount + 1
-                                          : 1,
-                                  }
-                                : {
-                                      ...t,
-                                  },
-                        ),
-                },
-            };
-        });
+        let newAmount: number;
+        const previousAmount = exactExercise.displayAmount;
+
+        if (exactExercise.exercise?.type === "duration") {
+            if (mode === "add") {
+                newAmount = previousAmount === null ? 10 : previousAmount + 10;
+            } else {
+                newAmount =
+                    previousAmount === null || previousAmount - 10 <= 0
+                        ? 0
+                        : previousAmount - 10;
+            }
+        } else {
+            // Type reps
+            if (mode === "add") {
+                newAmount = previousAmount === null ? 1 : previousAmount + 1;
+            } else {
+                newAmount =
+                    previousAmount === null || previousAmount - 1 <= 0
+                        ? 0
+                        : previousAmount - 1;
+            }
+        }
+        setFetchedDays((prev) =>
+            prev.map((d) =>
+                d.dayTitle === selectedDay
+                    ? {
+                          ...d,
+                          routineTemplate: {
+                              ...d.routineTemplate,
+                              templateExercises:
+                                  d.routineTemplate!.templateExercises.map(
+                                      (te) =>
+                                          te.id === templateExerciseId
+                                              ? {
+                                                    ...te,
+                                                    displayAmount: newAmount,
+                                                }
+                                              : {
+                                                    ...te,
+                                                },
+                                  ),
+                          },
+                      }
+                    : {
+                          ...d,
+                      },
+            ),
+        );
+        updateAmount(templateExerciseId, newAmount);
+        console.log("Uh", newAmount);
     };
 
-    if (!fetchedCurrentDay || fetchedCurrentDay.dayTitle !== selectedDay) {
-        console.log("Empty found");
-    }
+    const currentDay = fetchedDays.find((d) => d.dayTitle === selectedDay);
+
     return (
         <>
             <ScrollView>
@@ -234,8 +271,8 @@ export default function EditRoutineScreen() {
                             Exercises for {selectedDay}
                         </Text>
                         <View style={{ marginTop: 20 }}>
-                            {!fetchedCurrentDay ||
-                            fetchedCurrentDay.dayTitle !== selectedDay ? (
+                            {!currentDay ||
+                            currentDay.dayTitle !== selectedDay ? (
                                 <Text
                                     style={{
                                         color: "gray",
@@ -249,133 +286,10 @@ export default function EditRoutineScreen() {
                                     Add your first exercise
                                 </Text>
                             ) : (
-                                <View style={{ display: "flex", gap: 10 }}>
-                                    {fetchedCurrentDay.routineTemplate?.templateExercises.map(
-                                        (t) => (
-                                            <View
-                                                key={t.id}
-                                                style={{
-                                                    display: "flex",
-                                                    flexDirection: "row",
-                                                    gap: 10,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                            "space-between",
-                                                        alignItems: "center",
-                                                    }}
-                                                >
-                                                    <TouchableOpacity>
-                                                        <Text>
-                                                            <EllipsisVertical
-                                                                size={18}
-                                                            />
-                                                        </Text>
-                                                    </TouchableOpacity>
-                                                    <Text>{t.sequence}</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        height: 50,
-                                                        display: "flex",
-                                                        flexDirection: "row",
-                                                        justifyContent:
-                                                            "space-between",
-                                                        flex: 1,
-                                                        borderWidth: 1,
-                                                        borderRadius: 3,
-                                                    }}
-                                                >
-                                                    <Text
-                                                        style={{
-                                                            marginLeft: 40,
-                                                            marginVertical:
-                                                                "auto",
-                                                        }}
-                                                    >
-                                                        {
-                                                            t.exercise
-                                                                ?.displayName
-                                                        }
-                                                    </Text>
-                                                    <View
-                                                        style={{
-                                                            display: "flex",
-                                                            flexDirection:
-                                                                "row",
-                                                            alignItems:
-                                                                "center",
-                                                        }}
-                                                    >
-                                                        <Text
-                                                            style={{
-                                                                marginRight: 30,
-                                                            }}
-                                                        >
-                                                            {t.displayAmount
-                                                                ? t.displayAmount
-                                                                : "Null"}
-                                                        </Text>
-                                                        <TouchableOpacity
-                                                            style={{
-                                                                display: "flex",
-                                                                justifyContent:
-                                                                    "center",
-                                                                alignItems:
-                                                                    "center",
-                                                                paddingHorizontal: 12,
-                                                                alignSelf:
-                                                                    "stretch",
-                                                                backgroundColor:
-                                                                    "darkred",
-                                                            }}
-                                                        >
-                                                            <Text>
-                                                                <Minus
-                                                                    color="white"
-                                                                    strokeWidth={
-                                                                        1
-                                                                    }
-                                                                />
-                                                            </Text>
-                                                        </TouchableOpacity>
-                                                        <TouchableOpacity
-                                                            onPress={() =>
-                                                                handleUpdateAmount(
-                                                                    t.id,
-                                                                )
-                                                            }
-                                                            style={{
-                                                                display: "flex",
-                                                                justifyContent:
-                                                                    "center",
-                                                                alignItems:
-                                                                    "center",
-                                                                paddingHorizontal: 12,
-                                                                alignSelf:
-                                                                    "stretch",
-                                                                backgroundColor:
-                                                                    "limegreen",
-                                                            }}
-                                                        >
-                                                            <Text>
-                                                                <Plus
-                                                                    color="white"
-                                                                    strokeWidth={
-                                                                        1
-                                                                    }
-                                                                />
-                                                            </Text>
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                        ),
-                                    )}
-                                </View>
+                                <EditExercises
+                                    fetchedCurrentDay={currentDay}
+                                    handleUpdateAmount={handleUpdateAmount}
+                                />
                             )}
                         </View>
                     </View>
