@@ -8,6 +8,9 @@ export async function getCurrentDayWorkout() {
             where: {
                 creationDay: new Date().toDateString(),
             },
+            with: {
+                routines: true,
+            },
         });
         if (!res) {
             try {
