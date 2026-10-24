@@ -1,4 +1,4 @@
-import { DayTemplateTEE } from "@/app/(workouts)/routines/edit-routine-screen";
+import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
 import { EllipsisVertical, Minus, Plus } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 

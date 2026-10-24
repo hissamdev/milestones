@@ -1,0 +1,101 @@
+import Routines from "@/components/sections/routines/Routines";
+import CreateExercise from "@/components/ui/CreateExercise";
+import { exercises, workouts } from "@/db/schema/workouts";
+import { createRoutine } from "@/utils/routineHelpers";
+import { getCurrentDayWorkout } from "@/utils/workoutHelpers";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+("@/components/ui/Popup");
+
+type Workouts = typeof workouts.$inferSelect;
+type Exercise = typeof exercises.$inferSelect;
+
+export default function Workouts() {
+    const [workouts, setWorkouts] = useState<Workouts | null>(null);
+    const [routineName, setRoutineName] = useState("");
+    const [uiMessage, setUiMessage] = useState("");
+    const [standaloneExercises, setStandaloneExercises] = useState([
+        {
+            id: "id-1",
+            name: "Plank",
+            type: "Duration",
+        },
+    ]);
+    const [expandExercise, setExpandExercise] = useState<{
+        id: string;
+    } | null>({
+        id: "id-1",
+    });
+    const router = useRouter();
+
+    useEffect(() => {
+        const load = async () => {
+            const res = await getCurrentDayWorkout();
+            if (!res) return console.error("Failed to load workouts");
+            setWorkouts(res);
+        };
+
+        load();
+    }, []);
+
+    const handleAddStandaloneExercise = () => {
+        setStandaloneExercises((prev) => [
+            {
+                id: "id-" + new Date(),
+                name: "Random kid",
+                type: "typeshi",
+            },
+            ...prev,
+        ]);
+    };
+
+    const handleExpand = (id: string) => {
+        if (!id) return;
+        setExpandExercise(
+            expandExercise?.id === id
+                ? null
+                : {
+                      id,
+                  },
+        );
+    };
+
+    const handleCreateRoutine = async () => {
+        const res = await createRoutine(routineName);
+        if (!res || !res.success || !res.data) {
+            setUiMessage("There was an error, please try again later");
+            return;
+        }
+        setUiMessage("Routine created");
+        router.push({
+            pathname: "/(workouts)/routines/edit-routine-screen",
+            params: {
+                routineId: res.data.id,
+            },
+        });
+    };
+
+    if (!workouts) return;
+    return (
+        <View style={{ flex: 1, position: "relative", padding: 10 }}>
+            {/* <TouchableOpacity
+                style={{
+                    alignSelf: "flex-start",
+                    marginHorizontal: "auto",
+                    marginTop: 70,
+                    paddingVertical: 12,
+                    paddingHorizontal: 24,
+                    borderColor: "black",
+                    borderWidth: 1,
+                }}
+            >
+                <Text>Create Property</Text>
+            </TouchableOpacity> */}
+            <Text>{workouts?.creationDay}</Text>
+            <Routines />
+
+            <CreateExercise />
+        </View>
+    );
+}

@@ -50,7 +50,6 @@ export const workoutRelations = defineRelationsPart(
         workouts: {
             sessions: r.many.sessions(),
             standaloneExercises: r.many.standaloneExercises(),
-            routines: r.many.routines(),
         },
         exercises: {
             standalones: r.many.standaloneExercises(),

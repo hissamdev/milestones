@@ -20,6 +20,7 @@ export default function CreateExercise() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    zIndex: 100,
                 }}
             >
                 <Plus color="white" />

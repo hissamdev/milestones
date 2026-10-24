@@ -39,7 +39,15 @@ export async function getRoutines() {
     try {
         const res = await db.query.routines.findMany({
             with: {
-                daysOtw: true,
+                daysOtw: {
+                    with: {
+                        routineTemplate: {
+                            with: {
+                                templateExercises: true,
+                            },
+                        },
+                    },
+                },
             },
         });
         return {

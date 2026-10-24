@@ -7,7 +7,7 @@ export default function RoutineScreen() {
     const router = useRouter();
     const { routineId } = useLocalSearchParams();
     if (!routineId) {
-        router.push("/(workouts)/workouts-screen");
+        router.push("/(tabs)/(workouts)/workouts-screen");
         return;
     }
     useEffect(() => {
