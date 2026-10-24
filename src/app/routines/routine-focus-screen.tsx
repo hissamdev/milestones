@@ -6,9 +6,5 @@ import { View } from "react-native";
 export default function RoutineFocusScreen() {
     const [isRest, setIsRest] = useState(false);
 
-    return (
-        <View style={{ padding: 40 }}>
-            {isRest ? <RestScreen /> : <ExerciseScreen />}
-        </View>
-    );
+    return <View>{isRest ? <RestScreen /> : <ExerciseScreen />}</View>;
 }
