@@ -194,3 +194,36 @@ export async function updateAmount(
         console.error(err);
     }
 }
+
+const daysOfTheWeek = ["sat", "sun", "mon", "tue", "wed", "thu", "fri"];
+
+export async function getCurrentDayExercises(routineId: string) {
+    const currentDay = daysOfTheWeek[(new Date().getDay() + 1) % 7];
+
+    try {
+        const res = await db.query.daysOtw.findFirst({
+            where: {
+                routineId,
+                dayTitle: currentDay,
+            },
+            with: {
+                routineTemplate: {
+                    with: {
+                        templateExercises: {
+                            orderBy: {
+                                sequence: "asc",
+                            },
+                            with: {
+                                exercise: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        return res;
+    } catch (err) {
+        console.error("Something went wrong", err);
+    }
+}

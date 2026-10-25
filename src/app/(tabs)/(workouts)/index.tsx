@@ -8,11 +8,11 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 ("@/components/ui/Popup");
 
-type Workouts = typeof workouts.$inferSelect;
+type WorkoutsType = typeof workouts.$inferSelect;
 type Exercise = typeof exercises.$inferSelect;
 
 export default function Workouts() {
-    const [workouts, setWorkouts] = useState<Workouts | null>(null);
+    const [workouts, setWorkouts] = useState<WorkoutsType | null>(null);
     const [routineName, setRoutineName] = useState("");
     const [uiMessage, setUiMessage] = useState("");
     const [standaloneExercises, setStandaloneExercises] = useState([

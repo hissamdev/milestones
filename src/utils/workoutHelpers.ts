@@ -20,7 +20,7 @@ export async function getCurrentDayWorkout() {
 
                 return create[0];
             } catch (err) {
-                console.error("Something went wrong: Workouts");
+                console.error("Something went wrong: Workouts", err);
                 return;
             }
         }

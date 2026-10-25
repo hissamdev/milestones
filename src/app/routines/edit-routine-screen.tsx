@@ -9,13 +9,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SportShoe } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export type DayTemplateTEE = {
     id: string;
@@ -323,10 +317,3 @@ export default function EditRoutineScreen() {
         </>
     );
 }
-
-const styles = StyleSheet.create({
-    flexRow: {
-        display: "flex",
-        flexDirection: "row",
-    },
-});

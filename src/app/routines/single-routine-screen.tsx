@@ -17,6 +17,9 @@ export default function SingleRoutineScreen() {
                     onPress={() =>
                         router.push({
                             pathname: "/routines/routine-focus-screen",
+                            params: {
+                                routineId,
+                            },
                         })
                     }
                     style={{

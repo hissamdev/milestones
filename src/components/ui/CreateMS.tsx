@@ -1,4 +1,3 @@
-import { MilestoneWithData } from "@/app";
 import { createMilestone } from "@/utils/milestoneHelpers";
 import { SetStateAction, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
