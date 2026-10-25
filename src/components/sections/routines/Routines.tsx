@@ -53,7 +53,7 @@ export default function Routines() {
             return;
         }
         router.push({
-            pathname: "/(tabs)/(workouts)/routines/edit-routine-screen",
+            pathname: "/routines/edit-routine-screen",
             params: {
                 routineId: res.data.id,
             },
@@ -70,7 +70,6 @@ export default function Routines() {
                             const activeDays = routine.daysOtw.filter(
                                 (day) => day.routineTemplate.restDay === false,
                             );
-                            console.log("Active days", activeDays);
 
                             return (
                                 <View

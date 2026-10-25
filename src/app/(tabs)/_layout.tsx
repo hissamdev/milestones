@@ -5,14 +5,14 @@ export default function TabsLayout() {
     return (
         <Tabs screenOptions={{ headerShown: false }}>
             <Tabs.Screen
-                name="(workouts)/workouts-screen"
+                name="(workouts)/index"
                 options={{
                     title: "Workouts",
                     tabBarIcon: () => <BookSearch />,
                 }}
             />
             <Tabs.Screen
-                name="(milestones)/milestones"
+                name="(milestones)/milestones-screen"
                 options={{ title: "Milestones", tabBarIcon: () => <Weight /> }}
             />
         </Tabs>

@@ -1,6 +1,7 @@
 import CreateMS from "@/components/ui/CreateMS";
 import { db } from "@/db/client";
 import { milestoneData, milestones } from "@/db/schema/milestones";
+import { generateUuid } from "@/utils/helpers";
 import { getMilestones } from "@/utils/milestoneHelpers";
 import { useRouter } from "expo-router";
 import { Clock, Plus } from "lucide-react-native";
@@ -43,6 +44,7 @@ export default function Milestones() {
             const res = await db
                 .insert(milestoneData)
                 .values({
+                    id: generateUuid(),
                     milestoneId: id,
                 })
                 .returning();
@@ -59,7 +61,7 @@ export default function Milestones() {
                 ),
             );
             router.push({
-                pathname: "/(milestones)/duration-controls",
+                pathname: "/(tabs)/(milestones)/duration-controls",
                 params: { id, dataId: res[0].id },
             });
             return;

@@ -69,7 +69,7 @@ export default function Workouts() {
         }
         setUiMessage("Routine created");
         router.push({
-            pathname: "/(workouts)/routines/edit-routine-screen",
+            pathname: "/routines/edit-routine-screen",
             params: {
                 routineId: res.data.id,
             },
