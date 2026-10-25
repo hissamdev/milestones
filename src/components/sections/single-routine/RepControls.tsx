@@ -1,4 +1,4 @@
-import { Dumbbell, Minus, Plus } from "lucide-react-native";
+import { Clock, Dumbbell, Minus, Plus } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 import { CurrentActivity } from "./ExerciseScreen";
 
@@ -47,9 +47,7 @@ export default function RepControls({
                         gap: 5,
                     }}
                 >
-                    <Text style={{ fontSize: 30, lineHeight: 50 }}>
-                        {(!!currentActivity.displayAmount).toString()}
-                    </Text>
+                    <Text style={{ fontSize: 30, lineHeight: 50 }}>8</Text>
                     <Text
                         style={{
                             paddingTop: 5,
@@ -98,9 +96,10 @@ export default function RepControls({
                     </TouchableOpacity>
                 </View>
             </View>
+            {/*Second box */}
             <View
                 style={{
-                    paddingHorizontal: 20,
+                    paddingHorizontal: 10,
                     paddingVertical: 10,
                     borderWidth: 1,
                     flex: 1,
@@ -109,36 +108,84 @@ export default function RepControls({
             >
                 <View
                     style={{
-                        marginBottom: 10,
                         display: "flex",
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "space-between",
                     }}
                 >
-                    <Text>Completed</Text>
+                    <Text>Set Duration</Text>
                     <Text>
-                        <Dumbbell size={15} />
+                        <Clock size={15} />
                     </Text>
                 </View>
                 <View
                     style={{
                         display: "flex",
                         flexDirection: "row",
+                        justifyContent: "center",
                         gap: 5,
                     }}
                 >
-                    <Text style={{ fontSize: 50, lineHeight: 50 }}>8</Text>
+                    <Text style={{ fontSize: 30, lineHeight: 50 }}>00:25</Text>
                     <Text
                         style={{
-                            paddingTop: 20,
-                            fontSize: 16,
+                            paddingTop: 5,
+                            fontSize: 14,
                             textTransform: "uppercase",
                             verticalAlign: "middle",
                         }}
                     >
-                        reps
+                        {currentActivity.exercise?.type === "reps"
+                            ? "reps"
+                            : "s"}
                     </Text>
+                </View>
+                <View
+                    style={{
+                        paddingTop: 5,
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "stretch",
+                        borderTopWidth: 1.5,
+                        borderTopColor: "#EAEAEF",
+                        gap: 10,
+                    }}
+                >
+                    {/* <TouchableOpacity
+                        style={{
+                            paddingVertical: 3,
+                            flex: 1,
+                            backgroundColor: "#EFEDEE",
+                            borderRadius: 5,
+                        }}
+                    >
+                        <Text style={{ textAlign: "center" }}>
+                            <Minus />
+                        </Text>
+                    </TouchableOpacity> */}
+                    <TouchableOpacity
+                        style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            paddingVertical: 3,
+                            flex: 1,
+                            backgroundColor: "#094CB2",
+                            borderRadius: 5,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                textAlign: "center",
+                                textAlignVertical: "center",
+                                lineHeight: 10,
+                                color: "white",
+                            }}
+                        >
+                            Start
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </View>

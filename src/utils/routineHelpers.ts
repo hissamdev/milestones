@@ -204,7 +204,7 @@ export async function getCurrentDayExercises(routineId: string) {
         const res = await db.query.daysOtw.findFirst({
             where: {
                 routineId,
-                dayTitle: currentDay,
+                dayTitle: "sat",
             },
             with: {
                 routineTemplate: {

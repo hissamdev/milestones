@@ -23,7 +23,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen
                 name="routines/single-routine-screen"
-                options={{ title: "Workouts" }}
+                options={{ title: "Routine" }}
             />
         </Stack>
     );

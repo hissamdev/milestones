@@ -3,10 +3,9 @@ import RestScreen from "@/components/sections/single-routine/RestScreen";
 import { getCurrentDayExercises } from "@/utils/routineHelpers";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 
 export default function RoutineFocusScreen() {
-    const [isRest, setIsRest] = useState(false);
     const [currentSequence, setCurrentSequence] = useState(1);
     const { routineId }: { routineId: string } = useLocalSearchParams();
     const [currentDay, setCurrentDay] = useState<{
@@ -57,8 +56,7 @@ export default function RoutineFocusScreen() {
     );
 
     if (!currentDay || !currentActivity) {
-        console.log("Current day or activity not found", currentDay);
-        return;
+        return <Text>Current day or activity not found {routineId}</Text>;
     }
     return (
         <View style={{ flex: 1 }}>
@@ -66,8 +64,11 @@ export default function RoutineFocusScreen() {
                 <RestScreen />
             ) : (
                 <ExerciseScreen
+                    routineTemplate={currentDay.routineTemplate}
                     currentActivity={currentActivity}
+                    currentSequence={currentSequence}
                     setCurrentSequence={setCurrentSequence}
+                    routineId={routineId}
                 />
             )}
         </View>

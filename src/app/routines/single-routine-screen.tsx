@@ -6,6 +6,7 @@ export default function SingleRoutineScreen() {
     const router = useRouter();
 
     if (!routineId) {
+        console.error("No id");
         return <Text>No id</Text>;
     }
     return (
@@ -29,6 +30,23 @@ export default function SingleRoutineScreen() {
                     }}
                 >
                     <Text>Start Routine</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() =>
+                        router.push({
+                            pathname: "/routines/edit-routine-screen",
+                            params: {
+                                routineId,
+                            },
+                        })
+                    }
+                    style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderWidth: 1,
+                    }}
+                >
+                    <Text>Edit Routine</Text>
                 </TouchableOpacity>
             </View>
         </View>

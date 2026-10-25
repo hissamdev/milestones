@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import {
     ChevronLeft,
     ChevronRight,
@@ -6,9 +7,9 @@ import {
     PlusCircle,
     TrophyIcon,
 } from "lucide-react-native";
-import { SetStateAction } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import RepControls from "./RepControls";
+import DurationControls from "./DurationControls";
 // import * as SVG from "react-native-svg";
 // import TrophyFill from "../../../../assets/images/trophy-fill-icon.svg";
 
@@ -31,13 +32,81 @@ export type CurrentActivity = {
     } | null;
 };
 
+type RoutineTemplate = {
+    id: string;
+    restDay: boolean;
+    templateExercises: {
+        id: string;
+        exerciseId: string;
+        sequence: number;
+        templateId: string;
+        displayAmount: number;
+        displayRestAmount: number | null;
+        exercise: {
+            id: string;
+            name: string;
+            desc: string | null;
+            type: string;
+            createdAt: Date;
+            updatedAt: Date;
+            displayName: string;
+            icon: string | null;
+        } | null;
+    }[];
+};
+
 export default function ExerciseScreen({
+    routineTemplate,
     setCurrentSequence,
-    currentActivity,
+    currentSequence,
+    routineId,
 }: {
+    routineTemplate: RoutineTemplate;
     setCurrentSequence: React.Dispatch<SetStateAction<number>>;
+    currentSequence: number;
     currentActivity: CurrentActivity;
+    routineId: string;
 }) {
+    const [isNextAvailable, setIsNextAvailable] = useState(false);
+
+    const router = useRouter();
+
+    useEffect(() => {
+        const load = () => {
+            const isNextAvailable = routineTemplate.templateExercises.find(
+                (te) => te.sequence === currentSequence + 1,
+            );
+            console.log("Next availability", isNextAvailable);
+            if (!isNextAvailable) {
+                setIsNextAvailable(false);
+                return;
+            }
+            setIsNextAvailable(true);
+        };
+
+        load();
+    }, [currentSequence]);
+
+    const handleNextSequence = () => {
+        if (!isNextAvailable) {
+            router.push({
+                pathname: "/routines/single-routine-screen",
+                params: {
+                    routineId,
+                },
+            });
+            return;
+        }
+
+        setCurrentSequence((prev) => prev + 1);
+    };
+
+    const currentActivity = routineTemplate.templateExercises.find(
+        (te) => te.sequence === currentSequence,
+    );
+
+    if (!currentActivity) return;
+
     return (
         <View style={{ flex: 1 }}>
             <View
@@ -124,7 +193,15 @@ export default function ExerciseScreen({
                 }}
             >
                 <View style={{}}>
-                    <RepControls currentActivity={currentActivity} />
+                    {/* {currentActivity.exercise?.type &&
+                        currentActivity.exercise?.type === "reps" ? (
+                            <RepControls currentActivity={currentActivity} />
+                        ) : (
+                            <DurationControls
+                                currentActivity={currentActivity}
+                            />
+                        )} */}
+                    <DurationControls currentActivity={currentActivity} />
 
                     <View>
                         <View
@@ -223,9 +300,7 @@ export default function ExerciseScreen({
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            onPress={() =>
-                                setCurrentSequence((prev) => prev + 1)
-                            }
+                            onPress={handleNextSequence}
                             style={[
                                 styles.stepButtons,
                                 {
@@ -244,7 +319,7 @@ export default function ExerciseScreen({
                             <Text
                                 style={[styles.buttonText, { color: "white" }]}
                             >
-                                Done
+                                {isNextAvailable ? "Done" : "Finish"}
                             </Text>
                         </TouchableOpacity>
                     </View>
