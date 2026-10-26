@@ -1,3 +1,4 @@
+import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
 import { useRouter } from "expo-router";
 import {
     ChevronLeft,
@@ -61,10 +62,10 @@ export default function ExerciseScreen({
     currentSequence,
     routineId,
 }: {
-    routineTemplate: RoutineTemplate;
+    routineTemplate: DayTemplateTEE["routineTemplate"];
     setCurrentSequence: React.Dispatch<SetStateAction<number>>;
     currentSequence: number;
-    currentActivity: CurrentActivity;
+    currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];
     routineId: string;
 }) {
     const [isNextAvailable, setIsNextAvailable] = useState(false);

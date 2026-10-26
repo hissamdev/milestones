@@ -1,3 +1,4 @@
+import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
 import {
     Hourglass,
     Minus,
@@ -7,12 +8,11 @@ import {
     Timer,
 } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
-import { CurrentActivity } from "./ExerciseScreen";
 
 export default function RepControls({
     currentActivity,
 }: {
-    currentActivity: CurrentActivity;
+    currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];
 }) {
     return (
         <View
