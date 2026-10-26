@@ -94,8 +94,8 @@ export async function getRoutineDays(routineId: string) {
 export async function insertRoutineExercise(
     routineId: string,
     selectedDay: string,
-    exerciseId: string,
     sequence: number,
+    exerciseId?: string,
 ) {
     try {
         const res = await db.query.daysOtw.findFirst({
@@ -104,10 +104,23 @@ export async function insertRoutineExercise(
                 dayTitle: selectedDay.trim().toLocaleLowerCase(),
             },
             with: {
-                routineTemplate: true,
+                routineTemplate: {
+                    with: {
+                        templateExercises: {
+                            with: {
+                                exercise: true,
+                            },
+                        },
+                    },
+                },
             },
         });
+
         if (!res) {
+            if (!exerciseId) {
+                console.error("Day was not found for rest type", exerciseId);
+                return;
+            }
             // Check if the day exists, if not, create it, and insert the exercise in its appropriate template
             const templateInsert = await db
                 .insert(routineTemplates)
@@ -147,12 +160,47 @@ export async function insertRoutineExercise(
             return days;
         }
 
+        if (!exerciseId) {
+            const previousExerciseExists =
+                res.routineTemplate.templateExercises.find(
+                    (te) => te.sequence === sequence - 1,
+                );
+            if (!previousExerciseExists) {
+                return;
+            }
+
+            await db.insert(routineTemplateExercises).values({
+                id: generateUuid(),
+                templateId: res.routineTemplate.id,
+                sequence,
+                displayRestAmount: 120,
+                isRestType: true,
+            });
+            const days = await db.query.daysOtw.findMany({
+                with: {
+                    routineTemplate: {
+                        with: {
+                            templateExercises: {
+                                with: {
+                                    exercise: true,
+                                },
+                                orderBy: {
+                                    sequence: "asc",
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+            return days;
+        }
         await db.insert(routineTemplateExercises).values({
             id: generateUuid(),
             templateId: res.routineTemplateId,
             exerciseId,
             sequence,
         });
+
         const days = await db.query.daysOtw.findMany({
             with: {
                 routineTemplate: {
@@ -169,7 +217,7 @@ export async function insertRoutineExercise(
                 },
             },
         });
-
+        console.log(JSON.stringify(days, null, 2));
         return days;
     } catch (err: any) {
         console.error("Failed to insert into template or create day", err);
@@ -221,7 +269,6 @@ export async function getCurrentDayExercises(routineId: string) {
                 },
             },
         });
-
         return res;
     } catch (err) {
         console.error("Something went wrong", err);

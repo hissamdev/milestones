@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "f50ff70b-9d33-4983-99ff-39cb8cb31b55",
+  "id": "955299c6-9231-4281-a409-17e6eb5ec78c",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -479,6 +479,26 @@
       "default": null,
       "generated": null,
       "name": "exercise_id",
+      "entityType": "columns",
+      "table": "routine_template_exercises"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "name": "display_amount",
+      "entityType": "columns",
+      "table": "routine_template_exercises"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "false",
+      "generated": null,
+      "name": "is_rest_type",
       "entityType": "columns",
       "table": "routine_template_exercises"
     },

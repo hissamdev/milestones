@@ -70,6 +70,8 @@ CREATE TABLE `routine_template_exercises` (
 	`id` text PRIMARY KEY,
 	`template_id` text NOT NULL,
 	`exercise_id` text,
+	`display_amount` integer DEFAULT 0,
+	`is_rest_type` integer DEFAULT false NOT NULL,
 	`rest_time` integer,
 	`sequence` integer NOT NULL,
 	CONSTRAINT `fk_routine_template_exercises_template_id_routine_templates_id_fk` FOREIGN KEY (`template_id`) REFERENCES `routine_templates`(`id`),

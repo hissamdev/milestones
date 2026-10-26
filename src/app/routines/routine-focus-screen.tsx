@@ -4,38 +4,12 @@ import { getCurrentDayExercises } from "@/utils/routineHelpers";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
+import { DayTemplateTEE } from "./edit-routine-screen";
 
 export default function RoutineFocusScreen() {
     const [currentSequence, setCurrentSequence] = useState(1);
     const { routineId }: { routineId: string } = useLocalSearchParams();
-    const [currentDay, setCurrentDay] = useState<{
-        id: string;
-        routineId: string;
-        routineTemplateId: string;
-        dayTitle: string;
-        routineTemplate: {
-            id: string;
-            restDay: boolean;
-            templateExercises: {
-                id: string;
-                exerciseId: string;
-                sequence: number;
-                templateId: string;
-                displayAmount: number;
-                displayRestAmount: number | null;
-                exercise: {
-                    id: string;
-                    name: string;
-                    desc: string | null;
-                    type: string;
-                    createdAt: Date;
-                    updatedAt: Date;
-                    displayName: string;
-                    icon: string | null;
-                } | null;
-            }[];
-        };
-    } | null>(null);
+    const [currentDay, setCurrentDay] = useState<DayTemplateTEE | null>(null);
 
     useEffect(() => {
         const load = async () => {

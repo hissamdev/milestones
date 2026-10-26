@@ -21,10 +21,11 @@ export type DayTemplateTEE = {
         restDay: boolean;
         templateExercises: {
             id: string;
-            exerciseId: string;
+            exerciseId: string | null;
             sequence: number;
             templateId: string;
             displayAmount: number | null;
+            isRestType: boolean;
             displayRestAmount: number | null;
             exercise: {
                 id: string;
@@ -73,8 +74,8 @@ export default function EditRoutineScreen() {
     ];
     const [selectedDay, setSelectedDay] = useState("sat");
     const [fetchedDays, setFetchedDays] = useState<DayTemplateTEE[]>([]);
-    const [fetchedCurrentDay, setFetchedCurrentDay] =
-        useState<DayTemplateTEE | null>(null);
+    // const [fetchedCurrentDay, setFetchedCurrentDay] =
+    //     useState<DayTemplateTEE | null>(null);
     const [showExercises, setShowExercises] = useState(false);
     const { routineId }: { routineId: string } = useLocalSearchParams();
     const router = useRouter();
@@ -82,7 +83,7 @@ export default function EditRoutineScreen() {
         const load = async () => {
             if (!routineId || typeof routineId !== "string") {
                 console.error("Routine id not received");
-                router.navigate("/workouts-screen");
+                router.navigate("/(tabs)/(workouts)");
                 return;
             }
             const getDays = await getRoutineDays(routineId);
@@ -90,39 +91,39 @@ export default function EditRoutineScreen() {
                 return;
             }
             setFetchedDays(getDays.data);
-
-            const findCurrentDay = getDays.data.find(
-                (day) => day.dayTitle === selectedDay.toLocaleLowerCase(),
-            );
-            if (!findCurrentDay) {
-                return;
-            }
-            setFetchedCurrentDay(findCurrentDay);
         };
         load();
     }, []);
 
-    const handleInsertExercise = async (exerciseId: string) => {
-        const prevLength = fetchedCurrentDay
-            ? fetchedCurrentDay.routineTemplate?.templateExercises.length
+    const handleInsertExercise = async (exerciseId?: string) => {
+        console.log("Received id", exerciseId);
+        if (!exerciseId) {
+            const currentDay = fetchedDays.find(
+                (d) => d.dayTitle === selectedDay,
+            );
+            const lastExercise =
+                currentDay?.routineTemplate.templateExercises[
+                    currentDay?.routineTemplate.templateExercises.length - 1
+                ];
+            if (!lastExercise || lastExercise.isRestType) {
+                return;
+            }
+        }
+        const currentDay = fetchedDays.find((d) => d.dayTitle === selectedDay);
+        const prevLength = currentDay
+            ? currentDay.routineTemplate?.templateExercises.length
             : 0;
         const res = await insertRoutineExercise(
             routineId,
             selectedDay.toLowerCase(),
-            exerciseId,
             prevLength ? prevLength + 1 : 1,
+            exerciseId,
         );
         if (!res) {
             console.error("Failed to create day");
             return;
         }
         setFetchedDays(res);
-        const findCurrentDay = res.find((day) => day.dayTitle === selectedDay);
-        if (!findCurrentDay) {
-            setFetchedCurrentDay(null);
-            return;
-        }
-        setFetchedCurrentDay(findCurrentDay);
     };
 
     const handleUpdateCurrentDay = async (newDay: string) => {
@@ -132,14 +133,6 @@ export default function EditRoutineScreen() {
         // }
         // setFetchedDays(getDays.data);
 
-        const findCurrentDay = fetchedDays.find(
-            (day) => day.dayTitle === newDay.toLocaleLowerCase(),
-        );
-        if (!findCurrentDay) {
-            setFetchedCurrentDay(null);
-            return;
-        }
-        setFetchedCurrentDay(findCurrentDay);
         setSelectedDay(newDay);
     };
     const handleUpdateAmount = async (
@@ -159,7 +152,10 @@ export default function EditRoutineScreen() {
         let newAmount: number;
         const previousAmount = exactExercise.displayAmount;
 
-        if (exactExercise.exercise?.type === "duration") {
+        if (
+            exactExercise.exercise?.type === "duration" ||
+            exactExercise.isRestType
+        ) {
             if (mode === "add") {
                 newAmount = previousAmount === null ? 10 : previousAmount + 10;
             } else {
@@ -264,6 +260,11 @@ export default function EditRoutineScreen() {
                         <Text style={{ fontSize: 20, fontWeight: 500 }}>
                             Exercises for {selectedDay}
                         </Text>
+                        <TouchableOpacity
+                            onPress={() => handleInsertExercise()}
+                        >
+                            <Text>Insert Rest</Text>
+                        </TouchableOpacity>
                         <View style={{ marginTop: 20 }}>
                             {!currentDay ||
                             currentDay.dayTitle !== selectedDay ? (

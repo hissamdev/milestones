@@ -48,14 +48,22 @@ export default function EditExercises({
                             borderRadius: 3,
                         }}
                     >
-                        <Text
+                        <View
                             style={{
-                                marginLeft: 40,
+                                marginLeft: 10,
                                 marginVertical: "auto",
                             }}
                         >
-                            {t.exercise?.displayName}
-                        </Text>
+                            <Text>
+                                {t.isRestType
+                                    ? "Rest"
+                                    : t.exercise?.displayName}
+                            </Text>
+
+                            {t.isRestType ? null : (
+                                <Text>{t.exercise?.desc}</Text>
+                            )}
+                        </View>
                         <View
                             style={{
                                 display: "flex",

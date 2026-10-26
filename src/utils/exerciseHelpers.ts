@@ -1,5 +1,6 @@
 import { db } from "@/db/client";
 import { exercises } from "@/db/schema/workouts";
+import { generateUuid } from "./helpers";
 
 export async function getExercises() {
     try {
@@ -15,6 +16,7 @@ export async function createExercise(name: string, desc: string, type: string) {
         const res = await db
             .insert(exercises)
             .values({
+                id: generateUuid(),
                 name: name.trim().toLowerCase(),
                 displayName: name,
                 type,

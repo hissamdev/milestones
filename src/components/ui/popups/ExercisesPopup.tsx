@@ -109,6 +109,10 @@ export default function ExercisesPopup({
                                     paddingVertical: 6,
                                     flex: 1,
                                     borderWidth: 1,
+                                    backgroundColor:
+                                        exerciseType === "reps"
+                                            ? "gray"
+                                            : "white",
                                 }}
                             >
                                 <Text style={{ textAlign: "center" }}>
@@ -121,6 +125,10 @@ export default function ExercisesPopup({
                                     paddingVertical: 6,
                                     flex: 1,
                                     borderWidth: 1,
+                                    backgroundColor:
+                                        exerciseType === "duration"
+                                            ? "gray"
+                                            : "white",
                                 }}
                             >
                                 <Text style={{ textAlign: "center" }}>
