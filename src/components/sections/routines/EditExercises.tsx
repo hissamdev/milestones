@@ -1,122 +1,215 @@
 import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
-import { EllipsisVertical, Minus, Plus } from "lucide-react-native";
+import { Minus, Plus, TimerResetIcon, X } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function EditExercises({
     fetchedCurrentDay,
     handleUpdateAmount,
+    handleRemove,
 }: {
     fetchedCurrentDay: DayTemplateTEE;
     handleUpdateAmount: (
         templateExerciseId: string,
         mode: "add" | "subtract",
     ) => void;
+    handleRemove: (templateExerciseId: string) => void;
 }) {
     return (
         <View style={{ display: "flex", gap: 10 }}>
-            {fetchedCurrentDay.routineTemplate?.templateExercises.map((t) => (
-                <View
-                    key={t.id}
-                    style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        gap: 10,
-                    }}
-                >
+            {fetchedCurrentDay.routineTemplate?.templateExercises.map((e) =>
+                e.isRestType ? (
                     <View
+                        key={e.id}
                         style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                        }}
-                    >
-                        <TouchableOpacity>
-                            <Text>
-                                <EllipsisVertical size={18} />
-                            </Text>
-                        </TouchableOpacity>
-                        <Text>{t.sequence}</Text>
-                    </View>
-                    <View
-                        style={{
-                            height: 50,
+                            paddingVertical: 10,
                             display: "flex",
                             flexDirection: "row",
+                            alignItems: "center",
                             justifyContent: "space-between",
-                            flex: 1,
-                            borderWidth: 1,
-                            borderRadius: 3,
                         }}
                     >
-                        <View
-                            style={{
-                                marginLeft: 10,
-                                marginVertical: "auto",
-                            }}
-                        >
-                            <Text>
-                                {t.isRestType
-                                    ? "Rest"
-                                    : t.exercise?.displayName}
-                            </Text>
-
-                            {t.isRestType ? null : (
-                                <Text>{t.exercise?.desc}</Text>
-                            )}
-                        </View>
                         <View
                             style={{
                                 display: "flex",
                                 flexDirection: "row",
                                 alignItems: "center",
+                                gap: 3,
                             }}
                         >
-                            <Text
-                                style={{
-                                    marginRight: 30,
-                                }}
-                            >
-                                {!(t.displayAmount === null)
-                                    ? t.displayAmount
-                                    : "Null"}{" "}
-                                {t.exercise?.type === "reps" ? "reps" : "s"}
+                            <Text>
+                                <TimerResetIcon size={15} />
                             </Text>
-                            <TouchableOpacity
-                                onPress={() =>
-                                    handleUpdateAmount(t.id, "subtract")
-                                }
+                            <Text>Rest</Text>
+                        </View>
+                        <TouchableOpacity onPress={() => handleRemove(e.id)}>
+                            <Text>
+                                <X size={15} />
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <View
+                        key={e.id}
+                        style={{
+                            padding: 10,
+                            backgroundColor: "white",
+                            borderRadius: 10,
+                        }}
+                    >
+                        <View
+                            style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <View
                                 style={{
                                     display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    paddingHorizontal: 12,
-                                    alignSelf: "stretch",
-                                    backgroundColor: "darkred",
+                                    flexDirection: "row",
+                                    gap: 10,
                                 }}
                             >
-                                <Text>
-                                    <Minus color="white" strokeWidth={1} />
-                                </Text>
-                            </TouchableOpacity>
+                                <View
+                                    style={{
+                                        width: 40,
+                                        aspectRatio: 1 / 1,
+                                        backgroundColor: "gray",
+                                    }}
+                                />
+                                <View>
+                                    <Text>{e.exercise?.displayName}</Text>
+                                    <Text>{e.exercise?.desc}</Text>
+                                </View>
+                            </View>
                             <TouchableOpacity
-                                onPress={() => handleUpdateAmount(t.id, "add")}
-                                style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    paddingHorizontal: 12,
-                                    alignSelf: "stretch",
-                                    backgroundColor: "limegreen",
-                                }}
+                                onPress={() => handleRemove(e.id)}
                             >
                                 <Text>
-                                    <Plus color="white" strokeWidth={1} />
+                                    <X size={17} />
                                 </Text>
                             </TouchableOpacity>
                         </View>
+                        <View
+                            style={{
+                                marginTop: 10,
+                                display: "flex",
+                                flexDirection: "row",
+                                gap: 20,
+                            }}
+                        >
+                            <View
+                                style={{
+                                    boxSizing: "content-box",
+                                    padding: 5,
+                                    height: 30,
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "stretch",
+                                    backgroundColor: "#F5F3F4",
+                                    borderRadius: 5,
+                                }}
+                            >
+                                <TouchableOpacity
+                                    onPress={() =>
+                                        handleUpdateAmount(e.id, "subtract")
+                                    }
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor: "#EFEDEE",
+                                        aspectRatio: 1 / 1,
+                                        borderRadius: 5,
+                                    }}
+                                >
+                                    <Text>
+                                        <Minus size={15} />
+                                    </Text>
+                                </TouchableOpacity>
+                                <Text
+                                    style={{
+                                        paddingHorizontal: 10,
+                                        textAlignVertical: "center",
+                                    }}
+                                >
+                                    {e.displayAmount}
+                                </Text>
+                                <TouchableOpacity
+                                    onPress={() =>
+                                        handleUpdateAmount(e.id, "add")
+                                    }
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor: "#EFEDEE",
+                                        aspectRatio: 1 / 1,
+                                    }}
+                                >
+                                    <Text>
+                                        <Plus size={15} />
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            {/* <View
+                                style={{
+                                    boxSizing: "content-box",
+                                    padding: 5,
+                                    height: 30,
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "stretch",
+                                    backgroundColor: "#F5F3F4",
+                                    borderRadius: 5,
+                                }}
+                            >
+                                <TouchableOpacity
+                                    onPress={() =>
+                                        handleUpdateAmount(e.id, "subtract")
+                                    }
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor: "#EFEDEE",
+                                        aspectRatio: 1 / 1,
+                                        borderRadius: 5,
+                                    }}
+                                >
+                                    <Text>
+                                        <Minus size={15} />
+                                    </Text>
+                                </TouchableOpacity>
+                                <Text
+                                    style={{
+                                        paddingHorizontal: 10,
+                                        textAlignVertical: "center",
+                                    }}
+                                >
+                                    {e.displayAmount}
+                                </Text>
+                                <TouchableOpacity
+                                    onPress={() =>
+                                        handleUpdateAmount(e.id, "add")
+                                    }
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor: "#EFEDEE",
+                                        aspectRatio: 1 / 1,
+                                    }}
+                                >
+                                    <Text>
+                                        <Plus size={15} />
+                                    </Text>
+                                </TouchableOpacity>
+                            </View> */}
+                        </View>
                     </View>
-                </View>
-            ))}
+                ),
+            )}
         </View>
     );
 }

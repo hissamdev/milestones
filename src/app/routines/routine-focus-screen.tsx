@@ -35,11 +35,15 @@ export default function RoutineFocusScreen() {
     return (
         <View style={{ flex: 1 }}>
             {currentActivity.displayRestAmount ? (
-                <RestScreen />
+                <RestScreen
+                    routineId={routineId}
+                    routineTemplate={currentDay.routineTemplate}
+                    currentSequence={currentSequence}
+                    setCurrentSequence={setCurrentSequence}
+                />
             ) : (
                 <ExerciseScreen
                     routineTemplate={currentDay.routineTemplate}
-                    currentActivity={currentActivity}
                     currentSequence={currentSequence}
                     setCurrentSequence={setCurrentSequence}
                     routineId={routineId}

@@ -1,23 +1,17 @@
+import { exercises } from "@/db/schema/workouts";
 import { createExercise, getExercises } from "@/utils/exerciseHelpers";
-import { Plus } from "lucide-react-native";
+import { Plus, Trash } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+
+type Exercise = typeof exercises.$inferSelect;
 
 export default function ExercisesPopup({
     insertHandler,
 }: {
     insertHandler: (exerciseId: string) => Promise<void>;
 }) {
-    const [exercises, setExercises] = useState<
-        {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            icon: string | null;
-            desc: string | null;
-        }[]
-    >([]);
+    const [exercises, setExercises] = useState<Exercise[]>([]);
     const [showCreate, setShowCreate] = useState(false);
     const [exerciseName, setExerciseName] = useState("");
     const [exerciseDesc, setExerciseDesc] = useState("");
@@ -53,6 +47,10 @@ export default function ExercisesPopup({
         setShowCreate(false);
     };
 
+    const handleDelete = (exerciseId: string) => {
+        setExercises((prev) => prev.filter((e) => e.id !== exerciseId));
+    };
+
     return (
         <>
             <View
@@ -79,7 +77,7 @@ export default function ExercisesPopup({
                     </Text>
                 </TouchableOpacity>
             </View>
-            <View style={{ marginTop: 10 }}>
+            <View style={{ marginTop: 10, display: "flex", gap: 10 }}>
                 {showCreate && (
                     <View>
                         <Text>Exercise name</Text>
@@ -187,12 +185,48 @@ export default function ExercisesPopup({
                     </Text>
                 ) : (
                     exercises.map((e) => (
-                        <TouchableOpacity
-                            onPress={() => insertHandler(e.id)}
+                        <View
+                            // onPress={() => insertHandler(e.id)}
                             key={e.name}
+                            style={{
+                                padding: 8,
+                                display: "flex",
+                                flexDirection: "row",
+                                gap: 50,
+                                backgroundColor: "#eceaea",
+                                borderRadius: 5,
+                            }}
                         >
-                            <Text>{e.name}</Text>
-                        </TouchableOpacity>
+                            <View
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "stretch",
+                                    gap: 10,
+                                    flex: 1,
+                                }}
+                            >
+                                <View
+                                    style={{
+                                        width: 40,
+                                        aspectRatio: 1 / 1,
+                                        backgroundColor: "gray",
+                                        borderRadius: 5,
+                                    }}
+                                />
+                                <TouchableOpacity style={{ flex: 1 }}>
+                                    <Text>{e.displayName}</Text>
+                                    {e.desc && <Text>{e.desc}</Text>}
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ display: "flex" }}>
+                                <TouchableOpacity style={{ marginTop: "auto" }}>
+                                    <Text>
+                                        <Trash size={15} />
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                     ))
                 )}
             </View>

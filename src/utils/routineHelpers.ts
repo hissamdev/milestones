@@ -274,3 +274,13 @@ export async function getCurrentDayExercises(routineId: string) {
         console.error("Something went wrong", err);
     }
 }
+
+export async function removeTemplateExercise(templateExerciseId: string) {
+    try {
+        await db
+            .delete(routineTemplateExercises)
+            .where(eq(routineTemplateExercises.id, templateExerciseId));
+    } catch (err) {
+        console.error("Failed to remove TE", err);
+    }
+}

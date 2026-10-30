@@ -4,6 +4,7 @@ import ExercisesPopup from "@/components/ui/popups/ExercisesPopup";
 import {
     getRoutineDays,
     insertRoutineExercise,
+    removeTemplateExercise,
     updateAmount,
 } from "@/utils/routineHelpers";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -205,19 +206,50 @@ export default function EditRoutineScreen() {
         console.log("Uh", newAmount);
     };
 
+    const handleRemove = (templateExerciseId: string) => {
+        setFetchedDays((prev) =>
+            prev.map((d) =>
+                d.dayTitle === selectedDay
+                    ? {
+                          ...d,
+                          routineTemplate: {
+                              ...d.routineTemplate,
+                              templateExercises:
+                                  d.routineTemplate.templateExercises.filter(
+                                      (te) => te.id !== templateExerciseId,
+                                  ),
+                          },
+                      }
+                    : {
+                          ...d,
+                      },
+            ),
+        );
+        removeTemplateExercise(templateExerciseId);
+    };
+
     const currentDay = fetchedDays.find((d) => d.dayTitle === selectedDay);
 
     return (
         <>
             <ScrollView>
-                <Text>Edit Routine {routineId} </Text>
                 <View
                     style={{
-                        marginTop: 20,
+                        marginTop: 60,
                         paddingHorizontal: 10,
                     }}
                 >
-                    <View style={{ display: "flex", flexDirection: "row" }}>
+                    <View
+                        style={{
+                            boxSizing: "content-box",
+                            padding: 10,
+                            display: "flex",
+                            flexDirection: "row",
+                            height: 40,
+                            backgroundColor: "#EFEDEE",
+                            borderRadius: 10,
+                        }}
+                    >
                         {daysOfTheWeek.map((d) => {
                             const fetchedDay = fetchedDays.find(
                                 (fd) => fd.dayTitle === d.title,
@@ -225,15 +257,18 @@ export default function EditRoutineScreen() {
 
                             return (
                                 <TouchableOpacity
+                                    activeOpacity={1}
                                     key={d.title}
                                     style={{
                                         flex: 1,
-                                        borderWidth: 1,
-                                        paddingVertical: 4,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
                                         backgroundColor:
                                             selectedDay === d.title
                                                 ? "blue"
-                                                : "white",
+                                                : "transparent",
+                                        borderRadius: 10,
                                     }}
                                     onPress={() =>
                                         handleUpdateCurrentDay(d.title)
@@ -243,11 +278,9 @@ export default function EditRoutineScreen() {
                                         style={{
                                             textAlign: "center",
                                             color:
-                                                fetchedDay &&
-                                                fetchedDay.dayTitle ===
-                                                    d.title.toLocaleLowerCase()
-                                                    ? "pink"
-                                                    : "purple",
+                                                selectedDay === d.title
+                                                    ? "white"
+                                                    : "#434653",
                                         }}
                                     >
                                         {d.render}
@@ -284,6 +317,7 @@ export default function EditRoutineScreen() {
                                 <EditExercises
                                     fetchedCurrentDay={currentDay}
                                     handleUpdateAmount={handleUpdateAmount}
+                                    handleRemove={handleRemove}
                                 />
                             )}
                         </View>

@@ -65,7 +65,6 @@ export default function ExerciseScreen({
     routineTemplate: DayTemplateTEE["routineTemplate"];
     setCurrentSequence: React.Dispatch<SetStateAction<number>>;
     currentSequence: number;
-    currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];
     routineId: string;
 }) {
     const [isNextAvailable, setIsNextAvailable] = useState(false);
