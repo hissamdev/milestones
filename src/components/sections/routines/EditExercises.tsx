@@ -1,23 +1,18 @@
 import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
 import {
-    GripVertical,
+    ChevronDown,
+    ChevronUp,
     Minus,
-    Plus,
     TimerResetIcon,
     X,
 } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
-import {
-    NestableDraggableFlatList,
-    RenderItemParams,
-    ScaleDecorator,
-} from "react-native-draggable-flatlist";
 
 export default function EditExercises({
     fetchedCurrentDay,
     handleUpdateAmount,
     handleRemove,
-    handleTEReorder,
+    handleReorder,
 }: {
     fetchedCurrentDay: DayTemplateTEE;
     handleUpdateAmount: (
@@ -25,81 +20,52 @@ export default function EditExercises({
         mode: "add" | "subtract",
     ) => void;
     handleRemove: (templateExerciseId: string) => void;
-    handleTEReorder: (
-        data: DayTemplateTEE["routineTemplate"]["templateExercises"],
+    handleReorder: (
+        mode: "previous" | "next",
+        index: number,
+        prevState: DayTemplateTEE["routineTemplate"]["templateExercises"],
     ) => void;
 }) {
-    const render = ({
-        item,
-        drag,
-        isActive,
-    }: RenderItemParams<
-        DayTemplateTEE["routineTemplate"]["templateExercises"][0]
-    >) => {
-        return (
-            <ScaleDecorator>
-                {item.isRestType ? (
-                    <View
-                        key={item.id}
-                        style={{
-                            paddingVertical: 10,
-                            paddingHorizontal: 5,
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <TouchableOpacity
-                            onLongPress={drag}
-                            disabled={isActive}
-                        >
-                            <Text>
-                                <GripVertical size={24} color="gray" />
-                            </Text>
-                        </TouchableOpacity>
+    return (
+        <View style={{ display: "flex", gap: 10 }}>
+            {fetchedCurrentDay.routineTemplate?.templateExercises.map(
+                (e, idx) =>
+                    e.isRestType ? (
                         <View
+                            key={e.id}
                             style={{
+                                paddingVertical: 10,
                                 display: "flex",
                                 flexDirection: "row",
                                 alignItems: "center",
-                                gap: 3,
+                                justifyContent: "space-between",
                             }}
                         >
-                            <Text>
-                                <TimerResetIcon size={15} />
-                            </Text>
-                            <Text>Rest {item.displayRestAmount}</Text>
+                            <View
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    gap: 3,
+                                }}
+                            >
+                                <Text>
+                                    <TimerResetIcon size={15} />
+                                </Text>
+                                <Text>Rest</Text>
+                            </View>
+                            <TouchableOpacity
+                                onPress={() => handleRemove(e.id)}
+                            >
+                                <Text>
+                                    <X size={15} />
+                                </Text>
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity onPress={() => handleRemove(item.id)}>
-                            <Text>
-                                <X size={15} />
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    <View
-                        key={item.id}
-                        style={{
-                            paddingLeft: 5,
-                            display: "flex",
-                            flexDirection: "row",
-                            gap: 5,
-                            zIndex: 100,
-                        }}
-                    >
-                        <TouchableOpacity
-                            onLongPress={drag}
-                            disabled={isActive}
-                            style={{ marginTop: 10 }}
-                        >
-                            <Text>
-                                <GripVertical size={24} color="gray" />
-                            </Text>
-                        </TouchableOpacity>
+                    ) : (
                         <View
+                            key={e.id}
                             style={{
-                                flex: 1,
                                 padding: 10,
                                 backgroundColor: "white",
                                 borderRadius: 10,
@@ -114,6 +80,9 @@ export default function EditExercises({
                             >
                                 <View
                                     style={{
+                                        boxSizing: "content-box",
+                                        padding: 5,
+                                        height: 30,
                                         display: "flex",
                                         flexDirection: "row",
                                         gap: 10,
@@ -123,23 +92,16 @@ export default function EditExercises({
                                         style={{
                                             width: 40,
                                             aspectRatio: 1 / 1,
-                                            backgroundColor: "purple",
+                                            backgroundColor: "gray",
                                         }}
                                     />
                                     <View>
-                                        <Text
-                                            style={{
-                                                fontSize: 15,
-                                                fontWeight: 500,
-                                            }}
-                                        >
-                                            {item.exercise?.displayName}
-                                        </Text>
-                                        <Text>{item.exercise?.desc}</Text>
+                                        <Text>{e.exercise?.displayName}</Text>
+                                        <Text>{e.exercise?.desc}</Text>
                                     </View>
                                 </View>
                                 <TouchableOpacity
-                                    onPress={() => handleRemove(item.id)}
+                                    onPress={() => handleRemove(e.id)}
                                 >
                                     <Text>
                                         <X size={17} />
@@ -168,10 +130,7 @@ export default function EditExercises({
                                 >
                                     <TouchableOpacity
                                         onPress={() =>
-                                            handleUpdateAmount(
-                                                item.id,
-                                                "subtract",
-                                            )
+                                            handleUpdateAmount(e.id, "subtract")
                                         }
                                         style={{
                                             display: "flex",
@@ -192,11 +151,11 @@ export default function EditExercises({
                                             textAlignVertical: "center",
                                         }}
                                     >
-                                        {item.displayAmount}
+                                        {e.displayAmount}
                                     </Text>
                                     <TouchableOpacity
                                         onPress={() =>
-                                            handleUpdateAmount(item.id, "add")
+                                            handleUpdateAmount(e.id, "add")
                                         }
                                         style={{
                                             display: "flex",
@@ -207,33 +166,73 @@ export default function EditExercises({
                                         }}
                                     >
                                         <Text>
-                                            <Plus size={15} />
+                                            <Minus size={15} />
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <View
+                                    style={{
+                                        boxSizing: "content-box",
+                                        padding: 5,
+                                        height: 30,
+                                        display: "flex",
+                                        flexDirection: "row",
+                                        gap: 5,
+                                        alignItems: "stretch",
+                                        backgroundColor: "#F5F3F4",
+                                        borderRadius: 5,
+                                    }}
+                                >
+                                    <TouchableOpacity
+                                        onPress={() =>
+                                            handleReorder(
+                                                "next",
+                                                idx,
+                                                fetchedCurrentDay
+                                                    .routineTemplate
+                                                    .templateExercises,
+                                            )
+                                        }
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            backgroundColor: "#EFEDEE",
+                                            aspectRatio: 1 / 1,
+                                            borderRadius: 5,
+                                        }}
+                                    >
+                                        <Text>
+                                            <ChevronDown size={15} />
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() =>
+                                            handleReorder(
+                                                "previous",
+                                                idx,
+                                                fetchedCurrentDay
+                                                    .routineTemplate
+                                                    .templateExercises,
+                                            )
+                                        }
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            backgroundColor: "#EFEDEE",
+                                            aspectRatio: 1 / 1,
+                                        }}
+                                    >
+                                        <Text>
+                                            <ChevronUp size={15} />
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
                         </View>
-                    </View>
-                )}
-            </ScaleDecorator>
-        );
-    };
-
-    return (
-        <NestableDraggableFlatList
-            data={fetchedCurrentDay.routineTemplate.templateExercises}
-            keyExtractor={(
-                item: DayTemplateTEE["routineTemplate"]["templateExercises"][0],
-            ) => item.id}
-            renderItem={render}
-            contentContainerStyle={{ display: "flex", gap: 10, zIndex: 100 }}
-            onDragEnd={({ data }) => {
-                const newSeq = data.map((te, idx) => ({
-                    ...te,
-                    sequence: idx + 1,
-                }));
-                handleTEReorder(newSeq);
-            }}
-        />
+                    ),
+            )}
+        </View>
     );
 }

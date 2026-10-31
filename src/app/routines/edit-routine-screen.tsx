@@ -10,9 +10,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SportShoe } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import { NestableScrollContainer } from "react-native-draggable-flatlist";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export type DayTemplateTEE = {
     id: string;
@@ -254,9 +252,30 @@ export default function EditRoutineScreen() {
         });
     };
 
-    const handleTEReorder = (
-        data: DayTemplateTEE["routineTemplate"]["templateExercises"],
+    const handleReorder = (
+        mode: "previous" | "next",
+        index: number,
+        prevState: DayTemplateTEE["routineTemplate"]["templateExercises"],
     ) => {
+        if (mode === "previous") {
+            if (index === 0) return;
+            [prevState[index - 1], prevState[index]] = [
+                prevState[index],
+                prevState[index - 1],
+            ];
+        } else {
+            if (index + 1 === prevState.length) return;
+            [prevState[index], prevState[index + 1]] = [
+                prevState[index + 1],
+                prevState[index],
+            ];
+        }
+
+        const newSeq = prevState.map((te, idx) => ({
+            ...te,
+            sequence: idx + 1,
+        }));
+
         setFetchedDays((prev) =>
             prev.map((d) =>
                 d.dayTitle === selectedDay
@@ -264,7 +283,7 @@ export default function EditRoutineScreen() {
                           ...d,
                           routineTemplate: {
                               ...d.routineTemplate,
-                              templateExercises: data,
+                              templateExercises: newSeq,
                           },
                       }
                     : {
@@ -277,93 +296,100 @@ export default function EditRoutineScreen() {
     const currentDay = fetchedDays.find((d) => d.dayTitle === selectedDay);
 
     return (
-        <GestureHandlerRootView style={{ flex: 1, marginHorizontal: 15 }}>
-            <NestableScrollContainer
-                style={{
-                    marginTop: 60,
-                    flex: 1,
-                }}
-            >
+        <>
+            <ScrollView>
                 <View
                     style={{
-                        boxSizing: "content-box",
-                        padding: 10,
-                        display: "flex",
-                        flexDirection: "row",
-                        height: 40,
-                        backgroundColor: "#EFEDEE",
-                        borderRadius: 10,
+                        marginTop: 60,
+                        paddingHorizontal: 10,
                     }}
                 >
-                    {daysOfTheWeek.map((d) => {
-                        const fetchedDay = fetchedDays.find(
-                            (fd) => fd.dayTitle === d.title,
-                        );
+                    <View
+                        style={{
+                            boxSizing: "content-box",
+                            padding: 10,
+                            display: "flex",
+                            flexDirection: "row",
+                            height: 40,
+                            backgroundColor: "#EFEDEE",
+                            borderRadius: 10,
+                        }}
+                    >
+                        {daysOfTheWeek.map((d) => {
+                            const fetchedDay = fetchedDays.find(
+                                (fd) => fd.dayTitle === d.title,
+                            );
 
-                        return (
-                            <TouchableOpacity
-                                activeOpacity={1}
-                                key={d.title}
-                                style={{
-                                    flex: 1,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    backgroundColor:
-                                        selectedDay === d.title
-                                            ? "blue"
-                                            : "transparent",
-                                    borderRadius: 10,
-                                }}
-                                onPress={() => handleUpdateCurrentDay(d.title)}
-                            >
+                            return (
+                                <TouchableOpacity
+                                    activeOpacity={1}
+                                    key={d.title}
+                                    style={{
+                                        flex: 1,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        backgroundColor:
+                                            selectedDay === d.title
+                                                ? "blue"
+                                                : "transparent",
+                                        borderRadius: 10,
+                                    }}
+                                    onPress={() =>
+                                        handleUpdateCurrentDay(d.title)
+                                    }
+                                >
+                                    <Text
+                                        style={{
+                                            textAlign: "center",
+                                            color:
+                                                selectedDay === d.title
+                                                    ? "white"
+                                                    : "#434653",
+                                        }}
+                                    >
+                                        {d.render}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                    <View style={{ marginTop: 20 }}>
+                        <Text style={{ fontSize: 20, fontWeight: 500 }}>
+                            Exercises for {selectedDay}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => handleInsertExercise()}
+                        >
+                            <Text>Insert Rest</Text>
+                        </TouchableOpacity>
+                        <View style={{ marginTop: 20 }}>
+                            {!currentDay ||
+                            currentDay.dayTitle !== selectedDay ? (
                                 <Text
                                     style={{
+                                        color: "gray",
                                         textAlign: "center",
-                                        color:
-                                            selectedDay === d.title
-                                                ? "white"
-                                                : "#434653",
+                                        paddingVertical: 12,
+                                        backgroundColor: "rgba(0,0,0,0.1)",
+                                        borderWidth: 1,
+                                        borderColor: "rgba(0,0,0,0.2)",
                                     }}
                                 >
-                                    {d.render}
+                                    Add your first exercise
                                 </Text>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </View>
-                <View style={{ marginTop: 20 }}>
-                    <Text style={{ fontSize: 20, fontWeight: 500 }}>
-                        Exercises for {selectedDay}
-                    </Text>
-                    <TouchableOpacity onPress={() => handleInsertExercise()}>
-                        <Text>Insert Rest</Text>
-                    </TouchableOpacity>
-                    <View style={{ marginTop: 20 }}>
-                        {!currentDay || currentDay.dayTitle !== selectedDay ? (
-                            <Text
-                                style={{
-                                    color: "gray",
-                                    textAlign: "center",
-                                    paddingVertical: 12,
-                                    backgroundColor: "rgba(0,0,0,0.1)",
-                                    borderWidth: 1,
-                                    borderColor: "rgba(0,0,0,0.2)",
-                                }}
-                            >
-                                Add your first exercise
-                            </Text>
-                        ) : (
-                            <EditExercises
-                                fetchedCurrentDay={currentDay}
-                                handleUpdateAmount={handleUpdateAmount}
-                                handleRemove={handleRemove}
-                                handleTEReorder={handleTEReorder}
-                            />
-                        )}
+                            ) : (
+                                <EditExercises
+                                    fetchedCurrentDay={currentDay}
+                                    handleUpdateAmount={handleUpdateAmount}
+                                    handleRemove={handleRemove}
+                                    handleReorder={handleReorder}
+                                />
+                            )}
+                        </View>
                     </View>
                 </View>
-            </NestableScrollContainer>
+            </ScrollView>
 
             <TouchableOpacity
                 onPress={() => setShowExercises((prev) => !prev)}
@@ -392,6 +418,6 @@ export default function EditRoutineScreen() {
                     />
                 </Popup>
             )}
-        </GestureHandlerRootView>
+        </>
     );
 }
