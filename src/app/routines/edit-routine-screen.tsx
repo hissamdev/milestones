@@ -228,6 +228,30 @@ export default function EditRoutineScreen() {
         removeTemplateExercise(templateExerciseId);
     };
 
+    const handleDeleteExercise = (exerciseId: string) => {
+        setFetchedDays((prev) => {
+            const currentDay = prev.find((d) => d.dayTitle === selectedDay);
+            const updated =
+                currentDay?.routineTemplate.templateExercises.filter(
+                    (te) => te.exerciseId !== exerciseId,
+                );
+            if (!updated) return prev;
+            return prev.map((day) =>
+                day.dayTitle === selectedDay
+                    ? {
+                          ...day,
+                          routineTemplate: {
+                              ...day.routineTemplate,
+                              templateExercises: updated,
+                          },
+                      }
+                    : {
+                          ...day,
+                      },
+            );
+        });
+    };
+
     const currentDay = fetchedDays.find((d) => d.dayTitle === selectedDay);
 
     return (
@@ -343,10 +367,13 @@ export default function EditRoutineScreen() {
             </TouchableOpacity>
             {showExercises && (
                 <Popup
-                    customStyles={{ padding: 30 }}
+                    customStyles={{ padding: 15 }}
                     setModal={setShowExercises}
                 >
-                    <ExercisesPopup insertHandler={handleInsertExercise} />
+                    <ExercisesPopup
+                        handleDeleteExercise={handleDeleteExercise}
+                        insertHandler={handleInsertExercise}
+                    />
                 </Popup>
             )}
         </>

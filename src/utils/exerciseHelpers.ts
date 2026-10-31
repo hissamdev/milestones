@@ -1,5 +1,6 @@
 import { db } from "@/db/client";
-import { exercises } from "@/db/schema/workouts";
+import { exercises, routineTemplateExercises } from "@/db/schema/workouts";
+import { eq } from "drizzle-orm";
 import { generateUuid } from "./helpers";
 
 export async function getExercises() {
@@ -26,5 +27,16 @@ export async function createExercise(name: string, desc: string, type: string) {
         return res[0];
     } catch (err) {
         console.error(err);
+    }
+}
+
+export async function deleteExercise(exerciseId: string) {
+    try {
+        await db.delete(exercises).where(eq(exercises.id, exerciseId));
+        await db
+            .delete(routineTemplateExercises)
+            .where(eq(routineTemplateExercises.exerciseId, exerciseId));
+    } catch (err) {
+        console.error("Failed to delete exercise", err);
     }
 }
