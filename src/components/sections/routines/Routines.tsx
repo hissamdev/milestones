@@ -1,4 +1,4 @@
-import { createRoutine, getRoutines } from "@/utils/routineHelpers";
+import { createRoutine, getRoutines } from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import { Play } from "lucide-react-native";
 import { useEffect, useState } from "react";

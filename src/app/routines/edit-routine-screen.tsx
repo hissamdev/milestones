@@ -6,7 +6,7 @@ import {
     insertRoutineExercise,
     removeTemplateExercise,
     updateAmount,
-} from "@/utils/routineHelpers";
+} from "@/utils/workouts/routineHelpers";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SportShoe } from "lucide-react-native";
 import { useEffect, useState } from "react";

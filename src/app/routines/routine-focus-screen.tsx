@@ -1,6 +1,6 @@
 import ExerciseScreen from "@/components/sections/single-routine/ExerciseScreen";
 import RestScreen from "@/components/sections/single-routine/RestScreen";
-import { getCurrentDayExercises } from "@/utils/routineHelpers";
+import { getCurrentDayExercises } from "@/utils/workouts/routineHelpers";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";

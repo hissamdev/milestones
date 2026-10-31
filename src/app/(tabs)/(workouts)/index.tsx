@@ -1,8 +1,8 @@
 import Routines from "@/components/sections/routines/Routines";
 import CreateExercise from "@/components/ui/CreateExercise";
 import { exercises, workouts } from "@/db/schema/workouts";
-import { createRoutine } from "@/utils/routineHelpers";
-import { getCurrentDayWorkout } from "@/utils/workoutHelpers";
+import { createRoutine } from "@/utils/workouts/routineHelpers";
+import { getCurrentDayWorkout } from "@/utils/workouts/workoutHelpers";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";

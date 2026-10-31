@@ -1,9 +1,15 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function SingleRoutineScreen() {
     const { routineId } = useLocalSearchParams();
     const router = useRouter();
+
+    useEffect(() => {
+        const load = () => {};
+        load();
+    }, []);
 
     if (!routineId) {
         console.error("No id");
@@ -14,23 +20,7 @@ export default function SingleRoutineScreen() {
             <Text>Routine</Text>
             <View>
                 <Text>Exercises for Today</Text>
-                <TouchableOpacity
-                    onPress={() =>
-                        router.push({
-                            pathname: "/routines/routine-focus-screen",
-                            params: {
-                                routineId,
-                            },
-                        })
-                    }
-                    style={{
-                        paddingHorizontal: 8,
-                        paddingVertical: 4,
-                        borderWidth: 1,
-                    }}
-                >
-                    <Text>Start Routine</Text>
-                </TouchableOpacity>
+
                 <TouchableOpacity
                     onPress={() =>
                         router.push({
@@ -47,6 +37,23 @@ export default function SingleRoutineScreen() {
                     }}
                 >
                     <Text>Edit Routine</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() =>
+                        router.push({
+                            pathname: "/routines/routine-focus-screen",
+                            params: {
+                                routineId,
+                            },
+                        })
+                    }
+                    style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderWidth: 1,
+                    }}
+                >
+                    <Text>Start Routine</Text>
                 </TouchableOpacity>
             </View>
         </View>

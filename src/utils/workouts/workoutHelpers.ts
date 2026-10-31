@@ -1,6 +1,6 @@
 import { db } from "@/db/client";
 import { workouts } from "@/db/schema/workouts";
-import { generateUuid } from "./helpers";
+import { generateUuid } from "../helpers";
 
 export async function getCurrentDayWorkout() {
     try {

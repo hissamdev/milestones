@@ -7,7 +7,7 @@ import {
 } from "@/db/schema/workouts";
 import { eq } from "drizzle-orm";
 import z from "zod";
-import { generateUuid } from "./helpers";
+import { generateUuid } from "../helpers";
 export async function createRoutine(name: string) {
     const safeName = z.string().min(3).safeParse(name);
     if (!safeName.success) {
@@ -283,4 +283,9 @@ export async function removeTemplateExercise(templateExerciseId: string) {
     } catch (err) {
         console.error("Failed to remove TE", err);
     }
+}
+
+export async function getLatestRoutineData() {
+    try {
+    } catch (err) {}
 }

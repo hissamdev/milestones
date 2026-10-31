@@ -3,7 +3,7 @@ import {
     createExercise,
     deleteExercise,
     getExercises,
-} from "@/utils/exerciseHelpers";
+} from "@/utils/workouts/exerciseHelpers";
 import { CircleCheck, Clock3, Plus, Trash, Weight } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";

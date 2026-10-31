@@ -3,6 +3,8 @@ import { images, milestoneData, milestones } from "./schema/milestones";
 import {
     daysOtw,
     exercises,
+    routineDataTopLevel,
+    routineExerciseData,
     routines,
     routineTemplateExercises,
     routineTemplates,
@@ -45,6 +47,8 @@ export const workoutRelations = defineRelationsPart(
         daysOtw,
         routineTemplates,
         routineTemplateExercises,
+        routineDataTopLevel,
+        routineExerciseData,
     },
     (r) => ({
         workouts: {
@@ -88,6 +92,7 @@ export const workoutRelations = defineRelationsPart(
         },
         routines: {
             daysOtw: r.many.daysOtw(),
+            routineData: r.many.routineDataTopLevel(),
         },
         daysOtw: {
             routine: r.one.routines({
@@ -111,6 +116,19 @@ export const workoutRelations = defineRelationsPart(
             exercise: r.one.exercises({
                 from: r.routineTemplateExercises.exerciseId,
                 to: r.exercises.id,
+            }),
+        },
+        routineDataTopLevel: {
+            routine: r.one.routines({
+                from: r.routineDataTopLevel.routineId,
+                to: r.routines.id,
+            }),
+            dataExercises: r.many.routineExerciseData(),
+        },
+        routineExerciseData: {
+            topLevelData: r.one.routineDataTopLevel({
+                from: r.routineExerciseData.parentMetadataId,
+                to: r.routineDataTopLevel.id,
             }),
         },
     }),

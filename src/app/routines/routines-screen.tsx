@@ -1,4 +1,4 @@
-import { getRoutineDays } from "@/utils/routineHelpers";
+import { getRoutineDays } from "@/utils/workouts/routineHelpers";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Text, View } from "react-native";

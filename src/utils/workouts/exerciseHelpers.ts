@@ -1,7 +1,7 @@
 import { db } from "@/db/client";
 import { exercises, routineTemplateExercises } from "@/db/schema/workouts";
 import { eq } from "drizzle-orm";
-import { generateUuid } from "./helpers";
+import { generateUuid } from "../helpers";
 
 export async function getExercises() {
     try {

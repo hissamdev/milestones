@@ -142,7 +142,7 @@ export const routineTemplateExercises = s.sqliteTable(
     },
 );
 
-export const routineDataMetadata = s.sqliteTable("routine_tl_data", {
+export const routineDataTopLevel = s.sqliteTable("routine_tl_data", {
     id: s.text("id").primaryKey(),
     routineId: s
         .text("routine_id")
@@ -152,8 +152,11 @@ export const routineDataMetadata = s.sqliteTable("routine_tl_data", {
         .integer("interaction_time", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()), // Created when the user initiates a routine's workout, indicates a day of routine completion
-    completion: s.integer("completion").notNull(), // Percentage of a routine completed, calculated based on how many exercises from the template were done
-    isComplete: s.integer("is_complete", { mode: "boolean" }).notNull(), // Whether a routine is still ongoing
+    completionPercentage: s.integer("completion_percentage").notNull(), // Percentage of a routine completed, calculated based on how many exercises from the template were done
+    isComplete: s
+        .integer("is_complete", { mode: "boolean" })
+        .notNull()
+        .default(false), // Whether a routine is still ongoing
 });
 
 export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
@@ -162,6 +165,20 @@ export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
     parentMetadataId: s
         .text("parent_metadata_id")
         .notNull()
-        .references(() => routineDataMetadata.id),
+        .references(() => routineDataTopLevel.id),
     exerciseId: s.text("exercise_id").references(() => exercises.id),
+    // Preserve exercise info in case of exercise deletion
+    exerciseName: s.text("exercise_name").notNull(),
+    exerciseDisplayName: s.text("exercise_display_name").notNull(),
+    exerciseDesc: s.text("exercise_desc"),
+    exerciseType: s.text("exercise_type"), // Reps or Duration
+    // Work done
+    exerciseReps: s.integer("exercise_reps"),
+    exerciseDuration: s.integer("exercise_duration"),
+    currentSetStartTime: s
+        .integer("current_set_start_time", { mode: "timestamp" })
+        .notNull()
+        .$defaultFn(() => new Date()),
+    currentSetDuration: s.integer("current_set_duration"),
+    sequence: s.integer("sequence").notNull(),
 });
