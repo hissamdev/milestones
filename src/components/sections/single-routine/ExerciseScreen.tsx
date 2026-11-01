@@ -11,6 +11,7 @@ import {
 import { SetStateAction, useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import DurationControls from "./DurationControls";
+import RepControls from "./RepControls";
 // import * as SVG from "react-native-svg";
 // import TrophyFill from "../../../../assets/images/trophy-fill-icon.svg";
 
@@ -61,11 +62,13 @@ export default function ExerciseScreen({
     setCurrentSequence,
     currentSequence,
     routineId,
+    dataId,
 }: {
     routineTemplate: DayTemplateTEE["routineTemplate"];
     setCurrentSequence: React.Dispatch<SetStateAction<number>>;
     currentSequence: number;
     routineId: string;
+    dataId: string;
 }) {
     const [isNextAvailable, setIsNextAvailable] = useState(false);
 
@@ -193,15 +196,12 @@ export default function ExerciseScreen({
                 }}
             >
                 <View style={{}}>
-                    {/* {currentActivity.exercise?.type &&
-                        currentActivity.exercise?.type === "reps" ? (
-                            <RepControls currentActivity={currentActivity} />
-                        ) : (
-                            <DurationControls
-                                currentActivity={currentActivity}
-                            />
-                        )} */}
-                    <DurationControls currentActivity={currentActivity} />
+                    {currentActivity.exercise?.type &&
+                    currentActivity.exercise?.type === "reps" ? (
+                        <RepControls currentActivity={currentActivity} />
+                    ) : (
+                        <DurationControls currentActivity={currentActivity} />
+                    )}
 
                     <View>
                         <View

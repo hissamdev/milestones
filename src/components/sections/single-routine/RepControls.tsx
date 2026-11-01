@@ -1,11 +1,11 @@
-import { Clock, Dumbbell, Minus, Plus } from "lucide-react-native";
+import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
+import { Dumbbell, Minus, Plus, Timer } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
-import { CurrentActivity } from "./ExerciseScreen";
 
-export default function RepControls({
+export default function DurationControls({
     currentActivity,
 }: {
-    currentActivity: CurrentActivity;
+    currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];
 }) {
     return (
         <View
@@ -14,6 +14,7 @@ export default function RepControls({
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-between",
+                alignItems: "center",
                 gap: 10,
             }}
         >
@@ -96,6 +97,7 @@ export default function RepControls({
                     </TouchableOpacity>
                 </View>
             </View>
+
             {/*Second box */}
             <View
                 style={{
@@ -116,7 +118,7 @@ export default function RepControls({
                 >
                     <Text>Set Duration</Text>
                     <Text>
-                        <Clock size={15} />
+                        <Timer size={15} />
                     </Text>
                 </View>
                 <View
@@ -173,6 +175,7 @@ export default function RepControls({
                             flex: 1,
                             backgroundColor: "#094CB2",
                             borderRadius: 5,
+                            height: 30,
                         }}
                     >
                         <Text

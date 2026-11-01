@@ -8,7 +8,8 @@ import { DayTemplateTEE } from "./edit-routine-screen";
 
 export default function RoutineFocusScreen() {
     const [currentSequence, setCurrentSequence] = useState(1);
-    const { routineId }: { routineId: string } = useLocalSearchParams();
+    const { routineId, dataId }: { routineId: string; dataId: string } =
+        useLocalSearchParams();
     const [currentDay, setCurrentDay] = useState<DayTemplateTEE | null>(null);
 
     useEffect(() => {
@@ -37,6 +38,7 @@ export default function RoutineFocusScreen() {
             {currentActivity.displayRestAmount ? (
                 <RestScreen
                     routineId={routineId}
+                    dataId={dataId}
                     routineTemplate={currentDay.routineTemplate}
                     currentSequence={currentSequence}
                     setCurrentSequence={setCurrentSequence}
@@ -44,6 +46,7 @@ export default function RoutineFocusScreen() {
             ) : (
                 <ExerciseScreen
                     routineTemplate={currentDay.routineTemplate}
+                    dataId={dataId}
                     currentSequence={currentSequence}
                     setCurrentSequence={setCurrentSequence}
                     routineId={routineId}

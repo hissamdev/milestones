@@ -9,7 +9,7 @@ import {
 } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 
-export default function RepControls({
+export default function DurationControls({
     currentActivity,
 }: {
     currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];

@@ -1,11 +1,13 @@
 import { db } from "@/db/client";
 import {
     daysOtw,
+    routineDataTopLevel,
     routines,
     routineTemplateExercises,
     routineTemplates,
 } from "@/db/schema/workouts";
 import { eq } from "drizzle-orm";
+import { randomUUID } from "expo-crypto";
 import z from "zod";
 import { generateUuid } from "../helpers";
 export async function createRoutine(name: string) {
@@ -285,7 +287,62 @@ export async function removeTemplateExercise(templateExerciseId: string) {
     }
 }
 
-export async function getLatestRoutineData() {
+export async function getSingleRoutine(routineId: string) {
     try {
-    } catch (err) {}
+        const res = await db.query.routines.findFirst({
+            where: {
+                id: routineId,
+            },
+            with: {
+                daysOtw: {
+                    with: {
+                        routineTemplate: {
+                            with: {
+                                templateExercises: {
+                                    orderBy: {
+                                        sequence: "asc",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                routineData: {
+                    limit: 30,
+                    orderBy: {
+                        interactionTime: "desc",
+                    },
+                    with: {
+                        dataExercises: {
+                            orderBy: {
+                                sequence: "asc",
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!res) {
+            throw new Error("Something went wrong");
+        }
+
+        return res;
+    } catch (err) {
+        console.error(err);
+        throw new Error("Something went wrong");
+    }
+}
+export type Routine = Awaited<ReturnType<typeof getSingleRoutine>>;
+
+export async function createCurrentDayData(routineId: string) {
+    const [res] = await db
+        .insert(routineDataTopLevel)
+        .values({
+            id: randomUUID(),
+            routineId,
+            completionPercentage: 0,
+        })
+        .returning();
+    return res;
 }
