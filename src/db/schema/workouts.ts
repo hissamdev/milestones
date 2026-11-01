@@ -167,9 +167,10 @@ export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
         .notNull()
         .references(() => routineDataTopLevel.id),
     exerciseId: s.text("exercise_id").references(() => exercises.id),
+    isRest: s.integer("is_rest", { mode: "timestamp" }),
     // Preserve exercise info in case of exercise deletion
-    exerciseName: s.text("exercise_name").notNull(),
-    exerciseDisplayName: s.text("exercise_display_name").notNull(),
+    exerciseName: s.text("exercise_name"),
+    exerciseDisplayName: s.text("exercise_display_name"),
     exerciseDesc: s.text("exercise_desc"),
     exerciseType: s.text("exercise_type"), // Reps or Duration
     // Work done
@@ -179,6 +180,7 @@ export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
         .integer("current_set_start_time", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()),
+    currentSetEndTime: s.integer("current_set_end_time", { mode: "timestamp" }),
     currentSetDuration: s.integer("current_set_duration"),
     sequence: s.integer("sequence").notNull(),
 });

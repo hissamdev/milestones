@@ -1,0 +1,1 @@
+ALTER TABLE `routine_exercise_data` ADD `is_rest` integer;

@@ -2,6 +2,7 @@ import { db } from "@/db/client";
 import {
     daysOtw,
     routineDataTopLevel,
+    routineExerciseData,
     routines,
     routineTemplateExercises,
     routineTemplates,
@@ -345,4 +346,129 @@ export async function createCurrentDayData(routineId: string) {
         })
         .returning();
     return res;
+}
+
+export async function getTopLevelData(dataId: string) {
+    try {
+        const res = await db.query.routineDataTopLevel.findFirst({
+            where: {
+                id: dataId,
+            },
+            with: {
+                dataExercises: {
+                    orderBy: {
+                        sequence: "asc",
+                    },
+                },
+            },
+        });
+
+        if (!res) {
+            throw new Error("Failed");
+        }
+
+        return res;
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export async function checkExerciseDataExists(
+    dataId: string,
+    sequence: number,
+) {
+    try {
+        const alreadyExists = await db.query.routineDataTopLevel.findFirst({
+            where: {
+                id: dataId,
+            },
+            with: {
+                dataExercises: {
+                    orderBy: {
+                        sequence: "asc",
+                    },
+                },
+            },
+        });
+
+        if (!alreadyExists) {
+            return {
+                success: false,
+                message: "Top-Level Data is supposed to exist but doesn't",
+            };
+        }
+
+        const currentExerciseData = alreadyExists.dataExercises.find(
+            (de) => de.sequence === sequence,
+        );
+
+        if (!currentExerciseData) {
+            return {
+                success: true,
+                message: "Data exists but matching sequence was not found",
+                exists: false,
+            };
+        }
+
+        await db.update(routineExerciseData).set({
+            currentSetStartTime: new Date(),
+        });
+
+        return {
+            success: true,
+            message: "Data and matching sequence entries already exist",
+            exists: true,
+            data: currentExerciseData,
+        };
+    } catch (err) {
+        console.error(err);
+        return {
+            success: false,
+            message: "Something went wrong" + err,
+        };
+    }
+}
+
+type CreateExerciseArgs = {
+    dataId: string;
+    sequence: number;
+    exerciseId: string;
+    name: string;
+    desc: string | null;
+    type: "reps" | "duration";
+    reps: number;
+    duration: number;
+};
+
+export async function createExerciseData({
+    dataId,
+    sequence,
+    exerciseId,
+    name,
+    desc,
+    type,
+    reps,
+    duration,
+}: CreateExerciseArgs) {
+    try {
+        const [res] = await db
+            .insert(routineExerciseData)
+            .values({
+                id: randomUUID(),
+                parentMetadataId: dataId,
+                exerciseId,
+                exerciseName: name.trim().toLowerCase(),
+                exerciseDisplayName: name,
+                exerciseDesc: desc,
+                exerciseType: type, // reps or duration
+                exerciseReps: reps,
+                exerciseDuration: duration,
+                sequence,
+            })
+            .returning();
+
+        return res;
+    } catch (err) {
+        console.error(err);
+    }
 }

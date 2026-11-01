@@ -1,4 +1,8 @@
 import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
+import {
+    checkExerciseDataExists,
+    createExerciseData,
+} from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import {
     ChevronLeft,
@@ -15,48 +19,6 @@ import RepControls from "./RepControls";
 // import * as SVG from "react-native-svg";
 // import TrophyFill from "../../../../assets/images/trophy-fill-icon.svg";
 
-export type CurrentActivity = {
-    id: string;
-    exerciseId: string;
-    sequence: number;
-    templateId: string;
-    displayAmount: number;
-    displayRestAmount: number | null;
-    exercise: {
-        id: string;
-        name: string;
-        desc: string | null;
-        type: string;
-        createdAt: Date;
-        updatedAt: Date;
-        displayName: string;
-        icon: string | null;
-    } | null;
-};
-
-type RoutineTemplate = {
-    id: string;
-    restDay: boolean;
-    templateExercises: {
-        id: string;
-        exerciseId: string;
-        sequence: number;
-        templateId: string;
-        displayAmount: number;
-        displayRestAmount: number | null;
-        exercise: {
-            id: string;
-            name: string;
-            desc: string | null;
-            type: string;
-            createdAt: Date;
-            updatedAt: Date;
-            displayName: string;
-            icon: string | null;
-        } | null;
-    }[];
-};
-
 export default function ExerciseScreen({
     routineTemplate,
     setCurrentSequence,
@@ -71,6 +33,11 @@ export default function ExerciseScreen({
     dataId: string;
 }) {
     const [isNextAvailable, setIsNextAvailable] = useState(false);
+    const [exerciseDataId, setExerciseDataId] = useState("");
+    const [currentActivity, setCurrentActivity] = useState<
+        DayTemplateTEE["routineTemplate"]["templateExercises"][0] | null
+    >(null);
+    const [amount, setAmount] = useState(0);
 
     const router = useRouter();
 
@@ -79,7 +46,6 @@ export default function ExerciseScreen({
             const isNextAvailable = routineTemplate.templateExercises.find(
                 (te) => te.sequence === currentSequence + 1,
             );
-            console.log("Next availability", isNextAvailable);
             if (!isNextAvailable) {
                 setIsNextAvailable(false);
                 return;
@@ -90,9 +56,50 @@ export default function ExerciseScreen({
         load();
     }, [currentSequence]);
 
+    useEffect(() => {
+        // Create entry for this exercise if does not exist, update it on each interaction
+        const load = async () => {
+            const currentExercise = routineTemplate.templateExercises.find(
+                (te) => te.sequence === currentSequence,
+            );
+            if (!currentExercise) return;
+            setCurrentActivity(currentExercise);
+
+            const exists = await checkExerciseDataExists(
+                dataId,
+                currentSequence,
+            );
+            if (!exists.success) {
+                console.error(exists.message);
+                return;
+            }
+            if (exists.success && exists.exists) {
+                setAmount(exists.data!.exerciseReps!);
+                setExerciseDataId(exists.data!.id);
+                return;
+            }
+            const res = await createExerciseData({
+                exerciseId: currentExercise.exercise!.id,
+                dataId,
+                name: currentExercise.exercise!.displayName,
+                desc: currentExercise.exercise!.desc,
+                type: currentExercise.exercise!.type as "reps" | "duration",
+                reps: currentExercise.displayAmount!,
+                duration: currentExercise.displayAmount!,
+                sequence: currentSequence,
+            });
+            if (!res) {
+                return;
+            }
+            setExerciseDataId(res.id);
+            setAmount(res.exerciseReps!);
+        };
+        load();
+    }, []);
+
     const handleNextSequence = () => {
         if (!isNextAvailable) {
-            router.push({
+            router.navigate({
                 pathname: "/routines/single-routine-screen",
                 params: {
                     routineId,
@@ -104,11 +111,11 @@ export default function ExerciseScreen({
         setCurrentSequence((prev) => prev + 1);
     };
 
-    const currentActivity = routineTemplate.templateExercises.find(
-        (te) => te.sequence === currentSequence,
-    );
+    // const currentActivity = routineTemplate.templateExercises.find(
+    //     (te) => te.sequence === currentSequence,
+    // );
 
-    if (!currentActivity) return;
+    if (!currentActivity || !exerciseDataId) return;
 
     return (
         <View style={{ flex: 1 }}>
@@ -198,9 +205,16 @@ export default function ExerciseScreen({
                 <View style={{}}>
                     {currentActivity.exercise?.type &&
                     currentActivity.exercise?.type === "reps" ? (
-                        <RepControls currentActivity={currentActivity} />
+                        <RepControls
+                            currentActivity={currentActivity}
+                            amount={amount}
+                            setAmount={setAmount}
+                        />
                     ) : (
-                        <DurationControls currentActivity={currentActivity} />
+                        <DurationControls
+                            currentActivity={currentActivity}
+                            amount={amount}
+                        />
                     )}
 
                     <View>
@@ -319,7 +333,7 @@ export default function ExerciseScreen({
                             <Text
                                 style={[styles.buttonText, { color: "white" }]}
                             >
-                                {isNextAvailable ? "Done" : "Finish"}
+                                {isNextAvailable ? "Next" : "Finish"}
                             </Text>
                         </TouchableOpacity>
                     </View>

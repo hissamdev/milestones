@@ -1,6 +1,9 @@
 import ExerciseScreen from "@/components/sections/single-routine/ExerciseScreen";
 import RestScreen from "@/components/sections/single-routine/RestScreen";
-import { getCurrentDayExercises } from "@/utils/workouts/routineHelpers";
+import {
+    getCurrentDayExercises,
+    getTopLevelData,
+} from "@/utils/workouts/routineHelpers";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
@@ -18,9 +21,15 @@ export default function RoutineFocusScreen() {
                 console.error("Routine id not provided");
                 return;
             }
+
             const routineDay = await getCurrentDayExercises(routineId);
             if (!routineDay) return;
             setCurrentDay(routineDay);
+            const ongoingData = await getTopLevelData(dataId);
+            if (!ongoingData || !ongoingData.dataExercises.length) {
+                return;
+            }
+            setCurrentSequence(ongoingData.dataExercises.length);
         };
 
         load();

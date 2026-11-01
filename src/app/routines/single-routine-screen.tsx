@@ -86,6 +86,7 @@ export default function SingleRoutineScreen() {
                     <Text>{checkOngoing()}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                    disabled={checkOngoing() === "ongoing"}
                     onPress={() =>
                         router.push({
                             pathname: "/routines/edit-routine-screen",

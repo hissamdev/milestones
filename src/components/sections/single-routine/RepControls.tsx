@@ -1,11 +1,16 @@
 import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
 import { Dumbbell, Minus, Plus, Timer } from "lucide-react-native";
+import { SetStateAction } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function DurationControls({
     currentActivity,
+    amount,
+    setAmount,
 }: {
     currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];
+    amount: number;
+    setAmount: React.Dispatch<SetStateAction<number>>;
 }) {
     return (
         <View
@@ -48,7 +53,9 @@ export default function DurationControls({
                         gap: 5,
                     }}
                 >
-                    <Text style={{ fontSize: 30, lineHeight: 50 }}>8</Text>
+                    <Text style={{ fontSize: 30, lineHeight: 50 }}>
+                        {amount}
+                    </Text>
                     <Text
                         style={{
                             paddingTop: 5,
@@ -72,6 +79,9 @@ export default function DurationControls({
                     }}
                 >
                     <TouchableOpacity
+                        onPress={() =>
+                            setAmount((prev) => (prev - 1 < 0 ? 0 : prev - 1))
+                        }
                         style={{
                             paddingVertical: 3,
                             flex: 1,
@@ -84,6 +94,7 @@ export default function DurationControls({
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
+                        onPress={() => setAmount((prev) => prev + 1)}
                         style={{
                             paddingVertical: 3,
                             flex: 1,

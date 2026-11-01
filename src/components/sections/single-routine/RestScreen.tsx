@@ -9,6 +9,7 @@ type Props = {
     routineTemplate: DayTemplateTEE["routineTemplate"];
     currentSequence: number;
     setCurrentSequence: React.Dispatch<SetStateAction<number>>;
+    dataId: string;
 };
 
 export default function RestScreen({
@@ -16,6 +17,7 @@ export default function RestScreen({
     routineTemplate,
     currentSequence,
     setCurrentSequence,
+    dataId,
 }: Props) {
     const [isNextAvailable, setIsNextAvailable] = useState(false);
 

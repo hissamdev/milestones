@@ -11,8 +11,10 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 export default function DurationControls({
     currentActivity,
+    amount,
 }: {
     currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];
+    amount: number;
 }) {
     return (
         <View
