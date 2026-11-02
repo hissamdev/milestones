@@ -373,62 +373,6 @@ export async function getTopLevelData(dataId: string) {
     }
 }
 
-export async function checkExerciseDataExists(
-    dataId: string,
-    sequence: number,
-) {
-    try {
-        const alreadyExists = await db.query.routineDataTopLevel.findFirst({
-            where: {
-                id: dataId,
-            },
-            with: {
-                dataExercises: {
-                    orderBy: {
-                        sequence: "asc",
-                    },
-                },
-            },
-        });
-
-        if (!alreadyExists) {
-            return {
-                success: false,
-                message: "Top-Level Data is supposed to exist but doesn't",
-            };
-        }
-
-        const currentExerciseData = alreadyExists.dataExercises.find(
-            (de) => de.sequence === sequence,
-        );
-
-        if (!currentExerciseData) {
-            return {
-                success: true,
-                message: "Data exists but matching sequence was not found",
-                exists: false,
-            };
-        }
-
-        await db.update(routineExerciseData).set({
-            currentSetStartTime: new Date(),
-        });
-
-        return {
-            success: true,
-            message: "Data and matching sequence entries already exist",
-            exists: true,
-            data: currentExerciseData,
-        };
-    } catch (err) {
-        console.error(err);
-        return {
-            success: false,
-            message: "Something went wrong" + err,
-        };
-    }
-}
-
 type CreateExerciseArgs = {
     dataId: string;
     sequence: number;
@@ -436,38 +380,73 @@ type CreateExerciseArgs = {
     name: string;
     desc: string | null;
     type: "reps" | "duration";
-    reps: number;
-    duration: number;
+    workAmount: number;
 };
 
-export async function createExerciseData({
+export async function initializeExerciseData({
     dataId,
     sequence,
     exerciseId,
     name,
     desc,
     type,
-    reps,
-    duration,
+    workAmount,
 }: CreateExerciseArgs) {
     try {
-        const [res] = await db
-            .insert(routineExerciseData)
-            .values({
-                id: randomUUID(),
+        console.log("reached");
+        const alreadyCreated = await db.query.routineExerciseData.findFirst({
+            where: {
                 parentMetadataId: dataId,
-                exerciseId,
-                exerciseName: name.trim().toLowerCase(),
-                exerciseDisplayName: name,
-                exerciseDesc: desc,
-                exerciseType: type, // reps or duration
-                exerciseReps: reps,
-                exerciseDuration: duration,
                 sequence,
-            })
-            .returning();
+            },
+        });
+        if (!alreadyCreated) {
+            const [res] = await db
+                .insert(routineExerciseData)
+                .values({
+                    id: randomUUID(),
+                    parentMetadataId: dataId,
+                    exerciseId,
+                    isRest: false,
+                    exerciseName: name.trim().toLowerCase(),
+                    exerciseDisplayName: name,
+                    exerciseDesc: desc,
+                    exerciseType: type, // reps or duration
+                    workAmount,
+                    sequence,
+                })
+                .returning();
+            return res;
+        }
 
-        return res;
+        const [updatedStart] = await db
+            .update(routineExerciseData)
+            .set({
+                currentSetStartTime: new Date(),
+            })
+            .where(eq(routineExerciseData.id, exerciseId))
+            .returning();
+        return updatedStart;
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export async function updateExerciseAmountData(
+    exerciseDataId: string,
+    updatedAmount: number,
+    exerciseType: "reps" | "duration",
+) {
+    try {
+        console.log("Updating");
+
+        await db
+            .update(routineExerciseData)
+            .set({
+                workAmount: updatedAmount,
+            })
+            .where(eq(routineExerciseData.id, exerciseDataId));
+        return;
     } catch (err) {
         console.error(err);
     }

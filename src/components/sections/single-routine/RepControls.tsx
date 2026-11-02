@@ -1,4 +1,5 @@
 import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
+import { updateExerciseAmountData } from "@/utils/workouts/routineHelpers";
 import { Dumbbell, Minus, Plus, Timer } from "lucide-react-native";
 import { SetStateAction } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -7,11 +8,33 @@ export default function DurationControls({
     currentActivity,
     amount,
     setAmount,
+    exerciseDataId,
 }: {
     currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];
     amount: number;
     setAmount: React.Dispatch<SetStateAction<number>>;
+    exerciseDataId: string;
 }) {
+    const handleUpdateAmount = async (mode: "add" | "subtract") => {
+        if (mode === "subtract") {
+            const safeSubtraction = amount - 1 < 0 ? 0 : amount - 1;
+            setAmount((prev) => (prev - 1 < 0 ? 0 : prev - 1));
+            await updateExerciseAmountData(
+                exerciseDataId,
+                safeSubtraction,
+                currentActivity.exercise!.type as "reps" | "duration",
+            );
+            return;
+        }
+        setAmount((prev) => prev + 1);
+        await updateExerciseAmountData(
+            exerciseDataId,
+            amount + 1,
+            currentActivity.exercise!.type as "reps" | "duration",
+        );
+        return;
+    };
+
     return (
         <View
             style={{
@@ -79,9 +102,7 @@ export default function DurationControls({
                     }}
                 >
                     <TouchableOpacity
-                        onPress={() =>
-                            setAmount((prev) => (prev - 1 < 0 ? 0 : prev - 1))
-                        }
+                        onPress={() => handleUpdateAmount("subtract")}
                         style={{
                             paddingVertical: 3,
                             flex: 1,
@@ -94,7 +115,7 @@ export default function DurationControls({
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => setAmount((prev) => prev + 1)}
+                        onPress={() => handleUpdateAmount("add")}
                         style={{
                             paddingVertical: 3,
                             flex: 1,

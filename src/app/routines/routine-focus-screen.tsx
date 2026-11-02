@@ -9,11 +9,36 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { DayTemplateTEE } from "./edit-routine-screen";
 
+export type TopLevelData = {
+    routineId: string;
+    id: string;
+    interactionTime: Date;
+    completionPercentage: number;
+    isComplete: boolean;
+    dataExercises: {
+        routineId: string | null;
+        id: string;
+        exerciseId: string | null;
+        sequence: number;
+        parentMetadataId: string;
+        isRest: boolean;
+        exerciseName: string | null;
+        exerciseDisplayName: string | null;
+        exerciseDesc: string | null;
+        exerciseType: string | null;
+        workAmount: number | null;
+        currentSetStartTime: Date;
+        currentSetEndTime: Date | null;
+        currentSetDuration: number | null;
+    }[];
+};
+
 export default function RoutineFocusScreen() {
     const [currentSequence, setCurrentSequence] = useState(1);
     const { routineId, dataId }: { routineId: string; dataId: string } =
         useLocalSearchParams();
     const [currentDay, setCurrentDay] = useState<DayTemplateTEE | null>(null);
+    const [routineData, setRoutineData] = useState<TopLevelData | null>(null);
 
     useEffect(() => {
         const load = async () => {
@@ -25,11 +50,18 @@ export default function RoutineFocusScreen() {
             const routineDay = await getCurrentDayExercises(routineId);
             if (!routineDay) return;
             setCurrentDay(routineDay);
-            const ongoingData = await getTopLevelData(dataId);
-            if (!ongoingData || !ongoingData.dataExercises.length) {
+            const topLevelData = await getTopLevelData(dataId);
+            if (!topLevelData || !topLevelData.dataExercises.length) {
                 return;
             }
-            setCurrentSequence(ongoingData.dataExercises.length);
+
+            setRoutineData(topLevelData);
+
+            setCurrentSequence(
+                topLevelData.dataExercises[
+                    topLevelData.dataExercises.length - 1
+                ].sequence,
+            );
         };
 
         load();
@@ -59,6 +91,7 @@ export default function RoutineFocusScreen() {
                     currentSequence={currentSequence}
                     setCurrentSequence={setCurrentSequence}
                     routineId={routineId}
+                    topLevelData={routineData}
                 />
             )}
         </View>

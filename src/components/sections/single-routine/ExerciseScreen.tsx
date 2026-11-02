@@ -1,8 +1,6 @@
 import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
-import {
-    checkExerciseDataExists,
-    createExerciseData,
-} from "@/utils/workouts/routineHelpers";
+import { TopLevelData } from "@/app/routines/routine-focus-screen";
+import { initializeExerciseData } from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import {
     ChevronLeft,
@@ -16,8 +14,6 @@ import { SetStateAction, useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import DurationControls from "./DurationControls";
 import RepControls from "./RepControls";
-// import * as SVG from "react-native-svg";
-// import TrophyFill from "../../../../assets/images/trophy-fill-icon.svg";
 
 export default function ExerciseScreen({
     routineTemplate,
@@ -25,12 +21,14 @@ export default function ExerciseScreen({
     currentSequence,
     routineId,
     dataId,
+    topLevelData,
 }: {
     routineTemplate: DayTemplateTEE["routineTemplate"];
     setCurrentSequence: React.Dispatch<SetStateAction<number>>;
     currentSequence: number;
     routineId: string;
     dataId: string;
+    topLevelData: TopLevelData | null;
 }) {
     const [isNextAvailable, setIsNextAvailable] = useState(false);
     const [exerciseDataId, setExerciseDataId] = useState("");
@@ -65,34 +63,20 @@ export default function ExerciseScreen({
             if (!currentExercise) return;
             setCurrentActivity(currentExercise);
 
-            const exists = await checkExerciseDataExists(
-                dataId,
-                currentSequence,
-            );
-            if (!exists.success) {
-                console.error(exists.message);
-                return;
-            }
-            if (exists.success && exists.exists) {
-                setAmount(exists.data!.exerciseReps!);
-                setExerciseDataId(exists.data!.id);
-                return;
-            }
-            const res = await createExerciseData({
+            const res = await initializeExerciseData({
                 exerciseId: currentExercise.exercise!.id,
                 dataId,
                 name: currentExercise.exercise!.displayName,
                 desc: currentExercise.exercise!.desc,
                 type: currentExercise.exercise!.type as "reps" | "duration",
-                reps: currentExercise.displayAmount!,
-                duration: currentExercise.displayAmount!,
+                workAmount: currentExercise.displayAmount!,
                 sequence: currentSequence,
             });
             if (!res) {
                 return;
             }
             setExerciseDataId(res.id);
-            setAmount(res.exerciseReps!);
+            setAmount(res.workAmount!);
         };
         load();
     }, []);
@@ -110,10 +94,6 @@ export default function ExerciseScreen({
 
         setCurrentSequence((prev) => prev + 1);
     };
-
-    // const currentActivity = routineTemplate.templateExercises.find(
-    //     (te) => te.sequence === currentSequence,
-    // );
 
     if (!currentActivity || !exerciseDataId) return;
 
@@ -206,6 +186,7 @@ export default function ExerciseScreen({
                     {currentActivity.exercise?.type &&
                     currentActivity.exercise?.type === "reps" ? (
                         <RepControls
+                            exerciseDataId={exerciseDataId}
                             currentActivity={currentActivity}
                             amount={amount}
                             setAmount={setAmount}
@@ -219,71 +200,131 @@ export default function ExerciseScreen({
 
                     <View>
                         <View
-                            style={{ height: 1.5, backgroundColor: "#EAEAEF" }}
-                        />
-                        <View
                             style={{
-                                marginTop: 5,
-                                display: "flex",
-                                flexDirection: "row",
-                                justifyContent: "space-between",
+                                paddingTop: 8,
+                                paddingBottom: 8,
+                                borderTopWidth: 1.5,
+                                borderBottomWidth: 1.5,
+                                borderColor: "#EAEAEF",
                             }}
                         >
-                            <View>
-                                <View
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "row",
-                                        alignItems: "flex-start",
-
-                                        gap: 5,
-                                    }}
-                                >
-                                    <Text
+                            <View
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <View>
+                                    <View
                                         style={{
-                                            padding: 4,
-                                            backgroundColor: "#F9EBD6",
-                                            borderRadius: 100,
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            alignItems: "flex-start",
+                                            gap: 5,
                                         }}
                                     >
-                                        <TrophyIcon size={12} color="#D97706" />
-                                    </Text>
-                                    <View>
-                                        <Text>Lifetime Record</Text>
-                                        <Text>12 reps</Text>
-                                    </View>
-                                </View>
-                            </View>
-                            <View>
-                                <View
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "row",
-                                        alignItems: "flex-start",
-                                        gap: 5,
-                                    }}
-                                >
-                                    <View>
-                                        <Text>Last week best</Text>
                                         <Text
                                             style={{
-                                                textAlign: "right",
+                                                padding: 4,
+                                                backgroundColor: "#F9EBD6",
+                                                borderRadius: 100,
                                             }}
                                         >
-                                            10 reps
+                                            <TrophyIcon
+                                                size={12}
+                                                color="#D97706"
+                                            />
                                         </Text>
+                                        <View>
+                                            <Text>Lifetime Record</Text>
+                                            <Text>12 reps</Text>
+                                        </View>
                                     </View>
-                                    <Text
+                                </View>
+                                <View>
+                                    <View
                                         style={{
-                                            padding: 4,
-                                            backgroundColor: "#EBECEF",
-                                            borderRadius: 100,
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            alignItems: "flex-start",
+                                            gap: 5,
                                         }}
                                     >
-                                        <History size={14} color="#475569" />
-                                    </Text>
+                                        <View>
+                                            <Text>Last week best</Text>
+                                            <Text
+                                                style={{
+                                                    textAlign: "right",
+                                                }}
+                                            >
+                                                10 reps
+                                            </Text>
+                                        </View>
+                                        <Text
+                                            style={{
+                                                padding: 4,
+                                                backgroundColor: "#EBECEF",
+                                                borderRadius: 100,
+                                            }}
+                                        >
+                                            <History
+                                                size={14}
+                                                color="#475569"
+                                            />
+                                        </Text>
+                                    </View>
                                 </View>
                             </View>
+                        </View>
+                        <View style={{}}>
+                            <View
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    marginTop: 10,
+                                    paddingBottom: 4,
+                                    borderBottomWidth: 1.5,
+                                    borderBottomColor: "#EAEAEF",
+                                }}
+                            >
+                                <View style={{ flex: 1 }}>
+                                    <Text>Completed</Text>
+                                </View>
+                                <View style={{ flex: 1 / 3 }}>
+                                    <Text>Amount</Text>
+                                </View>
+                                <View>
+                                    <Text>Duration</Text>
+                                </View>
+                            </View>
+
+                            {topLevelData &&
+                                topLevelData.dataExercises
+                                    .filter(
+                                        (de) =>
+                                            !de.isRest &&
+                                            de.sequence !== currentSequence,
+                                    )
+                                    .map((de) => (
+                                        <View key={de.id}>
+                                            <Text>
+                                                {de.exerciseName} {de.sequence}{" "}
+                                                {currentSequence.toString()}
+                                                {de.isRest.toString()}
+                                                {JSON.stringify(
+                                                    topLevelData.dataExercises.filter(
+                                                        (de) =>
+                                                            !de.isRest ||
+                                                            de.sequence !==
+                                                                currentSequence,
+                                                    ),
+                                                    null,
+                                                    2,
+                                                )}
+                                            </Text>
+                                        </View>
+                                    ))}
                         </View>
                     </View>
                 </View>

@@ -167,15 +167,14 @@ export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
         .notNull()
         .references(() => routineDataTopLevel.id),
     exerciseId: s.text("exercise_id").references(() => exercises.id),
-    isRest: s.integer("is_rest", { mode: "timestamp" }),
+    isRest: s.integer("is_rest", { mode: "boolean" }).notNull(),
     // Preserve exercise info in case of exercise deletion
     exerciseName: s.text("exercise_name"),
     exerciseDisplayName: s.text("exercise_display_name"),
     exerciseDesc: s.text("exercise_desc"),
     exerciseType: s.text("exercise_type"), // Reps or Duration
     // Work done
-    exerciseReps: s.integer("exercise_reps"),
-    exerciseDuration: s.integer("exercise_duration"),
+    workAmount: s.integer("work_amount"),
     currentSetStartTime: s
         .integer("current_set_start_time", { mode: "timestamp" })
         .notNull()
