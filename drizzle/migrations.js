@@ -8,6 +8,7 @@ import m0004 from './20261101110636_mushy_arachne/migration.sql';
 import m0005 from './20261101110711_closed_energizer/migration.sql';
 import m0006 from './20261102022021_misty_blacklash/migration.sql';
 import m0007 from './20261102040230_secret_shadow_king/migration.sql';
+import m0008 from './20261102092436_polite_spacker_dave/migration.sql';
 
   export default {
     migrations: {
@@ -18,7 +19,8 @@ import m0007 from './20261102040230_secret_shadow_king/migration.sql';
 "20261101110636_mushy_arachne": m0004,
 "20261101110711_closed_energizer": m0005,
 "20261102022021_misty_blacklash": m0006,
-"20261102040230_secret_shadow_king": m0007
+"20261102040230_secret_shadow_king": m0007,
+"20261102092436_polite_spacker_dave": m0008
 }
   }
   

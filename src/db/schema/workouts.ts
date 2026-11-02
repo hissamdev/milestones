@@ -167,7 +167,11 @@ export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
         .notNull()
         .references(() => routineDataTopLevel.id),
     exerciseId: s.text("exercise_id").references(() => exercises.id),
-    isRest: s.integer("is_rest", { mode: "boolean" }).notNull(),
+    isRest: s.integer("is_rest", { mode: "boolean" }).notNull().default(false),
+    isComplete: s
+        .integer("is_complete", { mode: "boolean" })
+        .notNull()
+        .default(false),
     // Preserve exercise info in case of exercise deletion
     exerciseName: s.text("exercise_name"),
     exerciseDisplayName: s.text("exercise_display_name"),

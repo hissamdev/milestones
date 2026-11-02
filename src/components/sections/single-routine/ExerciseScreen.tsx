@@ -36,6 +36,9 @@ export default function ExerciseScreen({
         DayTemplateTEE["routineTemplate"]["templateExercises"][0] | null
     >(null);
     const [amount, setAmount] = useState(0);
+    const [exerciseData, setExerciseData] = useState<
+        TopLevelData["dataExercises"][0] | null
+    >(null);
 
     const router = useRouter();
 
@@ -73,10 +76,12 @@ export default function ExerciseScreen({
                 sequence: currentSequence,
             });
             if (!res) {
+                console.error("Something went wrong", res);
                 return;
             }
             setExerciseDataId(res.id);
             setAmount(res.workAmount!);
+            setExerciseData(res);
         };
         load();
     }, []);
@@ -95,7 +100,10 @@ export default function ExerciseScreen({
         setCurrentSequence((prev) => prev + 1);
     };
 
-    if (!currentActivity || !exerciseDataId) return;
+    if (!currentActivity || !exerciseDataId) {
+        console.log("Not ready");
+        return <Text>Failed {exerciseDataId.toString()}</Text>;
+    }
 
     return (
         <View style={{ flex: 1 }}>
@@ -173,6 +181,20 @@ export default function ExerciseScreen({
                         style={{ marginTop: 0, fontSize: 15, color: "white" }}
                     >
                         {currentActivity.exercise?.desc}
+                    </Text>
+                    <Text
+                        style={{ marginTop: 0, fontSize: 15, color: "white" }}
+                    >
+                        {exerciseData?.currentSetStartTime.toLocaleTimeString(
+                            "en-US",
+                            {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                hour12: true,
+                            },
+                        )}{" "}
+                        hi
                     </Text>
                 </View>
             </View>

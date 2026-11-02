@@ -7,7 +7,7 @@ import {
     routineTemplateExercises,
     routineTemplates,
 } from "@/db/schema/workouts";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 import z from "zod";
 import { generateUuid } from "../helpers";
@@ -393,7 +393,6 @@ export async function initializeExerciseData({
     workAmount,
 }: CreateExerciseArgs) {
     try {
-        console.log("reached");
         const alreadyCreated = await db.query.routineExerciseData.findFirst({
             where: {
                 parentMetadataId: dataId,
@@ -424,11 +423,18 @@ export async function initializeExerciseData({
             .set({
                 currentSetStartTime: new Date(),
             })
-            .where(eq(routineExerciseData.id, exerciseId))
+            .where(
+                and(
+                    eq(routineExerciseData.parentMetadataId, dataId),
+                    eq(routineExerciseData.sequence, sequence),
+                ),
+            )
             .returning();
+        console.log("Updated", updatedStart);
         return updatedStart;
     } catch (err) {
-        console.error(err);
+        console.error("Failed to initialize exercise", err);
+        return;
     }
 }
 
