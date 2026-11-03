@@ -27,7 +27,7 @@ export default function SingleRoutineScreen() {
     }
 
     const checkOngoing: () => "start" | "ongoing" | "redo" = () => {
-        if (!routine.routineData?.[0]) {
+        if (!routine.routineData.length) {
             return "start";
         }
         const exists =

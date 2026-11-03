@@ -28,6 +28,7 @@ export default function RestScreen({
         TopLevelData["dataExercises"][0] | null
     >(null);
     const [restId, setRestId] = useState("");
+    const [displayTimer, setDisplayTimer] = useState(0);
 
     const router = useRouter();
 
@@ -46,6 +47,10 @@ export default function RestScreen({
                 (te) => te.sequence === currentSequence,
             );
 
+            if (!displayTimer) {
+                setDisplayTimer(currentRest?.displayRestAmount!);
+            }
+
             const restData = await initializeRestData(
                 dataId,
                 currentRest!.displayRestAmount!,
@@ -59,6 +64,22 @@ export default function RestScreen({
         load();
     }, [currentSequence]);
 
+    useEffect(() => {
+        console.log("Effect ran");
+        if (!restData || !restData.startTime || !restData.endTime) {
+            return;
+        }
+
+        const timer = setInterval(() => {
+            const updateDisplay = Math.floor(
+                (restData.endTime!.getTime() - new Date().getTime()) / 1000,
+            );
+            setDisplayTimer(updateDisplay);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [restData]);
+
     const handleNextSequence = () => {
         if (!isNextAvailable) {
             router.push({
@@ -71,6 +92,17 @@ export default function RestScreen({
         }
 
         setCurrentSequence((prev) => prev + 1);
+    };
+
+    const formatSeconds = () => {
+        if (displayTimer < 60) {
+            return displayTimer.toString();
+        }
+        const seconds = (displayTimer % 60).toString().padStart(2, "0");
+        const minutes = Math.floor(displayTimer / 60)
+            .toString()
+            .padStart(2, "0");
+        return `${minutes}:${seconds}`;
     };
 
     return (
@@ -132,7 +164,7 @@ export default function RestScreen({
                         }}
                     />
                     <Text>Plank</Text>
-                    <Text>60s - 32</Text>
+                    <Text></Text>
                 </View>
 
                 <View
@@ -142,7 +174,9 @@ export default function RestScreen({
                         alignItems: "center",
                     }}
                 >
-                    <Text style={{ fontSize: 50, color: "white" }}>60s</Text>
+                    <Text style={{ fontSize: 50, color: "white" }}>
+                        {formatSeconds()}
+                    </Text>
                     <Text style={{ fontSize: 30, color: "white" }}>
                         Remaining
                     </Text>

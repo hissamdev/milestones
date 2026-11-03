@@ -350,21 +350,7 @@ export default function ExerciseScreen({
                                     )
                                     .map((de) => (
                                         <View key={de.id}>
-                                            <Text>
-                                                {de.exerciseName} {de.sequence}{" "}
-                                                {currentSequence.toString()}
-                                                {de.isRest.toString()}
-                                                {JSON.stringify(
-                                                    topLevelData.dataExercises.filter(
-                                                        (de) =>
-                                                            !de.isRest ||
-                                                            de.sequence !==
-                                                                currentSequence,
-                                                    ),
-                                                    null,
-                                                    2,
-                                                )}
-                                            </Text>
+                                            <Text>{de.exerciseName}</Text>
                                         </View>
                                     ))}
                         </View>

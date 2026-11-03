@@ -452,23 +452,33 @@ export async function initializeRestData(
             },
         });
 
+        const startTime = new Date();
+        const calculateEnd = new Date(startTime.getTime() + restEnd * 1000);
+
         if (!restExists) {
-            const calculateEnd = new Date(
-                new Date().getTime() + restEnd * 1000,
-            );
-            const [create] = await db
+            const [created] = await db
                 .insert(routineExerciseData)
                 .values({
                     id: randomUUID(),
                     parentMetadataId: dataId,
                     isRest: true,
+                    startTime,
                     endTime: calculateEnd,
                     sequence,
                 })
                 .returning();
-            return create;
+            return created;
         }
-        return restExists;
+
+        const [updated] = await db
+            .update(routineExerciseData)
+            .set({
+                startTime,
+                endTime: calculateEnd,
+            })
+            .returning();
+
+        return updated;
     } catch (err) {
         console.error(err);
     }
@@ -518,6 +528,16 @@ export async function completeExercise(
     } catch (err) {
         console.error(err);
     }
+}
+
+export async function completeRest(restId: string, endTime: Date) {
+    const res = await db
+        .update(routineExerciseData)
+        .set({
+            isComplete: true,
+            endTime,
+        })
+        .where(eq(routineExerciseData.id, restId));
 }
 
 export async function completeRoutine(dataId: string) {
