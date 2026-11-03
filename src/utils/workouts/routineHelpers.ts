@@ -438,6 +438,8 @@ export async function initializeExerciseData({
     }
 }
 
+export async function initializeRestData() {}
+
 export async function updateExerciseAmountData(
     exerciseDataId: string,
     updatedAmount: number,
@@ -453,6 +455,42 @@ export async function updateExerciseAmountData(
             })
             .where(eq(routineExerciseData.id, exerciseDataId));
         return;
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export async function completeExercise(
+    dataId: string,
+    exerciseDataId: string,
+    completionPercentage: number,
+) {
+    try {
+        await db
+            .update(routineExerciseData)
+            .set({
+                isComplete: true,
+                currentSetEndTime: new Date(),
+            })
+            .where(
+                and(
+                    eq(routineExerciseData.parentMetadataId, dataId),
+                    eq(routineExerciseData.id, exerciseDataId),
+                ),
+            );
+        await db.update(routineDataTopLevel).set({
+            completionPercentage,
+        });
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export async function completeRoutine(dataId: string) {
+    try {
+        await db.update(routineDataTopLevel).set({
+            isComplete: true,
+        });
     } catch (err) {
         console.error(err);
     }

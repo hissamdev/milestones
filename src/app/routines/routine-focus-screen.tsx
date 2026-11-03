@@ -54,7 +54,6 @@ export default function RoutineFocusScreen() {
             if (!topLevelData || !topLevelData.dataExercises.length) {
                 return;
             }
-
             setRoutineData(topLevelData);
 
             setCurrentSequence(
@@ -92,6 +91,7 @@ export default function RoutineFocusScreen() {
                     setCurrentSequence={setCurrentSequence}
                     routineId={routineId}
                     topLevelData={routineData}
+                    setTopLevelData={setRoutineData}
                 />
             )}
         </View>

@@ -1,6 +1,10 @@
 import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
 import { TopLevelData } from "@/app/routines/routine-focus-screen";
-import { initializeExerciseData } from "@/utils/workouts/routineHelpers";
+import {
+    completeExercise,
+    getTopLevelData,
+    initializeExerciseData,
+} from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import {
     ChevronLeft,
@@ -15,6 +19,16 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import DurationControls from "./DurationControls";
 import RepControls from "./RepControls";
 
+type Props = {
+    routineTemplate: DayTemplateTEE["routineTemplate"];
+    setCurrentSequence: React.Dispatch<SetStateAction<number>>;
+    currentSequence: number;
+    routineId: string;
+    dataId: string;
+    topLevelData: TopLevelData | null;
+    setTopLevelData: React.Dispatch<SetStateAction<TopLevelData | null>>;
+};
+
 export default function ExerciseScreen({
     routineTemplate,
     setCurrentSequence,
@@ -22,14 +36,8 @@ export default function ExerciseScreen({
     routineId,
     dataId,
     topLevelData,
-}: {
-    routineTemplate: DayTemplateTEE["routineTemplate"];
-    setCurrentSequence: React.Dispatch<SetStateAction<number>>;
-    currentSequence: number;
-    routineId: string;
-    dataId: string;
-    topLevelData: TopLevelData | null;
-}) {
+    setTopLevelData,
+}: Props) {
     const [isNextAvailable, setIsNextAvailable] = useState(false);
     const [exerciseDataId, setExerciseDataId] = useState("");
     const [currentActivity, setCurrentActivity] = useState<
@@ -43,7 +51,7 @@ export default function ExerciseScreen({
     const router = useRouter();
 
     useEffect(() => {
-        const load = () => {
+        const load = async () => {
             const isNextAvailable = routineTemplate.templateExercises.find(
                 (te) => te.sequence === currentSequence + 1,
             );
@@ -52,6 +60,11 @@ export default function ExerciseScreen({
                 return;
             }
             setIsNextAvailable(true);
+            const topLevelData = await getTopLevelData(dataId);
+            if (!topLevelData || !topLevelData.dataExercises.length) {
+                return;
+            }
+            setTopLevelData(topLevelData);
         };
 
         load();
@@ -87,7 +100,9 @@ export default function ExerciseScreen({
     }, []);
 
     const handleNextSequence = () => {
+        handleComplete();
         if (!isNextAvailable) {
+            // Finish logic
             router.navigate({
                 pathname: "/routines/single-routine-screen",
                 params: {
@@ -96,8 +111,16 @@ export default function ExerciseScreen({
             });
             return;
         }
-
         setCurrentSequence((prev) => prev + 1);
+    };
+
+    const handleComplete = async () => {
+        const completion =
+            (topLevelData?.dataExercises.filter((de) => !de.isRest).length! /
+                routineTemplate.templateExercises.filter((te) => !te.isRestType)
+                    .length) *
+            100;
+        await completeExercise(dataId, exerciseDataId, completion);
     };
 
     if (!currentActivity || !exerciseDataId) {

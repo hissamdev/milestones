@@ -26,7 +26,7 @@ export default function SingleRoutineScreen() {
         return <Text>No id or routine</Text>;
     }
 
-    const checkOngoing: () => "start" | "ongoing" = () => {
+    const checkOngoing: () => "start" | "ongoing" | "redo" = () => {
         if (!routine.routineData?.[0]) {
             return "start";
         }
@@ -37,12 +37,12 @@ export default function SingleRoutineScreen() {
             // New day
             return "start";
         }
-        const ongoing = routine.routineData[0].isComplete === false; // Is it ongoing?
+        const ongoing = routine.routineData[0].isComplete === true; // Is it complete?
         if (!ongoing) {
             // Exists but completed
             return "ongoing";
         }
-        return "ongoing";
+        return "redo";
     };
 
     const handleCreateData = async () => {
