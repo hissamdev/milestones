@@ -421,7 +421,7 @@ export async function initializeExerciseData({
         const [updatedStart] = await db
             .update(routineExerciseData)
             .set({
-                currentSetStartTime: new Date(),
+                startTime: new Date(),
             })
             .where(
                 and(
@@ -438,7 +438,41 @@ export async function initializeExerciseData({
     }
 }
 
-export async function initializeRestData() {}
+export async function initializeRestData(
+    dataId: string,
+    restEnd: number,
+    sequence: number,
+) {
+    try {
+        const restExists = await db.query.routineExerciseData.findFirst({
+            where: {
+                parentMetadataId: dataId,
+                isRest: true,
+                sequence,
+            },
+        });
+
+        if (!restExists) {
+            const calculateEnd = new Date(
+                new Date().getTime() + restEnd * 1000,
+            );
+            const [create] = await db
+                .insert(routineExerciseData)
+                .values({
+                    id: randomUUID(),
+                    parentMetadataId: dataId,
+                    isRest: true,
+                    endTime: calculateEnd,
+                    sequence,
+                })
+                .returning();
+            return create;
+        }
+        return restExists;
+    } catch (err) {
+        console.error(err);
+    }
+}
 
 export async function updateExerciseAmountData(
     exerciseDataId: string,
@@ -470,7 +504,7 @@ export async function completeExercise(
             .update(routineExerciseData)
             .set({
                 isComplete: true,
-                currentSetEndTime: new Date(),
+                endTime: new Date(),
             })
             .where(
                 and(

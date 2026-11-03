@@ -179,11 +179,10 @@ export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
     exerciseType: s.text("exercise_type"), // Reps or Duration
     // Work done
     workAmount: s.integer("work_amount"),
-    currentSetStartTime: s
+    startTime: s
         .integer("current_set_start_time", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()),
-    currentSetEndTime: s.integer("current_set_end_time", { mode: "timestamp" }),
-    currentSetDuration: s.integer("current_set_duration"),
+    endTime: s.integer("current_set_end_time", { mode: "timestamp" }),
     sequence: s.integer("sequence").notNull(),
 });

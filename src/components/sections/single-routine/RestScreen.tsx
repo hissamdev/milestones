@@ -1,4 +1,6 @@
 import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
+import { TopLevelData } from "@/app/routines/routine-focus-screen";
+import { initializeRestData } from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import { ChevronLeft, ChevronRight, RefreshCcwIcon } from "lucide-react-native";
 import { SetStateAction, useEffect, useState } from "react";
@@ -10,6 +12,7 @@ type Props = {
     currentSequence: number;
     setCurrentSequence: React.Dispatch<SetStateAction<number>>;
     dataId: string;
+    topLevelData: TopLevelData | null;
 };
 
 export default function RestScreen({
@@ -18,22 +21,39 @@ export default function RestScreen({
     currentSequence,
     setCurrentSequence,
     dataId,
+    topLevelData,
 }: Props) {
     const [isNextAvailable, setIsNextAvailable] = useState(false);
+    const [restData, setRestData] = useState<
+        TopLevelData["dataExercises"][0] | null
+    >(null);
+    const [restId, setRestId] = useState("");
 
     const router = useRouter();
 
     useEffect(() => {
-        const load = () => {
+        const load = async () => {
             const isNextAvailable = routineTemplate.templateExercises.find(
                 (te) => te.sequence === currentSequence + 1,
             );
-            console.log("Next availability", isNextAvailable);
             if (!isNextAvailable) {
                 setIsNextAvailable(false);
                 return;
             }
             setIsNextAvailable(true);
+
+            const currentRest = routineTemplate.templateExercises.find(
+                (te) => te.sequence === currentSequence,
+            );
+
+            const restData = await initializeRestData(
+                dataId,
+                currentRest!.displayRestAmount!,
+                currentSequence,
+            );
+            if (!restData) return;
+            setRestData(restData);
+            setRestId(restData.id);
         };
 
         load();

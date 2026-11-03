@@ -10,16 +10,17 @@ import { Text, View } from "react-native";
 import { DayTemplateTEE } from "./edit-routine-screen";
 
 export type TopLevelData = {
-    routineId: string;
     id: string;
+    routineId: string;
     interactionTime: Date;
     completionPercentage: number;
     isComplete: boolean;
     dataExercises: {
-        routineId: string | null;
         id: string;
         exerciseId: string | null;
+        routineId: string | null;
         sequence: number;
+        isComplete: boolean;
         parentMetadataId: string;
         isRest: boolean;
         exerciseName: string | null;
@@ -27,9 +28,8 @@ export type TopLevelData = {
         exerciseDesc: string | null;
         exerciseType: string | null;
         workAmount: number | null;
-        currentSetStartTime: Date;
-        currentSetEndTime: Date | null;
-        currentSetDuration: number | null;
+        startTime: Date;
+        endTime: Date | null;
     }[];
 };
 
@@ -82,6 +82,7 @@ export default function RoutineFocusScreen() {
                     routineTemplate={currentDay.routineTemplate}
                     currentSequence={currentSequence}
                     setCurrentSequence={setCurrentSequence}
+                    topLevelData={routineData}
                 />
             ) : (
                 <ExerciseScreen

@@ -55,16 +55,16 @@ export default function ExerciseScreen({
             const isNextAvailable = routineTemplate.templateExercises.find(
                 (te) => te.sequence === currentSequence + 1,
             );
-            if (!isNextAvailable) {
-                setIsNextAvailable(false);
-                return;
-            }
-            setIsNextAvailable(true);
             const topLevelData = await getTopLevelData(dataId);
             if (!topLevelData || !topLevelData.dataExercises.length) {
                 return;
             }
             setTopLevelData(topLevelData);
+            if (!isNextAvailable) {
+                setIsNextAvailable(false);
+                return;
+            }
+            setIsNextAvailable(true);
         };
 
         load();
@@ -208,15 +208,12 @@ export default function ExerciseScreen({
                     <Text
                         style={{ marginTop: 0, fontSize: 15, color: "white" }}
                     >
-                        {exerciseData?.currentSetStartTime.toLocaleTimeString(
-                            "en-US",
-                            {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                second: "2-digit",
-                                hour12: true,
-                            },
-                        )}{" "}
+                        {exerciseData?.startTime.toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: true,
+                        })}{" "}
                         hi
                     </Text>
                 </View>

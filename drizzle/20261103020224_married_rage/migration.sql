@@ -1,0 +1,1 @@
+ALTER TABLE `routine_exercise_data` DROP COLUMN `current_set_duration`;
