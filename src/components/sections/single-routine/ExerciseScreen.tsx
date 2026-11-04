@@ -2,6 +2,7 @@ import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
 import { TopLevelData } from "@/app/routines/routine-focus-screen";
 import {
     completeExercise,
+    completeRoutine,
     getTopLevelData,
     initializeExerciseData,
 } from "@/utils/workouts/routineHelpers";
@@ -99,10 +100,11 @@ export default function ExerciseScreen({
         load();
     }, []);
 
-    const handleNextSequence = () => {
+    const handleNextSequence = async () => {
         handleComplete();
         if (!isNextAvailable) {
             // Finish logic
+            await completeRoutine(dataId);
             router.navigate({
                 pathname: "/routines/single-routine-screen",
                 params: {

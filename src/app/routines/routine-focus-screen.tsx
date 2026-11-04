@@ -59,6 +59,7 @@ export default function RoutineFocusScreen() {
             const firstIncomplete = topLevelData.dataExercises.find(
                 (de) => !de.isComplete,
             );
+
             setCurrentSequence(firstIncomplete!.sequence!);
         };
 

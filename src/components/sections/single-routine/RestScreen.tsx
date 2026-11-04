@@ -1,6 +1,9 @@
 import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
 import { TopLevelData } from "@/app/routines/routine-focus-screen";
-import { initializeRestData } from "@/utils/workouts/routineHelpers";
+import {
+    completeRest,
+    initializeRestData,
+} from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import { ChevronLeft, ChevronRight, RefreshCcwIcon } from "lucide-react-native";
 import { SetStateAction, useEffect, useState } from "react";
@@ -29,10 +32,12 @@ export default function RestScreen({
     >(null);
     const [restId, setRestId] = useState("");
     const [displayTimer, setDisplayTimer] = useState(0);
+    const [useStopwatch, setUseStopwatch] = useState(true);
 
     const router = useRouter();
 
     useEffect(() => {
+        console.log(currentSequence);
         const load = async () => {
             const isNextAvailable = routineTemplate.templateExercises.find(
                 (te) => te.sequence === currentSequence + 1,
@@ -42,45 +47,69 @@ export default function RestScreen({
                 return;
             }
             setIsNextAvailable(true);
-
-            const currentRest = routineTemplate.templateExercises.find(
-                (te) => te.sequence === currentSequence,
-            );
-
-            if (!displayTimer) {
-                setDisplayTimer(currentRest?.displayRestAmount!);
-            }
-
-            const restData = await initializeRestData(
-                dataId,
-                currentRest!.displayRestAmount!,
-                currentSequence,
-            );
-            if (!restData) return;
-            setRestData(restData);
-            setRestId(restData.id);
+            handleInitialization();
         };
 
         load();
     }, [currentSequence]);
 
     useEffect(() => {
-        console.log("Effect ran");
+        console.log("Effect ran", useStopwatch);
         if (!restData || !restData.startTime || !restData.endTime) {
             return;
         }
 
-        const timer = setInterval(() => {
-            const updateDisplay = Math.floor(
-                (restData.endTime!.getTime() - new Date().getTime()) / 1000,
+        const customEnd = new Date().getTime() + 5 * 1000;
+        const calculateDisplayTime = () => {
+            const countdown = Math.floor(
+                (customEnd - new Date().getTime()) / 1000,
             );
-            setDisplayTimer(updateDisplay);
-        }, 1000);
+            if (countdown < 0) {
+                handleNextSequence("auto");
+                return;
+            }
 
-        return () => clearTimeout(timer);
-    }, [restData]);
+            setDisplayTimer(() => {
+                if (!useStopwatch) {
+                    return countdown;
+                } else {
+                    return Math.floor(
+                        (new Date().getTime() - restData.startTime!.getTime()) /
+                            1000,
+                    );
+                }
+            });
+        };
 
-    const handleNextSequence = () => {
+        calculateDisplayTime();
+
+        const timer = setInterval(() => {
+            calculateDisplayTime();
+        }, 100);
+        return () => clearInterval(timer);
+    }, [restData, useStopwatch]);
+
+    const handleInitialization = async () => {
+        const currentRest = routineTemplate.templateExercises.find(
+            (te) => te.sequence === currentSequence,
+        );
+
+        if (!displayTimer) {
+            setDisplayTimer(currentRest?.displayRestAmount!);
+        }
+
+        const restData = await initializeRestData(
+            dataId,
+            currentRest!.displayRestAmount!,
+            currentSequence,
+        );
+        if (!restData) return;
+        setRestData(restData);
+        setRestId(restData.id);
+    };
+
+    const handleNextSequence = (mode: "auto" | "manual") => {
+        console.log("Next seq ran");
         if (!isNextAvailable) {
             router.push({
                 pathname: "/routines/single-routine-screen",
@@ -90,7 +119,7 @@ export default function RestScreen({
             });
             return;
         }
-
+        completeRest(restId, mode === "auto" ? restData!.endTime! : new Date());
         setCurrentSequence((prev) => prev + 1);
     };
 
@@ -195,6 +224,7 @@ export default function RestScreen({
                 }}
             >
                 <TouchableOpacity
+                    onPress={() => setUseStopwatch((prev) => !prev)}
                     style={{
                         backgroundColor: "gray",
                         display: "flex",
@@ -218,7 +248,7 @@ export default function RestScreen({
                     <Text style={{ color: "white" }}>Switch to Stopwatch</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={handleNextSequence}
+                    onPress={() => handleNextSequence("manual")}
                     style={{
                         backgroundColor: "gray",
                         display: "flex",
