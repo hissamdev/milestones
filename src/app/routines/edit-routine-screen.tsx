@@ -1,6 +1,7 @@
 import EditExercises from "@/components/sections/routines/EditExercises";
 import Popup from "@/components/ui/Popup";
 import ExercisesPopup from "@/components/ui/popups/ExercisesPopup";
+import { DayTemplateTEE } from "@/types/routineTypes";
 import {
     getRoutineDays,
     insertRoutineExercise,
@@ -11,36 +12,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { SportShoe } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-
-export type DayTemplateTEE = {
-    id: string;
-    routineId: string;
-    routineTemplateId: string;
-    dayTitle: string;
-    routineTemplate: {
-        id: string;
-        restDay: boolean;
-        templateExercises: {
-            id: string;
-            exerciseId: string | null;
-            sequence: number;
-            templateId: string;
-            displayAmount: number | null;
-            isRestType: boolean;
-            displayRestAmount: number | null;
-            exercise: {
-                id: string;
-                name: string;
-                desc: string | null;
-                type: string;
-                createdAt: Date;
-                updatedAt: Date;
-                displayName: string;
-                icon: string | null;
-            } | null;
-        }[];
-    };
-};
 
 export default function EditRoutineScreen() {
     const daysOfTheWeek = [
