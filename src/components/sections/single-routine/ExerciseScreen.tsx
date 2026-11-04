@@ -1,5 +1,5 @@
-import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
 import { TopLevelData } from "@/app/routines/routine-focus-screen";
+import { DayTemplateTEE } from "@/types/routineTypes";
 import {
     completeExercise,
     completeRoutine,

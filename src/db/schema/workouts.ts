@@ -1,6 +1,6 @@
 import * as s from "drizzle-orm/sqlite-core";
 
-export const workouts = s.sqliteTable("workouts", {
+export const workoutDay = s.sqliteTable("workout_day", {
     id: s.text("id").primaryKey(),
     createdAt: s
         .integer("created_at", { mode: "timestamp" })
@@ -19,7 +19,7 @@ export const sessions = s.sqliteTable("sessions", {
     workoutId: s
         .text("workout_id")
         .notNull()
-        .references(() => workouts.id),
+        .references(() => workoutDay.id),
     routineId: s.text().references(() => routines.id),
     createdAt: s
         .integer("created_at", { mode: "timestamp" })
@@ -76,7 +76,7 @@ export const standaloneExercises = s.sqliteTable("standalone_exercises", {
     workoutId: s
         .text("workout_id")
         .notNull()
-        .references(() => workouts.id),
+        .references(() => workoutDay.id),
     exerciseId: s
         .text("exercise_id")
         .notNull()

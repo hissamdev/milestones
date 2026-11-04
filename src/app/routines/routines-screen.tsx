@@ -10,7 +10,7 @@ export default function RoutineScreen() {
     useEffect(() => {
         const load = async () => {
             if (!routineId) {
-                router.push("/(tabs)/(workouts)/workouts-screen");
+                router.push("/routines/routines-screen");
                 return;
             }
 

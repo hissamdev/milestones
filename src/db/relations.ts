@@ -11,7 +11,7 @@ import {
     sessionData,
     sessions,
     standaloneExercises,
-    workouts,
+    workoutDay,
 } from "./schema/workouts";
 
 export const milestoneRelations = defineRelationsPart(
@@ -38,7 +38,7 @@ export const milestoneRelations = defineRelationsPart(
 
 export const workoutRelations = defineRelationsPart(
     {
-        workouts,
+        workoutDay,
         exercises,
         standaloneExercises,
         sessions,
@@ -51,7 +51,7 @@ export const workoutRelations = defineRelationsPart(
         routineExerciseData,
     },
     (r) => ({
-        workouts: {
+        workoutDay: {
             sessions: r.many.sessions(),
             standaloneExercises: r.many.standaloneExercises(),
         },
@@ -60,9 +60,9 @@ export const workoutRelations = defineRelationsPart(
             templates: r.many.routineTemplateExercises(),
         },
         standaloneExercises: {
-            workout: r.one.workouts({
+            workout: r.one.workoutDay({
                 from: r.standaloneExercises.workoutId,
-                to: r.workouts.id,
+                to: r.workoutDay.id,
             }),
             exercise: r.one.exercises({
                 from: r.standaloneExercises.exerciseId,
@@ -70,9 +70,9 @@ export const workoutRelations = defineRelationsPart(
             }),
         },
         sessions: {
-            workout: r.one.workouts({
+            workout: r.one.workoutDay({
                 from: r.sessions.workoutId,
-                to: r.workouts.id,
+                to: r.workoutDay.id,
             }),
             routine: r.one.routines({
                 from: r.sessions.routineId,

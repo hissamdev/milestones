@@ -2,6 +2,7 @@ import EditExercises from "@/components/sections/routines/EditExercises";
 import Popup from "@/components/ui/Popup";
 import ExercisesPopup from "@/components/ui/popups/ExercisesPopup";
 import { DayTemplateTEE } from "@/types/routineTypes";
+import { daysOfTheWeek } from "@/utils/workouts/days";
 import {
     getRoutineDays,
     insertRoutineExercise,
@@ -14,36 +15,6 @@ import { useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function EditRoutineScreen() {
-    const daysOfTheWeek = [
-        {
-            title: "sat",
-            render: "Sat",
-        },
-        {
-            title: "sun",
-            render: "Sun",
-        },
-        {
-            title: "mon",
-            render: "Mon",
-        },
-        {
-            title: "tue",
-            render: "Tue",
-        },
-        {
-            title: "wed",
-            render: "Wed",
-        },
-        {
-            title: "thu",
-            render: "Thu",
-        },
-        {
-            title: "fri",
-            render: "Fri",
-        },
-    ];
     const [selectedDay, setSelectedDay] = useState("sat");
     const [fetchedDays, setFetchedDays] = useState<DayTemplateTEE[]>([]);
     // const [fetchedCurrentDay, setFetchedCurrentDay] =

@@ -1,3 +1,12 @@
+import { routineDataTopLevel, routines } from "@/db/schema/workouts";
+
+export type Routine = typeof routines.$inferSelect;
+export type TLD = typeof routineDataTopLevel.$inferSelect;
+
+export type RoutineWithTLD = Routine & {
+    routineData: TLD[];
+};
+
 export type DayTemplateTEE = {
     id: string;
     routineId: string;
