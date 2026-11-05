@@ -1,11 +1,7 @@
 import { TopLevelData } from "@/app/routines/routine-focus-screen";
+import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import { DayTemplateTEE } from "@/types/routineTypes";
-import {
-    completeExercise,
-    completeRoutine,
-    getTopLevelData,
-    initializeExerciseData,
-} from "@/utils/workouts/routineHelpers";
+import { completeExercise } from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import {
     ChevronLeft,
@@ -15,8 +11,9 @@ import {
     PlusCircle,
     TrophyIcon,
 } from "lucide-react-native";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 import DurationControls from "./DurationControls";
 import RepControls from "./RepControls";
 
@@ -30,90 +27,55 @@ type Props = {
     setTopLevelData: React.Dispatch<SetStateAction<TopLevelData | null>>;
 };
 
-export default function ExerciseScreen({
-    routineTemplate,
-    setCurrentSequence,
-    currentSequence,
-    routineId,
-    dataId,
-    topLevelData,
-    setTopLevelData,
-}: Props) {
-    const [isNextAvailable, setIsNextAvailable] = useState(false);
-    const [exerciseDataId, setExerciseDataId] = useState("");
-    const [currentActivity, setCurrentActivity] = useState<
-        DayTemplateTEE["routineTemplate"]["templateExercises"][0] | null
-    >(null);
-    const [amount, setAmount] = useState(0);
-    const [exerciseData, setExerciseData] = useState<
-        TopLevelData["dataExercises"][0] | null
-    >(null);
+export default function ExerciseScreen() {
+    const { singleRoutine } = useRoutineStore(
+        useShallow((state) => ({
+            singleRoutine: state.singleRoutine,
+        })),
+    );
 
     const router = useRouter();
 
     useEffect(() => {
         const load = async () => {
-            const isNextAvailable = routineTemplate.templateExercises.find(
-                (te) => te.sequence === currentSequence + 1,
-            );
-            const topLevelData = await getTopLevelData(dataId);
-            if (!topLevelData || !topLevelData.dataExercises.length) {
-                return;
-            }
-            setTopLevelData(topLevelData);
-            if (!isNextAvailable) {
-                setIsNextAvailable(false);
-                return;
-            }
-            setIsNextAvailable(true);
+            // const isNextAvailable = routineTemplate.templateExercises.find(
+            //     (te) => te.sequence === currentSequence + 1,
+            // );
+            // const topLevelData = await getTopLevelData(dataId);
+            // if (!topLevelData || !topLevelData.dataExercises.length) {
+            //     return;
+            // }
+            // setTopLevelData(topLevelData);
+            // if (!isNextAvailable) {
+            //     setIsNextAvailable(false);
+            //     return;
+            // }
+            // setIsNextAvailable(true);
         };
 
         load();
-    }, [currentSequence]);
+    }, [singleRoutine.currentSequence]);
 
     useEffect(() => {
         // Create entry for this exercise if does not exist, update it on each interaction
         const load = async () => {
-            const currentExercise = routineTemplate.templateExercises.find(
-                (te) => te.sequence === currentSequence,
-            );
-            if (!currentExercise) return;
-            setCurrentActivity(currentExercise);
-
-            const res = await initializeExerciseData({
-                exerciseId: currentExercise.exercise!.id,
-                dataId,
-                name: currentExercise.exercise!.displayName,
-                desc: currentExercise.exercise!.desc,
-                type: currentExercise.exercise!.type as "reps" | "duration",
-                workAmount: currentExercise.displayAmount!,
-                sequence: currentSequence,
-            });
-            if (!res) {
-                console.error("Something went wrong", res);
-                return;
-            }
-            setExerciseDataId(res.id);
-            setAmount(res.workAmount!);
-            setExerciseData(res);
+            const currentExercise =
+                singleRoutine.nestedRoutine!.routineData[0].dataExercises.find(
+                    (de) => de.sequence === singleRoutine.currentSequence,
+                )!;
         };
         load();
     }, []);
 
     const handleNextSequence = async () => {
         handleComplete();
-        if (!isNextAvailable) {
-            // Finish logic
-            await completeRoutine(dataId);
+        if (!singleRoutine.isNextAvailable) {
+            // Completion logic
             router.navigate({
                 pathname: "/routines/single-routine-screen",
-                params: {
-                    routineId,
-                },
             });
             return;
         }
-        setCurrentSequence((prev) => prev + 1);
     };
 
     const handleComplete = async () => {
@@ -343,18 +305,18 @@ export default function ExerciseScreen({
                                 </View>
                             </View>
 
-                            {topLevelData &&
-                                topLevelData.dataExercises
-                                    .filter(
-                                        (de) =>
-                                            !de.isRest &&
-                                            de.sequence !== currentSequence,
-                                    )
-                                    .map((de) => (
-                                        <View key={de.id}>
-                                            <Text>{de.exerciseName}</Text>
-                                        </View>
-                                    ))}
+                            {singleRoutine
+                                .nestedRoutine!.routineData[0].dataExercises.filter(
+                                    (de) =>
+                                        !de.isRest &&
+                                        de.sequence !==
+                                            singleRoutine.currentSequence,
+                                )
+                                .map((de) => (
+                                    <View key={de.id}>
+                                        <Text>{de.exerciseName}</Text>
+                                    </View>
+                                ))}
                         </View>
                     </View>
                 </View>

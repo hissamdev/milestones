@@ -14,7 +14,7 @@ interface RoutinesState {
     };
     runRoutineStart: () => void;
     findCurrentDay: () => NestedRoutine["daysOtw"][0];
-    checkIsNextAvailable: () => void;
+    updateAvailabilityState: () => void;
     loadSingleRoutine: (routineId: string) => void;
     updateOngoingState: () => void;
     updateSequence: {
@@ -163,26 +163,31 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
 
         return day!;
     },
-    checkIsNextAvailable: () => {
+    updateAvailabilityState: () => {
         // const nested = get().singleRoutine.nestedRoutine;
         // if (!nested) {
         //     get().loadRoutines();
         //     return;
         // }
 
-        const day = get().singleRoutine.nestedRoutine!.daysOtw.find(
-            (d) => d.dayTitle === "sat",
-        );
+        // const day = get().singleRoutine.nestedRoutine!.daysOtw.find(
+        //     (d) => d.dayTitle === "sat",
+        // );
 
-        const nextSeq = get().singleRoutine.currentSequence + 1;
-        const isAvailable = day!.routineTemplate.templateExercises.find(
-            (te) => te.sequence === nextSeq,
-        );
+        // const nextSeq = get().singleRoutine.currentSequence + 1;
+        // const isAvailable = day!.routineTemplate.templateExercises.find(
+        //     (te) => te.sequence === nextSeq,
+        // );
+
+        const available =
+            get().singleRoutine.nestedRoutine!.routineData[0].dataExercises.find(
+                (de) => de.sequence === get().singleRoutine.currentSequence,
+            );
 
         set((prev) => ({
             singleRoutine: {
                 ...prev.singleRoutine,
-                isNextAvailable: isAvailable ? true : false,
+                isNextAvailable: available ? true : false,
             },
         }));
     },
@@ -234,7 +239,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
 
     updateSequence: {
         increment: () => {
-            // get().checkIsNextAvailable();
+            // get().updateAvailabilityState();
             // const isAvailable = get().singleRoutine.isNextAvailable
 
             set((prev) => ({
@@ -243,6 +248,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                     currentSequence: prev.singleRoutine.currentSequence + 1,
                 },
             }));
+            get().updateAvailabilityState();
         },
         decrement: () => {
             const safeSubtract =
@@ -256,11 +262,13 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                     currentSequence: safeSubtract,
                 },
             }));
+            get().updateAvailabilityState();
         },
         setSequence: (num) => {
             set((prev) => ({
                 singleRoutine: { ...prev.singleRoutine, currentSequence: num },
             }));
+            get().updateAvailabilityState();
         },
     },
     allRoutinesState: [],

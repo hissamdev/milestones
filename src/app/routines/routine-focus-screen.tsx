@@ -1,13 +1,8 @@
 import ExerciseScreen from "@/components/sections/single-routine/ExerciseScreen";
 import RestScreen from "@/components/sections/single-routine/RestScreen";
-import {
-    getCurrentDayExercises,
-    getTopLevelData,
-} from "@/utils/workouts/routineHelpers";
-import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
-import { DayTemplateTEE } from "./edit-routine-screen";
+import { useRoutineStore } from "@/stores/routine-stores/routineStore";
+import { View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
 export type TopLevelData = {
     id: string;
@@ -34,66 +29,66 @@ export type TopLevelData = {
 };
 
 export default function RoutineFocusScreen() {
-    const [currentSequence, setCurrentSequence] = useState(1);
-    const { routineId, dataId }: { routineId: string; dataId: string } =
-        useLocalSearchParams();
-    const [currentDay, setCurrentDay] = useState<DayTemplateTEE | null>(null);
-    const [routineData, setRoutineData] = useState<TopLevelData | null>(null);
+    // const [currentSequence, setCurrentSequence] = useState(1);
+    // const { routineId, dataId }: { routineId: string; dataId: string } =
+    //     useLocalSearchParams();
+    // const [currentDay, setCurrentDay] = useState<DayTemplateTEE | null>(null);
+    // const [routineData, setRoutineData] = useState<TopLevelData | null>(null);
 
-    useEffect(() => {
-        const load = async () => {
-            if (!routineId) {
-                console.error("Routine id not provided");
-                return;
-            }
+    // useEffect(() => {
+    //     const load = async () => {
+    //         if (!routineId) {
+    //             console.error("Routine id not provided");
+    //             return;
+    //         }
 
-            const routineDay = await getCurrentDayExercises(routineId);
-            if (!routineDay) return;
-            setCurrentDay(routineDay);
-            const topLevelData = await getTopLevelData(dataId);
-            if (!topLevelData || !topLevelData.dataExercises.length) {
-                return;
-            }
-            setRoutineData(topLevelData);
+    //         const routineDay = await getCurrentDayExercises(routineId);
+    //         if (!routineDay) return;
+    //         setCurrentDay(routineDay);
+    //         const topLevelData = await getTopLevelData(dataId);
+    //         if (!topLevelData || !topLevelData.dataExercises.length) {
+    //             return;
+    //         }
+    //         setRoutineData(topLevelData);
 
-            const firstIncomplete = topLevelData.dataExercises.find(
-                (de) => !de.isComplete,
-            );
+    //         const firstIncomplete = topLevelData.dataExercises.find(
+    //             (de) => !de.isComplete,
+    //         );
 
-            setCurrentSequence(firstIncomplete!.sequence!);
-        };
+    //         setCurrentSequence(firstIncomplete!.sequence!);
+    //     };
 
-        load();
-    }, []);
+    //     load();
+    // }, []);
 
-    const currentActivity = currentDay?.routineTemplate.templateExercises.find(
-        (te) => te.sequence === currentSequence,
+    // const currentActivity = currentDay?.routineTemplate.templateExercises.find(
+    //     (te) => te.sequence === currentSequence,
+    // );
+
+    // if (!currentDay || !currentActivity) {
+    //     return <Text>Current day or activity not found {routineId}</Text>;
+    // }
+
+    const { singleRoutine } = useRoutineStore(
+        useShallow((state) => ({
+            singleRoutine: state.singleRoutine,
+            findCurrent: state.findCurrentDay,
+        })),
     );
 
-    if (!currentDay || !currentActivity) {
-        return <Text>Current day or activity not found {routineId}</Text>;
+    if (!singleRoutine.nestedRoutine) {
+        console.error("Single routine data was not initialized");
+        return;
     }
+
     return (
         <View style={{ flex: 1 }}>
-            {currentActivity.displayRestAmount ? (
-                <RestScreen
-                    routineId={routineId}
-                    dataId={dataId}
-                    routineTemplate={currentDay.routineTemplate}
-                    currentSequence={currentSequence}
-                    setCurrentSequence={setCurrentSequence}
-                    topLevelData={routineData}
-                />
+            {singleRoutine.nestedRoutine.routineData[0].dataExercises.find(
+                (de) => de.sequence === singleRoutine.currentSequence,
+            )!.isRest ? (
+                <RestScreen />
             ) : (
-                <ExerciseScreen
-                    routineTemplate={currentDay.routineTemplate}
-                    dataId={dataId}
-                    currentSequence={currentSequence}
-                    setCurrentSequence={setCurrentSequence}
-                    routineId={routineId}
-                    topLevelData={routineData}
-                    setTopLevelData={setRoutineData}
-                />
+                <ExerciseScreen />
             )}
         </View>
     );

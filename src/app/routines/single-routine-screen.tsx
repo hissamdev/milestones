@@ -83,7 +83,12 @@ export default function SingleRoutineScreen() {
                 </Text>
 
                 <TouchableOpacity
-                    onPress={() => runRoutineStart()}
+                    onPress={() => {
+                        runRoutineStart();
+                        router.push({
+                            pathname: "/routines/routine-focus-screen",
+                        });
+                    }}
                     style={{
                         paddingHorizontal: 8,
                         paddingVertical: 4,
