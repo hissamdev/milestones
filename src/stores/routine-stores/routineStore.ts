@@ -10,22 +10,18 @@ interface RoutinesState {
         nestedRoutine: NestedRoutine | null;
         isNextAvailable: boolean;
         currentSequence: number;
+        isOngoing: "new" | "ongoing" | "complete";
     };
     runRoutineStart: () => void;
     findCurrentDay: () => NestedRoutine["daysOtw"][0];
     checkIsNextAvailable: () => void;
     loadSingleRoutine: (routineId: string) => void;
-    checkOngoing: {
-        isOngoing: boolean;
-        ongoingId: string;
-    };
-    setIsOngoing: (value: boolean, id: string) => void;
+    updateOngoingState: () => void;
     updateSequence: {
         increment: () => void;
         decrement: () => void;
         setSequence: (num: number) => void;
     };
-
     routinesState: ShallowRoutine[];
     loadRoutines: () => void;
 }
@@ -35,6 +31,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
         nestedRoutine: null,
         isNextAvailable: false,
         currentSequence: 1,
+        isOngoing: "new",
     },
     runRoutineStart: async () => {
         try {
@@ -122,6 +119,40 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
             console.error(err);
         }
     },
+    updateOngoingState: () => {
+        const tld = get().singleRoutine.nestedRoutine!.routineData[0];
+        if (!tld || tld.interactionTime.getDay() !== new Date().getDay()) {
+            set((prev) => ({
+                singleRoutine: {
+                    ...prev.singleRoutine,
+                    isOngoing: "new",
+                },
+            }));
+            get().updateSequence.setSequence(1);
+            return;
+        }
+        if (!tld.isComplete) {
+            set((prev) => ({
+                singleRoutine: {
+                    ...prev.singleRoutine,
+                    isOngoing: "ongoing",
+                },
+            }));
+            const first =
+                get().singleRoutine.nestedRoutine!.routineData[0].dataExercises.find(
+                    (tld) => !tld.isComplete,
+                );
+            get().updateSequence.setSequence(first ? first.sequence : 1);
+            return;
+        }
+        set((prev) => ({
+            singleRoutine: {
+                ...prev.singleRoutine,
+                isOngoing: "complete",
+            },
+        }));
+        get().updateSequence.setSequence(1);
+    },
     findCurrentDay: () => {
         const currentDayTitle = daysOfTheWeek.map((d) => d.title)[
             new Date().getDay() + 1
@@ -197,15 +228,10 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                 nestedRoutine: singleRoutine,
             },
         }));
+
+        get().updateOngoingState();
     },
-    checkOngoing: {
-        isOngoing: false,
-        ongoingId: "",
-    },
-    setIsOngoing: (value, id) => ({
-        isOngoing: value,
-        ongoingId: id,
-    }),
+
     updateSequence: {
         increment: () => {
             // get().checkIsNextAvailable();
@@ -261,5 +287,3 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
         set(() => ({ routinesState: get }));
     },
 }));
-
-// Current Routine: Nested Routine, isOngoing, isNextAvailable, currentSequence
