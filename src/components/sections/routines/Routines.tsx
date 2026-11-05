@@ -8,12 +8,14 @@ import { useShallow } from "zustand/react/shallow";
 import Popup from "../../ui/Popup";
 
 export default function Routines() {
-    const { routinesState, loadRoutines } = useRoutineStore(
-        useShallow((state) => ({
-            routinesState: state.routinesState,
-            loadRoutines: state.loadRoutines,
-        })),
-    );
+    const { allRoutinesState, loadRoutines, loadSingleRoutine } =
+        useRoutineStore(
+            useShallow((state) => ({
+                allRoutinesState: state.allRoutinesState,
+                loadRoutines: state.loadRoutines,
+                loadSingleRoutine: state.loadSingleRoutine,
+            })),
+        );
 
     const router = useRouter();
 
@@ -22,7 +24,7 @@ export default function Routines() {
 
     useEffect(() => {
         const load = async () => {
-            if (!routinesState.length) {
+            if (!allRoutinesState.length) {
                 loadRoutines();
                 return;
             }
@@ -48,8 +50,8 @@ export default function Routines() {
             <View style={{ marginTop: 10, paddingBottom: 30 }}>
                 <Text style={{ fontSize: 24, fontWeight: 500 }}>Routines</Text>
                 <View style={{ marginTop: 10 }}>
-                    {routinesState.length ? (
-                        routinesState.map((routine) => {
+                    {allRoutinesState.length ? (
+                        allRoutinesState.map((routine) => {
                             const activeDays = routine.daysOtw.filter(
                                 (day) => day.routineTemplate.restDay === false,
                             );
@@ -94,16 +96,19 @@ export default function Routines() {
                                                 </Text>
                                             </View>
                                             <TouchableOpacity
-                                                onPress={() =>
-                                                    router.push({
+                                                onPress={() => {
+                                                    loadSingleRoutine(
+                                                        routine.id,
+                                                    );
+                                                    return router.push({
                                                         pathname:
                                                             "/routines/single-routine-screen",
                                                         params: {
                                                             routineId:
                                                                 routine.id,
                                                         },
-                                                    })
-                                                }
+                                                    });
+                                                }}
                                                 style={{
                                                     marginLeft: "auto",
                                                     backgroundColor: "#EFEDEE",

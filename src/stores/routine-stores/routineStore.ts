@@ -22,7 +22,7 @@ interface RoutinesState {
         decrement: () => void;
         setSequence: (num: number) => void;
     };
-    routinesState: ShallowRoutine[];
+    allRoutinesState: ShallowRoutine[];
     loadRoutines: () => void;
 }
 
@@ -263,9 +263,9 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
             }));
         },
     },
-    routinesState: [],
+    allRoutinesState: [],
     loadRoutines: async () => {
-        const get = await db.query.routines.findMany({
+        const allRoutines = await db.query.routines.findMany({
             orderBy: {
                 createdAt: "desc",
             },
@@ -284,6 +284,6 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
             },
         });
 
-        set(() => ({ routinesState: get }));
+        set(() => ({ allRoutinesState: allRoutines }));
     },
 }));
