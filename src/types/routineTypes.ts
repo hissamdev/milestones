@@ -1,5 +1,6 @@
 import {
     daysOtw,
+    exercises,
     routineDataTopLevel,
     routineExerciseData,
     routines,
@@ -13,6 +14,7 @@ export type ExerciseData = typeof routineExerciseData.$inferSelect;
 export type DaysOtw = typeof daysOtw.$inferSelect;
 export type RoutineTemplate = typeof routineTemplates.$inferSelect;
 export type TemplateExercises = typeof routineTemplateExercises.$inferSelect;
+export type Exercise = typeof exercises.$inferSelect;
 
 export type ShallowRoutine = Routine & {
     daysOtw: (DaysOtw & {
@@ -24,7 +26,9 @@ export type ShallowRoutine = Routine & {
 export type NestedRoutine = Routine & {
     daysOtw: (DaysOtw & {
         routineTemplate: RoutineTemplate & {
-            templateExercises: TemplateExercises[];
+            templateExercises: (TemplateExercises & {
+                exercise: Exercise;
+            })[];
         };
     })[];
     routineData: (TLD & {
