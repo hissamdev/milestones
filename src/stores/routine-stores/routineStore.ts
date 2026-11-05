@@ -97,7 +97,27 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
             //     sequence: number;
             // }
 
-            await db.insert(routineExerciseData).values(compatibleInsert);
+            const inserted = await db
+                .insert(routineExerciseData)
+                .values(compatibleInsert)
+                .returning();
+            const compatibleState = {
+                ...createdTld,
+                dataExercises: inserted,
+            };
+
+            set((prev) => ({
+                singleRoutine: {
+                    ...prev.singleRoutine,
+                    nestedRoutine: {
+                        ...prev.singleRoutine.nestedRoutine!,
+                        routineData: [
+                            compatibleState,
+                            ...prev.singleRoutine.nestedRoutine!.routineData,
+                        ],
+                    },
+                },
+            }));
         } catch (err) {
             console.error(err);
         }
