@@ -1,10 +1,10 @@
 import { db } from "@/db/client";
-import { workouts } from "@/db/schema/workouts";
+import { workoutDay } from "@/db/schema/workouts";
 import { generateUuid } from "../helpers";
 
 export async function getCurrentDayWorkout() {
     try {
-        const res = await db.query.workouts.findFirst({
+        const res = await db.query.workoutDay.findFirst({
             where: {
                 creationDay: new Date().toDateString(),
             },
@@ -12,7 +12,7 @@ export async function getCurrentDayWorkout() {
         if (!res) {
             try {
                 const create = await db
-                    .insert(workouts)
+                    .insert(workoutDay)
                     .values({
                         id: generateUuid(),
                     })

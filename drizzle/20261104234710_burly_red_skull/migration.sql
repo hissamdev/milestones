@@ -1,0 +1,1 @@
+ALTER TABLE `workouts` RENAME TO `workout_day`;

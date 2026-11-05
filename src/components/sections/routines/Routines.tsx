@@ -1,48 +1,31 @@
-import { createRoutine, getRoutines } from "@/utils/workouts/routineHelpers";
+import { useRoutineStore } from "@/stores/routine-stores/routineStore";
+import { createRoutine } from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import { Play } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 import Popup from "../../ui/Popup";
 
 export default function Routines() {
+    const { routinesState, loadRoutines } = useRoutineStore(
+        useShallow((state) => ({
+            routinesState: state.routinesState,
+            loadRoutines: state.loadRoutines,
+        })),
+    );
+
     const router = useRouter();
-    const [routines, setRoutines] = useState<
-        {
-            id: string;
-            createdAt: Date;
-            creationDay: string;
-            name: string;
-            daysOtw: {
-                id: string;
-                routineId: string;
-                routineTemplateId: string;
-                dayTitle: string;
-                routineTemplate: {
-                    id: string;
-                    restDay: boolean;
-                    templateExercises: {
-                        id: string;
-                        exerciseId: string;
-                        sequence: number;
-                        templateId: string;
-                        displayAmount: number;
-                        displayRestAmount: number | null;
-                    }[];
-                };
-            }[];
-        }[]
-    >([]);
+
     const [routineName, setRoutineName] = useState("");
     const [showCreate, setShowCreate] = useState(false);
 
     useEffect(() => {
         const load = async () => {
-            const res = await getRoutines();
-            if (!res || !res.data) {
+            if (!routinesState.length) {
+                loadRoutines();
                 return;
             }
-            setRoutines(res.data);
         };
         load();
     }, []);
@@ -65,8 +48,8 @@ export default function Routines() {
             <View style={{ marginTop: 10, paddingBottom: 30 }}>
                 <Text style={{ fontSize: 24, fontWeight: 500 }}>Routines</Text>
                 <View style={{ marginTop: 10 }}>
-                    {routines.length ? (
-                        routines.map((routine) => {
+                    {routinesState.length ? (
+                        routinesState.map((routine) => {
                             const activeDays = routine.daysOtw.filter(
                                 (day) => day.routineTemplate.restDay === false,
                             );
@@ -74,15 +57,6 @@ export default function Routines() {
                             return (
                                 <View
                                     key={routine.name}
-                                    // onPress={() =>
-                                    //     router.push({
-                                    //         pathname:
-                                    //             "/(workouts)/routines/single-routine-screen",
-                                    //         params: {
-                                    //             routineId: routine.id,
-                                    //         },
-                                    //     })
-                                    // }
                                     style={{
                                         backgroundColor: "white",
                                         borderRadius: 15,

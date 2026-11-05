@@ -1,18 +1,16 @@
 import Routines from "@/components/sections/routines/Routines";
 import CreateExercise from "@/components/ui/CreateExercise";
-import { exercises, workouts } from "@/db/schema/workouts";
+import { exercises } from "@/db/schema/workouts";
 import { createRoutine } from "@/utils/workouts/routineHelpers";
-import { getCurrentDayWorkout } from "@/utils/workouts/workoutHelpers";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 ("@/components/ui/Popup");
 
-type WorkoutsType = typeof workouts.$inferSelect;
 type Exercise = typeof exercises.$inferSelect;
 
 export default function Workouts() {
-    const [workouts, setWorkouts] = useState<WorkoutsType | null>(null);
+    // const [workouts, setWorkouts] = useState<WorkoutsType | null>(null);
     const [routineName, setRoutineName] = useState("");
     const [uiMessage, setUiMessage] = useState("");
     const [standaloneExercises, setStandaloneExercises] = useState([
@@ -29,15 +27,15 @@ export default function Workouts() {
     });
     const router = useRouter();
 
-    useEffect(() => {
-        const load = async () => {
-            const res = await getCurrentDayWorkout();
-            if (!res) return console.error("Failed to load workouts");
-            setWorkouts(res);
-        };
+    // useEffect(() => {
+    //     const load = async () => {
+    //         const res = await getCurrentDayWorkout();
+    //         if (!res) return console.error("Failed to load workouts");
+    //         setWorkouts(res);
+    //     };
 
-        load();
-    }, []);
+    //     load();
+    // }, []);
 
     const handleAddStandaloneExercise = () => {
         setStandaloneExercises((prev) => [
@@ -76,9 +74,9 @@ export default function Workouts() {
         });
     };
 
-    if (!workouts) return;
+    // if (!workouts) return;
     return (
-        <View style={{ flex: 1, position: "relative", padding: 10 }}>
+        <SafeAreaView style={{ flex: 1, position: "relative", padding: 10 }}>
             {/* <TouchableOpacity
                 style={{
                     alignSelf: "flex-start",
@@ -92,10 +90,9 @@ export default function Workouts() {
             >
                 <Text>Create Property</Text>
             </TouchableOpacity> */}
-            <Text>{workouts?.creationDay}</Text>
             <Routines />
 
             <CreateExercise />
-        </View>
+        </SafeAreaView>
     );
 }

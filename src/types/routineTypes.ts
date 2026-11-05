@@ -1,10 +1,35 @@
-import { routineDataTopLevel, routines } from "@/db/schema/workouts";
+import {
+    daysOtw,
+    routineDataTopLevel,
+    routineExerciseData,
+    routines,
+    routineTemplateExercises,
+    routineTemplates,
+} from "@/db/schema/workouts";
 
 export type Routine = typeof routines.$inferSelect;
 export type TLD = typeof routineDataTopLevel.$inferSelect;
+export type ExerciseData = typeof routineExerciseData.$inferSelect;
+export type DaysOtw = typeof daysOtw.$inferSelect;
+export type RoutineTemplate = typeof routineTemplates.$inferSelect;
+export type TemplateExercises = typeof routineTemplateExercises.$inferSelect;
 
-export type RoutineWithTLD = Routine & {
+export type ShallowRoutine = Routine & {
+    daysOtw: (DaysOtw & {
+        routineTemplate: RoutineTemplate;
+    })[];
     routineData: TLD[];
+};
+
+export type NestedRoutine = Routine & {
+    daysOtw: (DaysOtw & {
+        routineTemplate: RoutineTemplate & {
+            templateExercises: TemplateExercises[];
+        };
+    })[];
+    routineData: (TLD & {
+        dataExercises: ExerciseData[];
+    })[];
 };
 
 export type DayTemplateTEE = {
