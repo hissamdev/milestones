@@ -1,39 +1,36 @@
-import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
-import { updateExerciseAmountData } from "@/utils/workouts/routineHelpers";
+import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import { Dumbbell, Minus, Plus, Timer } from "lucide-react-native";
-import { SetStateAction } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
-export default function DurationControls({
-    currentActivity,
-    amount,
-    setAmount,
-    exerciseDataId,
-}: {
-    currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];
-    amount: number;
-    setAmount: React.Dispatch<SetStateAction<number>>;
-    exerciseDataId: string;
-}) {
-    const handleUpdateAmount = async (mode: "add" | "subtract") => {
-        if (mode === "subtract") {
-            const safeSubtraction = amount - 1 < 0 ? 0 : amount - 1;
-            setAmount((prev) => (prev - 1 < 0 ? 0 : prev - 1));
-            await updateExerciseAmountData(
-                exerciseDataId,
-                safeSubtraction,
-                currentActivity.exercise!.type as "reps" | "duration",
-            );
-            return;
-        }
-        setAmount((prev) => prev + 1);
-        await updateExerciseAmountData(
-            exerciseDataId,
-            amount + 1,
-            currentActivity.exercise!.type as "reps" | "duration",
-        );
-        return;
-    };
+export default function RepControls() {
+    // const handleUpdateAmount = async (mode: "add" | "subtract") => {
+    //     if (mode === "subtract") {
+    //         const safeSubtraction = amount - 1 < 0 ? 0 : amount - 1;
+    //         setAmount((prev) => (prev - 1 < 0 ? 0 : prev - 1));
+    //         await updateExerciseAmountData(
+    //             exerciseDataId,
+    //             safeSubtraction,
+    //             currentActivity.exercise!.type as "reps" | "duration",
+    //         );
+    //         return;
+    //     }
+    //     setAmount((prev) => prev + 1);
+    //     await updateExerciseAmountData(
+    //         exerciseDataId,
+    //         amount + 1,
+    //         currentActivity.exercise!.type as "reps" | "duration",
+    //     );
+    //     return;
+    // };
+
+    const { singleRoutine } = useRoutineStore(
+        useShallow((state) => ({
+            singleRoutine: state.singleRoutine,
+        })),
+    );
+
+    const currentActivity = singleRoutine.findSingleActivity();
 
     return (
         <View
@@ -77,7 +74,7 @@ export default function DurationControls({
                     }}
                 >
                     <Text style={{ fontSize: 30, lineHeight: 50 }}>
-                        {amount}
+                        {currentActivity.workAmount}
                     </Text>
                     <Text
                         style={{
@@ -102,7 +99,6 @@ export default function DurationControls({
                     }}
                 >
                     <TouchableOpacity
-                        onPress={() => handleUpdateAmount("subtract")}
                         style={{
                             paddingVertical: 3,
                             flex: 1,
@@ -115,7 +111,6 @@ export default function DurationControls({
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => handleUpdateAmount("add")}
                         style={{
                             paddingVertical: 3,
                             flex: 1,
@@ -170,9 +165,7 @@ export default function DurationControls({
                             verticalAlign: "middle",
                         }}
                     >
-                        {currentActivity.exercise?.type === "reps"
-                            ? "reps"
-                            : "s"}
+                        {currentActivity.exerciseType === "reps" ? "reps" : "s"}
                     </Text>
                 </View>
                 <View

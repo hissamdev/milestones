@@ -1,7 +1,6 @@
 import { TopLevelData } from "@/app/routines/routine-focus-screen";
 import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import { DayTemplateTEE } from "@/types/routineTypes";
-import { completeExercise } from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import {
     ChevronLeft,
@@ -67,30 +66,32 @@ export default function ExerciseScreen() {
         load();
     }, []);
 
-    const handleNextSequence = async () => {
-        handleComplete();
-        if (!singleRoutine.isNextAvailable) {
-            // Completion logic
-            router.navigate({
-                pathname: "/routines/single-routine-screen",
-            });
-            return;
-        }
-    };
+    // const handleNextSequence = async () => {
+    //     handleComplete();
+    //     if (!singleRoutine.isNextAvailable) {
+    //         // Completion logic
+    //         router.navigate({
+    //             pathname: "/routines/single-routine-screen",
+    //         });
+    //         return;
+    //     }
+    // };
 
-    const handleComplete = async () => {
-        const completion =
-            (topLevelData?.dataExercises.filter((de) => !de.isRest).length! /
-                routineTemplate.templateExercises.filter((te) => !te.isRestType)
-                    .length) *
-            100;
-        await completeExercise(dataId, exerciseDataId, completion);
-    };
+    // const handleComplete = async () => {
+    //     const completion =
+    //         (topLevelData?.dataExercises.filter((de) => !de.isRest).length! /
+    //             routineTemplate.templateExercises.filter((te) => !te.isRestType)
+    //                 .length) *
+    //         100;
+    //     await completeExercise(dataId, exerciseDataId, completion);
+    // };
 
-    if (!currentActivity || !exerciseDataId) {
-        console.log("Not ready");
-        return <Text>Failed {exerciseDataId.toString()}</Text>;
-    }
+    // if (!currentActivity || !exerciseDataId) {
+    //     console.log("Not ready");
+    //     return <Text>Failed {exerciseDataId.toString()}</Text>;
+    // }
+
+    const currentActivity = singleRoutine.findSingleActivity();
 
     return (
         <View style={{ flex: 1 }}>
@@ -162,17 +163,17 @@ export default function ExerciseScreen() {
                     <Text
                         style={{ marginTop: 10, fontSize: 24, color: "white" }}
                     >
-                        {currentActivity.exercise?.displayName}
+                        {currentActivity.exerciseDisplayName}
                     </Text>
                     <Text
                         style={{ marginTop: 0, fontSize: 15, color: "white" }}
                     >
-                        {currentActivity.exercise?.desc}
+                        {currentActivity.exerciseDesc}
                     </Text>
                     <Text
                         style={{ marginTop: 0, fontSize: 15, color: "white" }}
                     >
-                        {exerciseData?.startTime.toLocaleTimeString("en-US", {
+                        {currentActivity.startTime.toLocaleTimeString("en-US", {
                             hour: "numeric",
                             minute: "2-digit",
                             second: "2-digit",
@@ -189,19 +190,10 @@ export default function ExerciseScreen() {
                 }}
             >
                 <View style={{}}>
-                    {currentActivity.exercise?.type &&
-                    currentActivity.exercise?.type === "reps" ? (
-                        <RepControls
-                            exerciseDataId={exerciseDataId}
-                            currentActivity={currentActivity}
-                            amount={amount}
-                            setAmount={setAmount}
-                        />
+                    {currentActivity.exerciseType === "reps" ? (
+                        <RepControls />
                     ) : (
-                        <DurationControls
-                            currentActivity={currentActivity}
-                            amount={amount}
-                        />
+                        <DurationControls />
                     )}
 
                     <View>
@@ -347,7 +339,6 @@ export default function ExerciseScreen() {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            onPress={handleNextSequence}
                             style={[
                                 styles.stepButtons,
                                 {
@@ -366,7 +357,9 @@ export default function ExerciseScreen() {
                             <Text
                                 style={[styles.buttonText, { color: "white" }]}
                             >
-                                {isNextAvailable ? "Next" : "Finish"}
+                                {singleRoutine.isNextAvailable
+                                    ? "Next"
+                                    : "Finish"}
                             </Text>
                         </TouchableOpacity>
                     </View>

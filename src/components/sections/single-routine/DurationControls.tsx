@@ -1,4 +1,4 @@
-import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
+import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import {
     Hourglass,
     Minus,
@@ -8,14 +8,17 @@ import {
     Timer,
 } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
-export default function DurationControls({
-    currentActivity,
-    amount,
-}: {
-    currentActivity: DayTemplateTEE["routineTemplate"]["templateExercises"][0];
-    amount: number;
-}) {
+export default function DurationControls() {
+    const { singleRoutine } = useRoutineStore(
+        useShallow((state) => ({
+            singleRoutine: state.singleRoutine,
+        })),
+    );
+
+    const currentActivity = singleRoutine.findSingleActivity();
+
     return (
         <View
             style={{
@@ -66,9 +69,7 @@ export default function DurationControls({
                             verticalAlign: "middle",
                         }}
                     >
-                        {currentActivity.exercise?.type === "reps"
-                            ? "reps"
-                            : "s"}
+                        {currentActivity.exerciseType === "reps" ? "reps" : "s"}
                     </Text>
                 </View>
                 <View
@@ -225,9 +226,7 @@ export default function DurationControls({
                             verticalAlign: "middle",
                         }}
                     >
-                        {currentActivity.exercise?.type === "reps"
-                            ? "reps"
-                            : "s"}
+                        {currentActivity.exerciseType === "reps" ? "reps" : "s"}
                     </Text>
                 </View>
                 <View

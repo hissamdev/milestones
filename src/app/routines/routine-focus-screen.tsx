@@ -1,7 +1,7 @@
 import ExerciseScreen from "@/components/sections/single-routine/ExerciseScreen";
-import RestScreen from "@/components/sections/single-routine/RestScreen";
 import { useRoutineStore } from "@/stores/routine-stores/routineStore";
-import { View } from "react-native";
+import { useRouter } from "expo-router";
+import { Text, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
 export type TopLevelData = {
@@ -69,6 +69,7 @@ export default function RoutineFocusScreen() {
     //     return <Text>Current day or activity not found {routineId}</Text>;
     // }
 
+    const router = useRouter();
     const { singleRoutine } = useRoutineStore(
         useShallow((state) => ({
             singleRoutine: state.singleRoutine,
@@ -78,6 +79,9 @@ export default function RoutineFocusScreen() {
 
     if (!singleRoutine.nestedRoutine) {
         console.error("Single routine data was not initialized");
+        router.navigate({
+            pathname: "/routines/single-routine-screen",
+        });
         return;
     }
 
@@ -86,8 +90,9 @@ export default function RoutineFocusScreen() {
             {singleRoutine.nestedRoutine.routineData[0].dataExercises.find(
                 (de) => de.sequence === singleRoutine.currentSequence,
             )!.isRest ? (
-                <RestScreen />
+                <Text>Text</Text>
             ) : (
+                // <RestScreen />
                 <ExerciseScreen />
             )}
         </View>

@@ -11,6 +11,7 @@ interface RoutinesState {
         isNextAvailable: boolean;
         currentSequence: number;
         isOngoing: "new" | "ongoing" | "complete";
+        findSingleActivity: () => NestedRoutine["routineData"][0]["dataExercises"][0];
     };
     runRoutineStart: () => void;
     findCurrentDay: () => NestedRoutine["daysOtw"][0];
@@ -32,6 +33,14 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
         isNextAvailable: false,
         currentSequence: 1,
         isOngoing: "new",
+        findSingleActivity: () => {
+            const activity =
+                get().singleRoutine.nestedRoutine!.routineData[0].dataExercises.find(
+                    (de) => de.sequence === get().singleRoutine.currentSequence,
+                );
+
+            return activity!;
+        },
     },
     runRoutineStart: async () => {
         try {
@@ -158,7 +167,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
             new Date().getDay() + 1
         ];
         const day = get().singleRoutine.nestedRoutine!.daysOtw.find(
-            (d) => d.dayTitle === currentDayTitle,
+            (d) => d.dayTitle === "sat",
         );
 
         return day!;
@@ -204,6 +213,9 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                                 templateExercises: {
                                     orderBy: {
                                         sequence: "asc",
+                                    },
+                                    with: {
+                                        exercise: true,
                                     },
                                 },
                             },
