@@ -1,12 +1,7 @@
 import { TopLevelData } from "@/app/routines/routine-focus-screen";
 import { DayTemplateTEE } from "@/types/routineTypes";
-import {
-    completeRest,
-    initializeRestData,
-} from "@/utils/workouts/routineHelpers";
-import { useRouter } from "expo-router";
 import { ChevronLeft, ChevronRight, RefreshCcwIcon } from "lucide-react-native";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
@@ -18,121 +13,108 @@ type Props = {
     topLevelData: TopLevelData | null;
 };
 
-export default function RestScreen({
-    routineId,
-    routineTemplate,
-    currentSequence,
-    setCurrentSequence,
-    dataId,
-    topLevelData,
-}: Props) {
-    const [isNextAvailable, setIsNextAvailable] = useState(false);
-    const [restData, setRestData] = useState<
-        TopLevelData["dataExercises"][0] | null
-    >(null);
-    const [restId, setRestId] = useState("");
-    const [displayTimer, setDisplayTimer] = useState(0);
-    const [useStopwatch, setUseStopwatch] = useState(true);
+export default function RestScreen() {
+    // const [displayTimer, setDisplayTimer] = useState(0);
+    // const [useStopwatch, setUseStopwatch] = useState(true);
 
-    const router = useRouter();
+    // const router = useRouter();
 
-    useEffect(() => {
-        console.log(currentSequence);
-        const load = async () => {
-            const isNextAvailable = routineTemplate.templateExercises.find(
-                (te) => te.sequence === currentSequence + 1,
-            );
-            if (!isNextAvailable) {
-                setIsNextAvailable(false);
-                return;
-            }
-            setIsNextAvailable(true);
-            handleInitialization();
-        };
+    // useEffect(() => {
+    //     const load = async () => {
+    //         const isNextAvailable = routineTemplate.templateExercises.find(
+    //             (te) => te.sequence === currentSequence + 1,
+    //         );
+    //         if (!isNextAvailable) {
+    //             setIsNextAvailable(false);
+    //             return;
+    //         }
+    //         setIsNextAvailable(true);
+    //         handleInitialization();
+    //     };
 
-        load();
-    }, [currentSequence]);
+    //     load();
+    // }, [currentSequence]);
 
-    useEffect(() => {
-        console.log("Effect ran", useStopwatch);
-        if (!restData || !restData.startTime || !restData.endTime) {
-            return;
-        }
+    // useEffect(() => {
+    //     console.log("Effect ran", useStopwatch);
+    //     if (!restData || !restData.startTime || !restData.endTime) {
+    //         return;
+    //     }
 
-        const customEnd = new Date().getTime() + 5 * 1000;
-        const calculateDisplayTime = () => {
-            const countdown = Math.floor(
-                (customEnd - new Date().getTime()) / 1000,
-            );
-            if (countdown < 0) {
-                handleNextSequence("auto");
-                return;
-            }
+    //     const customEnd = new Date().getTime() + 5 * 1000;
+    //     const calculateDisplayTime = () => {
+    //         const countdown = Math.floor(
+    //             (customEnd - new Date().getTime()) / 1000,
+    //         );
+    //         if (countdown < 0) {
+    //             handleNextSequence("auto");
+    //             return;
+    //         }
 
-            setDisplayTimer(() => {
-                if (!useStopwatch) {
-                    return countdown;
-                } else {
-                    return Math.floor(
-                        (new Date().getTime() - restData.startTime!.getTime()) /
-                            1000,
-                    );
-                }
-            });
-        };
+    //         setDisplayTimer(() => {
+    //             if (!useStopwatch) {
+    //                 return countdown;
+    //             } else {
+    //                 return Math.floor(
+    //                     (new Date().getTime() - restData.startTime!.getTime()) /
+    //                         1000,
+    //                 );
+    //             }
+    //         });
+    //     };
 
-        calculateDisplayTime();
+    //     calculateDisplayTime();
 
-        const timer = setInterval(() => {
-            calculateDisplayTime();
-        }, 100);
-        return () => clearInterval(timer);
-    }, [restData, useStopwatch]);
+    //     const timer = setInterval(() => {
+    //         calculateDisplayTime();
+    //     }, 100);
+    //     return () => clearInterval(timer);
+    // }, [restData, useStopwatch]);
 
-    const handleInitialization = async () => {
-        const currentRest = routineTemplate.templateExercises.find(
-            (te) => te.sequence === currentSequence,
-        );
+    // const handleInitialization = async () => {
+    //     const currentRest = routineTemplate.templateExercises.find(
+    //         (te) => te.sequence === currentSequence,
+    //     );
 
-        if (!displayTimer) {
-            setDisplayTimer(currentRest?.displayRestAmount!);
-        }
+    //     if (!displayTimer) {
+    //         setDisplayTimer(currentRest?.displayRestAmount!);
+    //     }
 
-        const restData = await initializeRestData(
-            dataId,
-            currentRest!.displayRestAmount!,
-            currentSequence,
-        );
-        if (!restData) return;
-        setRestData(restData);
-        setRestId(restData.id);
-    };
+    //     const restData = await initializeRestData(
+    //         dataId,
+    //         currentRest!.displayRestAmount!,
+    //         currentSequence,
+    //     );
+    //     if (!restData) return;
+    //     setRestData(restData);
+    //     setRestId(restData.id);
+    // };
 
-    const handleNextSequence = (mode: "auto" | "manual") => {
-        console.log("Next seq ran");
-        if (!isNextAvailable) {
-            router.push({
-                pathname: "/routines/single-routine-screen",
-                params: {
-                    routineId,
-                },
-            });
-            return;
-        }
-        completeRest(restId, mode === "auto" ? restData!.endTime! : new Date());
-        setCurrentSequence((prev) => prev + 1);
-    };
+    // const handleNextSequence = (mode: "auto" | "manual") => {
+    //     console.log("Next seq ran");
+    //     if (!isNextAvailable) {
+    //         router.push({
+    //             pathname: "/routines/single-routine-screen",
+    //             params: {
+    //                 routineId,
+    //             },
+    //         });
+    //         return;
+    //     }
+    //     completeRest(restId, mode === "auto" ? restData!.endTime! : new Date());
+    //     setCurrentSequence((prev) => prev + 1);
+    // };
 
-    const formatSeconds = () => {
-        if (displayTimer < 60) {
-            return displayTimer.toString();
-        }
-        const seconds = (displayTimer % 60).toString().padStart(2, "0");
-        const minutes = Math.floor(displayTimer / 60)
-            .toString()
-            .padStart(2, "0");
-        return `${minutes}:${seconds}`;
-    };
+    // const formatSeconds = () => {
+    //     if (displayTimer < 60) {
+    //         return displayTimer.toString();
+    //     }
+    //     const seconds = (displayTimer % 60).toString().padStart(2, "0");
+    //     const minutes = Math.floor(displayTimer / 60)
+    //         .toString()
+    //         .padStart(2, "0");
+    //     return `${minutes}:${seconds}`;
+    // };
 
     return (
         <View style={{ flex: 1, backgroundColor: "#1950CE" }}>

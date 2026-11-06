@@ -12,17 +12,18 @@ interface RoutinesState {
         currentSequence: number;
         isOngoing: "new" | "ongoing" | "complete";
         findSingleActivity: () => NestedRoutine["routineData"][0]["dataExercises"][0];
+        updateSequence: {
+            increment: () => void;
+            decrement: () => void;
+            setSequence: (num: number) => void;
+        };
     };
     runRoutineStart: () => void;
     findCurrentDay: () => NestedRoutine["daysOtw"][0];
     updateAvailabilityState: () => void;
     loadSingleRoutine: (routineId: string) => void;
     updateOngoingState: () => void;
-    updateSequence: {
-        increment: () => void;
-        decrement: () => void;
-        setSequence: (num: number) => void;
-    };
+
     allRoutinesState: ShallowRoutine[];
     loadRoutines: () => void;
 }
@@ -40,6 +41,43 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                 );
 
             return activity!;
+        },
+        updateSequence: {
+            increment: () => {
+                // get().updateAvailabilityState();
+                // const isAvailable = get().singleRoutine.isNextAvailable
+
+                set((prev) => ({
+                    singleRoutine: {
+                        ...prev.singleRoutine,
+                        currentSequence: prev.singleRoutine.currentSequence + 1,
+                    },
+                }));
+                get().updateAvailabilityState();
+            },
+            decrement: () => {
+                const safeSubtract =
+                    get().singleRoutine.currentSequence - 1 < 0
+                        ? 0
+                        : get().singleRoutine.currentSequence;
+
+                set((prev) => ({
+                    singleRoutine: {
+                        ...prev.singleRoutine,
+                        currentSequence: safeSubtract,
+                    },
+                }));
+                get().updateAvailabilityState();
+            },
+            setSequence: (num) => {
+                set((prev) => ({
+                    singleRoutine: {
+                        ...prev.singleRoutine,
+                        currentSequence: num,
+                    },
+                }));
+                get().updateAvailabilityState();
+            },
         },
     },
     runRoutineStart: async () => {
@@ -137,7 +175,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                     isOngoing: "new",
                 },
             }));
-            get().updateSequence.setSequence(1);
+            get().singleRoutine.updateSequence.setSequence(1);
             return;
         }
         if (!tld.isComplete) {
@@ -151,7 +189,9 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                 get().singleRoutine.nestedRoutine!.routineData[0].dataExercises.find(
                     (tld) => !tld.isComplete,
                 );
-            get().updateSequence.setSequence(first ? first.sequence : 1);
+            get().singleRoutine.updateSequence.setSequence(
+                first ? first.sequence : 1,
+            );
             return;
         }
         set((prev) => ({
@@ -160,7 +200,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                 isOngoing: "complete",
             },
         }));
-        get().updateSequence.setSequence(1);
+        get().singleRoutine.updateSequence.setSequence(1);
     },
     findCurrentDay: () => {
         const currentDayTitle = daysOfTheWeek.map((d) => d.title)[
@@ -247,41 +287,6 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
         }));
 
         get().updateOngoingState();
-    },
-
-    updateSequence: {
-        increment: () => {
-            // get().updateAvailabilityState();
-            // const isAvailable = get().singleRoutine.isNextAvailable
-
-            set((prev) => ({
-                singleRoutine: {
-                    ...prev.singleRoutine,
-                    currentSequence: prev.singleRoutine.currentSequence + 1,
-                },
-            }));
-            get().updateAvailabilityState();
-        },
-        decrement: () => {
-            const safeSubtract =
-                get().singleRoutine.currentSequence - 1 < 0
-                    ? 0
-                    : get().singleRoutine.currentSequence;
-
-            set((prev) => ({
-                singleRoutine: {
-                    ...prev.singleRoutine,
-                    currentSequence: safeSubtract,
-                },
-            }));
-            get().updateAvailabilityState();
-        },
-        setSequence: (num) => {
-            set((prev) => ({
-                singleRoutine: { ...prev.singleRoutine, currentSequence: num },
-            }));
-            get().updateAvailabilityState();
-        },
     },
     allRoutinesState: [],
     loadRoutines: async () => {

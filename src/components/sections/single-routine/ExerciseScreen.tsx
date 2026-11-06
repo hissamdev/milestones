@@ -10,7 +10,7 @@ import {
     PlusCircle,
     TrophyIcon,
 } from "lucide-react-native";
-import { SetStateAction, useEffect } from "react";
+import { SetStateAction } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 import DurationControls from "./DurationControls";
@@ -35,36 +35,25 @@ export default function ExerciseScreen() {
 
     const router = useRouter();
 
-    useEffect(() => {
-        const load = async () => {
-            // const isNextAvailable = routineTemplate.templateExercises.find(
-            //     (te) => te.sequence === currentSequence + 1,
-            // );
-            // const topLevelData = await getTopLevelData(dataId);
-            // if (!topLevelData || !topLevelData.dataExercises.length) {
-            //     return;
-            // }
-            // setTopLevelData(topLevelData);
-            // if (!isNextAvailable) {
-            //     setIsNextAvailable(false);
-            //     return;
-            // }
-            // setIsNextAvailable(true);
-        };
+    // useEffect(() => {
+    //     const load = async () => {
+    //         // const isNextAvailable = routineTemplate.templateExercises.find(
+    //         //     (te) => te.sequence === currentSequence + 1,
+    //         // );
+    //         // const topLevelData = await getTopLevelData(dataId);
+    //         // if (!topLevelData || !topLevelData.dataExercises.length) {
+    //         //     return;
+    //         // }
+    //         // setTopLevelData(topLevelData);
+    //         // if (!isNextAvailable) {
+    //         //     setIsNextAvailable(false);
+    //         //     return;
+    //         // }
+    //         // setIsNextAvailable(true);
+    //     };
 
-        load();
-    }, [singleRoutine.currentSequence]);
-
-    useEffect(() => {
-        // Create entry for this exercise if does not exist, update it on each interaction
-        const load = async () => {
-            const currentExercise =
-                singleRoutine.nestedRoutine!.routineData[0].dataExercises.find(
-                    (de) => de.sequence === singleRoutine.currentSequence,
-                )!;
-        };
-        load();
-    }, []);
+    //     load();
+    // }, [singleRoutine.currentSequence]);
 
     // const handleNextSequence = async () => {
     //     handleComplete();
@@ -90,6 +79,15 @@ export default function ExerciseScreen() {
     //     console.log("Not ready");
     //     return <Text>Failed {exerciseDataId.toString()}</Text>;
     // }
+
+    const handleNext = () => {
+        if (!singleRoutine.isNextAvailable) {
+            router.navigate({
+                pathname: "/routines/single-routine-screen",
+            });
+            return;
+        }
+    };
 
     const currentActivity = singleRoutine.findSingleActivity();
 
