@@ -12,6 +12,8 @@ import m0008 from './20261102092436_polite_spacker_dave/migration.sql';
 import m0009 from './20261103020224_married_rage/migration.sql';
 import m0010 from './20261104234710_burly_red_skull/migration.sql';
 import m0011 from './20261106022952_awesome_blue_shield/migration.sql';
+import m0012 from './20261106061601_far_silver_samurai/migration.sql';
+import m0013 from './20261106062711_clumsy_donald_blake/migration.sql';
 
   export default {
     migrations: {
@@ -26,7 +28,9 @@ import m0011 from './20261106022952_awesome_blue_shield/migration.sql';
 "20261102092436_polite_spacker_dave": m0008,
 "20261103020224_married_rage": m0009,
 "20261104234710_burly_red_skull": m0010,
-"20261106022952_awesome_blue_shield": m0011
+"20261106022952_awesome_blue_shield": m0011,
+"20261106061601_far_silver_samurai": m0012,
+"20261106062711_clumsy_donald_blake": m0013
 }
   }
   

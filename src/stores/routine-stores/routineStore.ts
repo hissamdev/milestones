@@ -156,7 +156,9 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                               parentMetadataId: createdTld.id,
                               isRest: true,
                               isComplete: false,
-                              workAmount: te.displayRestAmount,
+                              workAmount: te.displayRestAmount
+                                  ? te.displayRestAmount
+                                  : 0,
                               startTime: null,
                               endTime: null,
                               sequence: te.sequence,
@@ -172,7 +174,9 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                               exerciseDisplayName: te.exercise.displayName,
                               exerciseDesc: te.exercise.desc,
                               exerciseType: te.exercise.type,
-                              workAmount: te.displayAmount,
+                              workAmount: te.displayAmount
+                                  ? te.displayAmount
+                                  : 0,
                               startTime: null,
                               endTime: null,
                               sequence: te.sequence,

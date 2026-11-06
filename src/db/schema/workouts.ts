@@ -118,6 +118,10 @@ export const routineTemplateExercises = s.sqliteTable(
             .notNull()
             .default(false),
         displayRestAmount: s.integer("rest_time"),
+        useStopwatch: s
+            .integer("use_stopwatch", { mode: "boolean" })
+            .notNull()
+            .default(false),
         sequence: s.integer("sequence").notNull(),
     },
 );
@@ -148,6 +152,10 @@ export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
         .references(() => routineDataTopLevel.id),
     exerciseId: s.text("exercise_id").references(() => exercises.id),
     isRest: s.integer("is_rest", { mode: "boolean" }).notNull().default(false),
+    useStopwatch: s
+        .integer("use_stopwatch", { mode: "boolean" })
+        .notNull()
+        .default(false),
     isComplete: s
         .integer("is_complete", { mode: "boolean" })
         .notNull()
@@ -158,7 +166,7 @@ export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
     exerciseDesc: s.text("exercise_desc"),
     exerciseType: s.text("exercise_type"), // Reps or Duration
     // Work done
-    workAmount: s.integer("work_amount"),
+    workAmount: s.integer("work_amount").notNull().default(0),
     startTime: s.integer("current_set_start_time", { mode: "timestamp" }),
     endTime: s.integer("current_set_end_time", { mode: "timestamp" }),
     sequence: s.integer("sequence").notNull(),

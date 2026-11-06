@@ -2,7 +2,7 @@ import { TopLevelData } from "@/app/routines/routine-focus-screen";
 import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import { DayTemplateTEE } from "@/types/routineTypes";
 import { ChevronLeft, ChevronRight, RefreshCcwIcon } from "lucide-react-native";
-import { SetStateAction, useEffect } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
@@ -122,6 +122,8 @@ export default function RestScreen() {
         useShallow((state) => ({ singleRoutine: state.singleRoutine })),
     );
 
+    const [projectedEnd, setProjectedEnd] = useState(0);
+
     const current = singleRoutine.findSingleActivity();
 
     useEffect(() => {
@@ -137,6 +139,19 @@ export default function RestScreen() {
         };
         load();
     }, []);
+
+    const handleSwitching = () => {
+        const isStopwatch = current.useStopwatch;
+        if (!isStopwatch) {
+            singleRoutine.complexSetters.activity("useStopwatch", true);
+            return;
+        }
+
+        const timestamp = new Date();
+        const calculateEnd = timestamp.getTime() + current.workAmount * 1000;
+        singleRoutine.markStart(timestamp);
+        singleRoutine.complexSetters.activity("useStopwatch", false);
+    };
 
     return (
         <View style={{ flex: 1, backgroundColor: "#1950CE" }}>

@@ -1,0 +1,2 @@
+ALTER TABLE `routine_exercise_data` ADD `use_stopwatch` integer DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `routine_template_exercises` ADD `use_stopwatch` integer DEFAULT false NOT NULL;
