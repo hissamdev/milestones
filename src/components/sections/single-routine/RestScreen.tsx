@@ -1,8 +1,10 @@
 import { TopLevelData } from "@/app/routines/routine-focus-screen";
+import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import { DayTemplateTEE } from "@/types/routineTypes";
 import { ChevronLeft, ChevronRight, RefreshCcwIcon } from "lucide-react-native";
-import { SetStateAction } from "react";
+import { SetStateAction, useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
 type Props = {
     routineId: string;
@@ -116,6 +118,26 @@ export default function RestScreen() {
     //     return `${minutes}:${seconds}`;
     // };
 
+    const { singleRoutine } = useRoutineStore(
+        useShallow((state) => ({ singleRoutine: state.singleRoutine })),
+    );
+
+    const current = singleRoutine.findSingleActivity();
+
+    useEffect(() => {
+        const load = async () => {
+            if (!current.startTime) {
+                const newTimestamp = new Date();
+                singleRoutine.markStart(newTimestamp).catch((error) => {
+                    console.error(error);
+                    return;
+                });
+                return;
+            }
+        };
+        load();
+    }, []);
+
     return (
         <View style={{ flex: 1, backgroundColor: "#1950CE" }}>
             <View
@@ -128,6 +150,9 @@ export default function RestScreen() {
                 }}
             >
                 <TouchableOpacity
+                    onPress={() => {
+                        singleRoutine.updateSequence.decrement();
+                    }}
                     style={{
                         padding: 10,
                         display: "flex",
@@ -185,9 +210,7 @@ export default function RestScreen() {
                         alignItems: "center",
                     }}
                 >
-                    <Text style={{ fontSize: 50, color: "white" }}>
-                        {formatSeconds()}
-                    </Text>
+                    <Text style={{ fontSize: 50, color: "white" }}>text</Text>
                     <Text style={{ fontSize: 30, color: "white" }}>
                         Remaining
                     </Text>
@@ -206,7 +229,6 @@ export default function RestScreen() {
                 }}
             >
                 <TouchableOpacity
-                    onPress={() => setUseStopwatch((prev) => !prev)}
                     style={{
                         backgroundColor: "gray",
                         display: "flex",
@@ -230,7 +252,6 @@ export default function RestScreen() {
                     <Text style={{ color: "white" }}>Switch to Stopwatch</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() => handleNextSequence("manual")}
                     style={{
                         backgroundColor: "gray",
                         display: "flex",

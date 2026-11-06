@@ -1,7 +1,8 @@
 import ExerciseScreen from "@/components/sections/single-routine/ExerciseScreen";
+import RestScreen from "@/components/sections/single-routine/RestScreen";
 import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import { useRouter } from "expo-router";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
 export type TopLevelData = {
@@ -90,9 +91,8 @@ export default function RoutineFocusScreen() {
             {singleRoutine.nestedRoutine.routineData[0].dataExercises.find(
                 (de) => de.sequence === singleRoutine.currentSequence,
             )!.isRest ? (
-                <Text>Text</Text>
+                <RestScreen />
             ) : (
-                // <RestScreen />
                 <ExerciseScreen />
             )}
         </View>

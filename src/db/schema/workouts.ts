@@ -6,10 +6,6 @@ export const workoutDay = s.sqliteTable("workout_day", {
         .integer("created_at", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()),
-    creationDay: s
-        .text("creation_day")
-        .notNull()
-        .$defaultFn(() => new Date().toDateString()),
     // standaloneExercises
     // sessions
 });
@@ -25,10 +21,6 @@ export const sessions = s.sqliteTable("sessions", {
         .integer("created_at", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()),
-    creationDay: s
-        .text("creation_day")
-        .notNull()
-        .$defaultFn(() => new Date().toDateString()),
 });
 
 export const sessionData = s.sqliteTable("session_data", {
@@ -43,10 +35,6 @@ export const sessionData = s.sqliteTable("session_data", {
         .integer("created_at", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()),
-    creationDay: s
-        .text("creation_day")
-        .notNull()
-        .$defaultFn(() => new Date().toDateString()),
     restTime: s.integer("rest_time"),
     workoutSequence: s.integer("sequence").notNull(),
 });
@@ -85,10 +73,6 @@ export const standaloneExercises = s.sqliteTable("standalone_exercises", {
         .integer("created_at", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()),
-    creationDay: s
-        .text("creation_day")
-        .notNull()
-        .$defaultFn(() => new Date().toDateString()),
     repitition: s.integer("repetition").notNull(),
 });
 
@@ -98,10 +82,6 @@ export const routines = s.sqliteTable("routines", {
         .integer("created_at", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()),
-    creationDay: s
-        .text("creation_day")
-        .notNull()
-        .$defaultFn(() => new Date().toDateString()),
     name: s.text().notNull(),
 });
 
@@ -179,10 +159,7 @@ export const routineExerciseData = s.sqliteTable("routine_exercise_data", {
     exerciseType: s.text("exercise_type"), // Reps or Duration
     // Work done
     workAmount: s.integer("work_amount"),
-    startTime: s
-        .integer("current_set_start_time", { mode: "timestamp" })
-        .notNull()
-        .$defaultFn(() => new Date()),
+    startTime: s.integer("current_set_start_time", { mode: "timestamp" }),
     endTime: s.integer("current_set_end_time", { mode: "timestamp" }),
     sequence: s.integer("sequence").notNull(),
 });

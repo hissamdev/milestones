@@ -1,7 +1,12 @@
 import { db } from "@/db/client";
 import { routineDataTopLevel, routineExerciseData } from "@/db/schema/workouts";
-import { NestedRoutine, ShallowRoutine } from "@/types/routineTypes";
+import {
+    ExerciseData,
+    NestedRoutine,
+    ShallowRoutine,
+} from "@/types/routineTypes";
 import { daysOfTheWeek } from "@/utils/workouts/days";
+import { updateStartTime } from "@/utils/workouts/routineHelpers";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
@@ -17,13 +22,19 @@ interface RoutinesState {
             decrement: () => void;
             setSequence: (num: number) => void;
         };
+        complexSetters: {
+            activity: <K extends keyof ExerciseData>(
+                keyName: K,
+                value: ExerciseData[K],
+            ) => void;
+        };
+        markStart: (newStart: Date) => Promise<void>;
     };
     runRoutineStart: () => void;
     findCurrentDay: () => NestedRoutine["daysOtw"][0];
     updateAvailabilityState: () => void;
     loadSingleRoutine: (routineId: string) => void;
     updateOngoingState: () => void;
-
     allRoutinesState: ShallowRoutine[];
     loadRoutines: () => void;
 }
@@ -53,13 +64,14 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                         currentSequence: prev.singleRoutine.currentSequence + 1,
                     },
                 }));
+
                 get().updateAvailabilityState();
             },
             decrement: () => {
                 const safeSubtract =
                     get().singleRoutine.currentSequence - 1 < 0
                         ? 0
-                        : get().singleRoutine.currentSequence;
+                        : get().singleRoutine.currentSequence - 1;
 
                 set((prev) => ({
                     singleRoutine: {
@@ -79,9 +91,51 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                 get().updateAvailabilityState();
             },
         },
+        complexSetters: {
+            activity: (keyName, value) => {
+                set((prev) => ({
+                    singleRoutine: {
+                        ...prev.singleRoutine,
+                        nestedRoutine: {
+                            ...prev.singleRoutine.nestedRoutine!,
+                            routineData: [
+                                {
+                                    ...prev.singleRoutine.nestedRoutine!
+                                        .routineData[0],
+                                    dataExercises:
+                                        prev.singleRoutine.nestedRoutine!.routineData[0].dataExercises.map(
+                                            (de) =>
+                                                de.sequence ===
+                                                get().singleRoutine
+                                                    .currentSequence
+                                                    ? {
+                                                          ...de,
+                                                          [keyName]: value,
+                                                      }
+                                                    : {
+                                                          ...de,
+                                                      },
+                                        ),
+                                },
+                                ...prev.singleRoutine.nestedRoutine!
+                                    .routineData,
+                            ],
+                        },
+                    },
+                }));
+            },
+        },
+        markStart: async (newStart: Date) => {
+            const activity = get().singleRoutine.findSingleActivity();
+            await updateStartTime(activity.id, newStart);
+            get().singleRoutine.complexSetters.activity("startTime", newStart);
+        },
     },
     runRoutineStart: async () => {
         try {
+            if (get().singleRoutine.isOngoing === "ongoing") {
+                return;
+            }
             const [createdTld] = await db
                 .insert(routineDataTopLevel)
                 .values({
@@ -103,7 +157,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                               isRest: true,
                               isComplete: false,
                               workAmount: te.displayRestAmount,
-                              startTime: new Date(),
+                              startTime: null,
                               endTime: null,
                               sequence: te.sequence,
                           }
@@ -119,7 +173,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                               exerciseDesc: te.exercise.desc,
                               exerciseType: te.exercise.type,
                               workAmount: te.displayAmount,
-                              startTime: new Date(),
+                              startTime: null,
                               endTime: null,
                               sequence: te.sequence,
                           },
@@ -185,12 +239,13 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                     isOngoing: "ongoing",
                 },
             }));
-            const first =
+            // dataExercises may not contain any entries to find from in case of a transaction failure
+            const firstIncomplete =
                 get().singleRoutine.nestedRoutine!.routineData[0].dataExercises.find(
                     (tld) => !tld.isComplete,
                 );
             get().singleRoutine.updateSequence.setSequence(
-                first ? first.sequence : 1,
+                firstIncomplete ? firstIncomplete.sequence : 1,
             );
             return;
         }
@@ -200,7 +255,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                 isOngoing: "complete",
             },
         }));
-        get().singleRoutine.updateSequence.setSequence(1);
+        get().singleRoutine.updateSequence.setSequence(1); // Reset sequence
     },
     findCurrentDay: () => {
         const currentDayTitle = daysOfTheWeek.map((d) => d.title)[
@@ -228,8 +283,10 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
         //     (te) => te.sequence === nextSeq,
         // );
 
+        console.log("Found seq", get().singleRoutine.currentSequence);
+
         const available =
-            get().singleRoutine.nestedRoutine!.routineData[0].dataExercises.find(
+            get().singleRoutine.nestedRoutine?.routineData?.[0]?.dataExercises?.find(
                 (de) => de.sequence === get().singleRoutine.currentSequence,
             );
 
@@ -241,7 +298,7 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
         }));
     },
     loadSingleRoutine: async (routineId: string) => {
-        const singleRoutine = await db.query.routines.findFirst({
+        const getCurrentRoutine = await db.query.routines.findFirst({
             where: {
                 id: routineId,
             },
@@ -277,14 +334,16 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
             },
         });
 
-        if (!singleRoutine) return null;
-
         set((prev) => ({
             singleRoutine: {
                 ...prev.singleRoutine,
-                nestedRoutine: singleRoutine,
+                nestedRoutine: getCurrentRoutine ? getCurrentRoutine : null,
             },
         }));
+
+        if (!getCurrentRoutine) {
+            return;
+        }
 
         get().updateOngoingState();
     },

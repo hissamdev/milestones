@@ -87,6 +87,7 @@ export default function ExerciseScreen() {
             });
             return;
         }
+        singleRoutine.updateSequence.increment();
     };
 
     const currentActivity = singleRoutine.findSingleActivity();
@@ -171,12 +172,15 @@ export default function ExerciseScreen() {
                     <Text
                         style={{ marginTop: 0, fontSize: 15, color: "white" }}
                     >
-                        {currentActivity.startTime.toLocaleTimeString("en-US", {
-                            hour: "numeric",
-                            minute: "2-digit",
-                            second: "2-digit",
-                            hour12: true,
-                        })}{" "}
+                        {currentActivity.startTime?.toLocaleTimeString(
+                            "en-US",
+                            {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                second: "2-digit",
+                                hour12: true,
+                            },
+                        )}{" "}
                         hi
                     </Text>
                 </View>
@@ -337,6 +341,7 @@ export default function ExerciseScreen() {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                            onPress={handleNext}
                             style={[
                                 styles.stepButtons,
                                 {

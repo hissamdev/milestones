@@ -549,3 +549,22 @@ export async function completeRoutine(dataId: string) {
         console.error(err);
     }
 }
+
+export async function updateStartTime(activityId: string, timestamp: Date) {
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            await db
+                .update(routineExerciseData)
+                .set({ startTime: timestamp })
+                .where(eq(routineExerciseData.id, activityId));
+            return;
+        } catch (error) {
+            if (attempt === maxRetries) {
+                throw error;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+    }
+}
