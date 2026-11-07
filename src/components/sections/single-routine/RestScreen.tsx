@@ -1,156 +1,120 @@
-import { TopLevelData } from "@/app/routines/routine-focus-screen";
 import { useRoutineStore } from "@/stores/routine-stores/routineStore";
-import { DayTemplateTEE } from "@/types/routineTypes";
+import { calculateEnd } from "@/utils/workouts/routineHelpers";
 import { ChevronLeft, ChevronRight, RefreshCcwIcon } from "lucide-react-native";
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
-type Props = {
-    routineId: string;
-    routineTemplate: DayTemplateTEE["routineTemplate"];
-    currentSequence: number;
-    setCurrentSequence: React.Dispatch<SetStateAction<number>>;
-    dataId: string;
-    topLevelData: TopLevelData | null;
-};
-
 export default function RestScreen() {
-    // const [displayTimer, setDisplayTimer] = useState(0);
-    // const [useStopwatch, setUseStopwatch] = useState(true);
-
-    // const router = useRouter();
-
-    // useEffect(() => {
-    //     const load = async () => {
-    //         const isNextAvailable = routineTemplate.templateExercises.find(
-    //             (te) => te.sequence === currentSequence + 1,
-    //         );
-    //         if (!isNextAvailable) {
-    //             setIsNextAvailable(false);
-    //             return;
-    //         }
-    //         setIsNextAvailable(true);
-    //         handleInitialization();
-    //     };
-
-    //     load();
-    // }, [currentSequence]);
-
-    // useEffect(() => {
-    //     console.log("Effect ran", useStopwatch);
-    //     if (!restData || !restData.startTime || !restData.endTime) {
-    //         return;
-    //     }
-
-    //     const customEnd = new Date().getTime() + 5 * 1000;
-    //     const calculateDisplayTime = () => {
-    //         const countdown = Math.floor(
-    //             (customEnd - new Date().getTime()) / 1000,
-    //         );
-    //         if (countdown < 0) {
-    //             handleNextSequence("auto");
-    //             return;
-    //         }
-
-    //         setDisplayTimer(() => {
-    //             if (!useStopwatch) {
-    //                 return countdown;
-    //             } else {
-    //                 return Math.floor(
-    //                     (new Date().getTime() - restData.startTime!.getTime()) /
-    //                         1000,
-    //                 );
-    //             }
-    //         });
-    //     };
-
-    //     calculateDisplayTime();
-
-    //     const timer = setInterval(() => {
-    //         calculateDisplayTime();
-    //     }, 100);
-    //     return () => clearInterval(timer);
-    // }, [restData, useStopwatch]);
-
-    // const handleInitialization = async () => {
-    //     const currentRest = routineTemplate.templateExercises.find(
-    //         (te) => te.sequence === currentSequence,
-    //     );
-
-    //     if (!displayTimer) {
-    //         setDisplayTimer(currentRest?.displayRestAmount!);
-    //     }
-
-    //     const restData = await initializeRestData(
-    //         dataId,
-    //         currentRest!.displayRestAmount!,
-    //         currentSequence,
-    //     );
-    //     if (!restData) return;
-    //     setRestData(restData);
-    //     setRestId(restData.id);
-    // };
-
-    // const handleNextSequence = (mode: "auto" | "manual") => {
-    //     console.log("Next seq ran");
-    //     if (!isNextAvailable) {
-    //         router.push({
-    //             pathname: "/routines/single-routine-screen",
-    //             params: {
-    //                 routineId,
-    //             },
-    //         });
-    //         return;
-    //     }
-    //     completeRest(restId, mode === "auto" ? restData!.endTime! : new Date());
-    //     setCurrentSequence((prev) => prev + 1);
-    // };
-
-    // const formatSeconds = () => {
-    //     if (displayTimer < 60) {
-    //         return displayTimer.toString();
-    //     }
-    //     const seconds = (displayTimer % 60).toString().padStart(2, "0");
-    //     const minutes = Math.floor(displayTimer / 60)
-    //         .toString()
-    //         .padStart(2, "0");
-    //     return `${minutes}:${seconds}`;
-    // };
-
     const { singleRoutine } = useRoutineStore(
         useShallow((state) => ({ singleRoutine: state.singleRoutine })),
     );
 
-    const [projectedEnd, setProjectedEnd] = useState(0);
-
-    const current = singleRoutine.findSingleActivity();
+    const [display, setDisplay] = useState(0);
 
     useEffect(() => {
-        const load = async () => {
-            if (!current.startTime) {
-                const newTimestamp = new Date();
-                singleRoutine.markStart(newTimestamp).catch((error) => {
-                    console.error(error);
-                    return;
-                });
+        if (!singleRoutine.findSingleActivity().startTime) {
+            if (!singleRoutine.findSingleActivity().useStopwatch) {
+                singleRoutine.markStart(newTimestamp);
+                singleRoutine.markEnd(
+                    calculateEnd(
+                        newTimestamp,
+                        singleRoutine.findSingleActivity().workAmount,
+                    ),
+                );
                 return;
             }
+            singleRoutine.markStart(newTimestamp).catch((error) => {
+                console.error(error);
+                return;
+            });
+        }
+
+        const newTime = new Date();
+        const initStartEnd = () => {
+            if (!singleRoutine.findSingleActivity().useStopwatch) {
+                if (!singleRoutine.findSingleActivity().startTime) {
+                    singleRoutine.markStart(newTime);
+                    singleRoutine.markEnd(
+                        calculateEnd(
+                            newTime,
+                            singleRoutine.findSingleActivity().workAmount,
+                        ),
+                    );
+                    return;
+                }
+                shouldResetCountdown();
+                return;
+            }
+
+            if (!singleRoutine.findSingleActivity().startTime) {
+                singleRoutine.markStart(newTime);
+            }
         };
-        load();
+
+        initStartEnd();
+        updateDisplay();
+
+        const timer = setInterval(updateDisplay, 100);
+
+        return () => clearInterval(timer);
     }, []);
 
-    const handleSwitching = () => {
-        const isStopwatch = current.useStopwatch;
-        if (!isStopwatch) {
-            singleRoutine.complexSetters.activity("useStopwatch", true);
+    const updateDisplay = () => {
+        const currentTime = new Date();
+        if (!singleRoutine.findSingleActivity().useStopwatch) {
+            const remaining =
+                Math.round(
+                    singleRoutine.findSingleActivity().endTime!.getTime() -
+                        currentTime.getTime(),
+                ) / 1000;
+            setDisplay(remaining);
+            return;
+        }
+        const elapsed =
+            Math.round(
+                currentTime.getTime() -
+                    singleRoutine.findSingleActivity().startTime!.getTime(),
+            ) / 1000;
+        setDisplay(elapsed);
+    };
+
+    const shouldResetCountdown = () => {
+        const newTimestamp = new Date();
+        if (
+            calculateEnd(
+                singleRoutine.findSingleActivity().startTime!,
+                singleRoutine.findSingleActivity().workAmount,
+            ) < new Date()
+        ) {
+            singleRoutine.markStart(newTimestamp);
+            singleRoutine.markEnd(
+                calculateEnd(
+                    newTimestamp,
+                    singleRoutine.findSingleActivity().workAmount,
+                ),
+            );
             return;
         }
 
-        const timestamp = new Date();
-        const calculateEnd = timestamp.getTime() + current.workAmount * 1000;
-        singleRoutine.markStart(timestamp);
+        // singleRoutine.markEnd(
+        //     calculateEnd(
+        //         singleRoutine.findSingleActivity().startTime!,
+        //         singleRoutine.findSingleActivity().workAmount,
+        //     ),
+        // );
+    };
+
+    const handleSwitching = () => {
+        console.log("Captured", display);
+        if (!singleRoutine.findSingleActivity().useStopwatch) {
+            singleRoutine.complexSetters.activity("useStopwatch", true);
+            updateDisplay();
+            return;
+        }
+        shouldResetCountdown();
         singleRoutine.complexSetters.activity("useStopwatch", false);
+        updateDisplay();
     };
 
     return (
@@ -225,9 +189,13 @@ export default function RestScreen() {
                         alignItems: "center",
                     }}
                 >
-                    <Text style={{ fontSize: 50, color: "white" }}>text</Text>
+                    <Text style={{ fontSize: 50, color: "white" }}>
+                        {display}
+                    </Text>
                     <Text style={{ fontSize: 30, color: "white" }}>
-                        Remaining
+                        {singleRoutine.findSingleActivity().useStopwatch
+                            ? "Elapsed"
+                            : "Remaining"}
                     </Text>
                 </View>
             </View>
@@ -256,6 +224,7 @@ export default function RestScreen() {
                     <RefreshCcwIcon color="white" size={17} />
                 </TouchableOpacity>
                 <TouchableOpacity
+                    onPress={handleSwitching}
                     style={{
                         backgroundColor: "gray",
                         display: "flex",

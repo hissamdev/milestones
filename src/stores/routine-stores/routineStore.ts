@@ -29,6 +29,7 @@ interface RoutinesState {
             ) => void;
         };
         markStart: (newStart: Date) => Promise<void>;
+        markEnd: (time: Date) => void;
     };
     runRoutineStart: () => void;
     findCurrentDay: () => NestedRoutine["daysOtw"][0];
@@ -125,10 +126,15 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
                 }));
             },
         },
-        markStart: async (newStart: Date) => {
+        markStart: async (time: Date) => {
             const activity = get().singleRoutine.findSingleActivity();
-            await updateStartTime(activity.id, newStart);
-            get().singleRoutine.complexSetters.activity("startTime", newStart);
+            await updateStartTime(activity.id, time);
+            get().singleRoutine.complexSetters.activity("startTime", time);
+        },
+        markEnd: (time) => {
+            const activity = get().singleRoutine.findSingleActivity();
+            get().singleRoutine.complexSetters.activity("endTime", time);
+            console.log("End marked in zustand", activity.endTime);
         },
     },
     runRoutineStart: async () => {

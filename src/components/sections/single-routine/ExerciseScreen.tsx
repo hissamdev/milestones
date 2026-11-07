@@ -308,7 +308,9 @@ export default function ExerciseScreen() {
                                 )
                                 .map((de) => (
                                     <View key={de.id}>
-                                        <Text>{de.exerciseName}</Text>
+                                        <Text>
+                                            {de.exerciseName} {de.sequence}
+                                        </Text>
                                     </View>
                                 ))}
                         </View>
