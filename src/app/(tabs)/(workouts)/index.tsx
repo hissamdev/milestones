@@ -1,4 +1,5 @@
 import Routines from "@/components/sections/routines/Routines";
+import Sessions from "@/components/sections/sessions/Sessions";
 import CreateExercise from "@/components/ui/CreateExercise";
 import { exercises } from "@/db/schema/workouts";
 import { createRoutine } from "@/utils/workouts/routineHelpers";
@@ -77,19 +78,7 @@ export default function Workouts() {
     // if (!workouts) return;
     return (
         <SafeAreaView style={{ flex: 1, position: "relative", padding: 10 }}>
-            {/* <TouchableOpacity
-                style={{
-                    alignSelf: "flex-start",
-                    marginHorizontal: "auto",
-                    marginTop: 70,
-                    paddingVertical: 12,
-                    paddingHorizontal: 24,
-                    borderColor: "black",
-                    borderWidth: 1,
-                }}
-            >
-                <Text>Create Property</Text>
-            </TouchableOpacity> */}
+            <Sessions />
             <Routines />
 
             <CreateExercise />

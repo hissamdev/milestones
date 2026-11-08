@@ -47,7 +47,7 @@ export default function Routines() {
 
     return (
         <>
-            <View style={{ marginTop: 10, paddingBottom: 30 }}>
+            <View style={{ marginTop: 20, paddingBottom: 30 }}>
                 <Text style={{ fontSize: 24, fontWeight: 500 }}>Routines</Text>
                 <View style={{ marginTop: 10 }}>
                     {allRoutinesState.length ? (
