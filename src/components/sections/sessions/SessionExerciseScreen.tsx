@@ -1,38 +1,16 @@
-import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import { useRouter } from "expo-router";
 import {
+    ArrowUpDown,
     ChevronLeft,
-    ChevronRight,
     CircleCheck,
+    Flag,
     History,
-    PlusCircle,
     TrophyIcon,
 } from "lucide-react-native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useShallow } from "zustand/react/shallow";
-import DurationControls from "./DurationControls";
-import RepControls from "./RepControls";
 
-export default function ExerciseScreen() {
-    const { singleRoutine } = useRoutineStore(
-        useShallow((state) => ({
-            singleRoutine: state.singleRoutine,
-        })),
-    );
-
+export default function SessionExercise() {
     const router = useRouter();
-
-    const handleNext = () => {
-        if (!singleRoutine.isNextAvailable) {
-            router.navigate({
-                pathname: "/routines/single-routine-screen",
-            });
-            return;
-        }
-        singleRoutine.updateSequence.increment();
-    };
-
-    const currentActivity = singleRoutine.findSingleActivity();
 
     return (
         <View style={{ flex: 1 }}>
@@ -76,13 +54,17 @@ export default function ExerciseScreen() {
                             flexDirection: "row",
                             alignItems: "center",
                             gap: 4,
-                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                            backgroundColor: "white",
+                            borderWidth: 2,
+                            borderColor: "#7D9FEA",
                             borderRadius: 100,
                         }}
                     >
-                        <Text style={{ color: "white" }}>Skip</Text>
+                        <Text style={{ color: "#1A56DB", fontWeight: 500 }}>
+                            Swap
+                        </Text>
                         <Text>
-                            <ChevronRight color="white" size={16} />
+                            <ArrowUpDown color="#1A56DB" size={14} />
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -104,25 +86,16 @@ export default function ExerciseScreen() {
                     <Text
                         style={{ marginTop: 10, fontSize: 24, color: "white" }}
                     >
-                        {currentActivity.exerciseDisplayName}
+                        Exercise name
                     </Text>
                     <Text
                         style={{ marginTop: 0, fontSize: 15, color: "white" }}
                     >
-                        {currentActivity.exerciseDesc}
+                        Desc
                     </Text>
                     <Text
                         style={{ marginTop: 0, fontSize: 15, color: "white" }}
                     >
-                        {currentActivity.startTime?.toLocaleTimeString(
-                            "en-US",
-                            {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                second: "2-digit",
-                                hour12: true,
-                            },
-                        )}{" "}
                         hi
                     </Text>
                 </View>
@@ -134,11 +107,7 @@ export default function ExerciseScreen() {
                 }}
             >
                 <View style={{}}>
-                    {currentActivity.exerciseType === "reps" ? (
-                        <RepControls />
-                    ) : (
-                        <DurationControls />
-                    )}
+                    {/* {"reps" === "reps" ? <RepControls /> : <DurationControls />} */}
 
                     <View>
                         <View
@@ -241,7 +210,7 @@ export default function ExerciseScreen() {
                                 </View>
                             </View>
 
-                            {singleRoutine
+                            {/* {singleRoutine
                                 .nestedRoutine!.routineData[0].dataExercises.filter(
                                     (de) =>
                                         !de.isRest &&
@@ -254,7 +223,7 @@ export default function ExerciseScreen() {
                                             {de.exerciseName} {de.sequence}
                                         </Text>
                                     </View>
-                                ))}
+                                ))} */}
                         </View>
                     </View>
                 </View>
@@ -271,21 +240,29 @@ export default function ExerciseScreen() {
                             style={[
                                 styles.stepButtons,
                                 {
-                                    backgroundColor: "#EFEDEE",
+                                    backgroundColor: "#FFE4E6",
                                     borderWidth: 1,
-                                    borderColor: "#DDDDE4",
+                                    borderColor: "#FDA4AF",
                                 },
                             ]}
                         >
                             <Text>
-                                <PlusCircle size={17} />
+                                <Flag size={17} color="#BE123C" />
                             </Text>
-                            <Text style={[styles.buttonText, { fontSize: 14 }]}>
-                                Add Set
+                            <Text
+                                style={[
+                                    styles.buttonText,
+                                    {
+                                        fontSize: 14,
+                                        color: "#BE123C",
+                                        fontWeight: 500,
+                                    },
+                                ]}
+                            >
+                                Done
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            onPress={handleNext}
                             style={[
                                 styles.stepButtons,
                                 {
@@ -304,9 +281,7 @@ export default function ExerciseScreen() {
                             <Text
                                 style={[styles.buttonText, { color: "white" }]}
                             >
-                                {singleRoutine.isNextAvailable
-                                    ? "Next"
-                                    : "Finish"}
+                                Rest
                             </Text>
                         </TouchableOpacity>
                     </View>

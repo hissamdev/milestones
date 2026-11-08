@@ -1,121 +1,66 @@
-import { useRoutineStore } from "@/stores/routine-stores/routineStore";
-import { calculateEnd } from "@/utils/workouts/focus-screen-helpers";
 import { ChevronLeft, ChevronRight, RefreshCcwIcon } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { useShallow } from "zustand/react/shallow";
 
-export default function RestScreen() {
-    const { singleRoutine } = useRoutineStore(
-        useShallow((state) => ({ singleRoutine: state.singleRoutine })),
-    );
-
+export default function SessionRest() {
     const [display, setDisplay] = useState(0);
 
-    useEffect(() => {
-        if (!singleRoutine.findSingleActivity().startTime) {
-            if (!singleRoutine.findSingleActivity().useStopwatch) {
-                singleRoutine.markStart(newTimestamp);
-                singleRoutine.markEnd(
-                    calculateEnd(
-                        newTimestamp,
-                        singleRoutine.findSingleActivity().workAmount,
-                    ),
-                );
-                return;
-            }
-            singleRoutine.markStart(newTimestamp).catch((error) => {
-                console.error(error);
-                return;
-            });
-        }
+    // const updateDisplay = () => {
+    //     const currentTime = new Date();
+    //     if (!singleRoutine.findSingleActivity().useStopwatch) {
+    //         const remaining =
+    //             Math.round(
+    //                 singleRoutine.findSingleActivity().endTime!.getTime() -
+    //                     currentTime.getTime(),
+    //             ) / 1000;
+    //         setDisplay(remaining);
+    //         return;
+    //     }
+    //     const elapsed =
+    //         Math.round(
+    //             currentTime.getTime() -
+    //                 singleRoutine.findSingleActivity().startTime!.getTime(),
+    //         ) / 1000;
+    //     setDisplay(elapsed);
+    // };
 
-        const newTime = new Date();
-        const initStartEnd = () => {
-            if (!singleRoutine.findSingleActivity().useStopwatch) {
-                if (!singleRoutine.findSingleActivity().startTime) {
-                    singleRoutine.markStart(newTime);
-                    singleRoutine.markEnd(
-                        calculateEnd(
-                            newTime,
-                            singleRoutine.findSingleActivity().workAmount,
-                        ),
-                    );
-                    return;
-                }
-                shouldResetCountdown();
-                return;
-            }
+    // const shouldResetCountdown = () => {
+    //     const newTimestamp = new Date();
+    //     if (
+    //         calculateEnd(
+    //             singleRoutine.findSingleActivity().startTime!,
+    //             singleRoutine.findSingleActivity().workAmount,
+    //         ) < new Date()
+    //     ) {
+    //         singleRoutine.markStart(newTimestamp);
+    //         singleRoutine.markEnd(
+    //             calculateEnd(
+    //                 newTimestamp,
+    //                 singleRoutine.findSingleActivity().workAmount,
+    //             ),
+    //         );
+    //         return;
+    //     }
 
-            if (!singleRoutine.findSingleActivity().startTime) {
-                singleRoutine.markStart(newTime);
-            }
-        };
+    //     // singleRoutine.markEnd(
+    //     //     calculateEnd(
+    //     //         singleRoutine.findSingleActivity().startTime!,
+    //     //         singleRoutine.findSingleActivity().workAmount,
+    //     //     ),
+    //     // );
+    // };
 
-        initStartEnd();
-        updateDisplay();
-
-        const timer = setInterval(updateDisplay, 100);
-
-        return () => clearInterval(timer);
-    }, []);
-
-    const updateDisplay = () => {
-        const currentTime = new Date();
-        if (!singleRoutine.findSingleActivity().useStopwatch) {
-            const remaining =
-                Math.round(
-                    singleRoutine.findSingleActivity().endTime!.getTime() -
-                        currentTime.getTime(),
-                ) / 1000;
-            setDisplay(remaining);
-            return;
-        }
-        const elapsed =
-            Math.round(
-                currentTime.getTime() -
-                    singleRoutine.findSingleActivity().startTime!.getTime(),
-            ) / 1000;
-        setDisplay(elapsed);
-    };
-
-    const shouldResetCountdown = () => {
-        const newTimestamp = new Date();
-        if (
-            calculateEnd(
-                singleRoutine.findSingleActivity().startTime!,
-                singleRoutine.findSingleActivity().workAmount,
-            ) < new Date()
-        ) {
-            singleRoutine.markStart(newTimestamp);
-            singleRoutine.markEnd(
-                calculateEnd(
-                    newTimestamp,
-                    singleRoutine.findSingleActivity().workAmount,
-                ),
-            );
-            return;
-        }
-
-        // singleRoutine.markEnd(
-        //     calculateEnd(
-        //         singleRoutine.findSingleActivity().startTime!,
-        //         singleRoutine.findSingleActivity().workAmount,
-        //     ),
-        // );
-    };
-
-    const handleSwitching = () => {
-        console.log("Captured", display);
-        if (!singleRoutine.findSingleActivity().useStopwatch) {
-            singleRoutine.complexSetters.activity("useStopwatch", true);
-            updateDisplay();
-            return;
-        }
-        shouldResetCountdown();
-        singleRoutine.complexSetters.activity("useStopwatch", false);
-        updateDisplay();
-    };
+    // const handleSwitching = () => {
+    //     console.log("Captured", display);
+    //     if (!singleRoutine.findSingleActivity().useStopwatch) {
+    //         singleRoutine.complexSetters.activity("useStopwatch", true);
+    //         updateDisplay();
+    //         return;
+    //     }
+    //     shouldResetCountdown();
+    //     singleRoutine.complexSetters.activity("useStopwatch", false);
+    //     updateDisplay();
+    // };
 
     return (
         <View style={{ flex: 1, backgroundColor: "#1950CE" }}>
@@ -129,9 +74,6 @@ export default function RestScreen() {
                 }}
             >
                 <TouchableOpacity
-                    onPress={() => {
-                        singleRoutine.updateSequence.decrement();
-                    }}
                     style={{
                         padding: 10,
                         display: "flex",
@@ -193,9 +135,7 @@ export default function RestScreen() {
                         {display}
                     </Text>
                     <Text style={{ fontSize: 30, color: "white" }}>
-                        {singleRoutine.findSingleActivity().useStopwatch
-                            ? "Elapsed"
-                            : "Remaining"}
+                        Elapsed
                     </Text>
                 </View>
             </View>
@@ -224,7 +164,6 @@ export default function RestScreen() {
                     <RefreshCcwIcon color="white" size={17} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={handleSwitching}
                     style={{
                         backgroundColor: "gray",
                         display: "flex",
