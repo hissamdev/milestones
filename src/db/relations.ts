@@ -51,10 +51,6 @@ export const workoutRelations = defineRelationsPart(
         routineExerciseData,
     },
     (r) => ({
-        workoutDay: {
-            sessions: r.many.sessions(),
-            standaloneExercises: r.many.standaloneExercises(),
-        },
         exercises: {
             standalones: r.many.standaloneExercises(),
             templates: r.many.routineTemplateExercises(),
@@ -70,14 +66,6 @@ export const workoutRelations = defineRelationsPart(
             }),
         },
         sessions: {
-            workout: r.one.workoutDay({
-                from: r.sessions.workoutId,
-                to: r.workoutDay.id,
-            }),
-            routine: r.one.routines({
-                from: r.sessions.routineId,
-                to: r.routines.id,
-            }),
             sessionData: r.many.sessionData(),
         },
         sessionData: {
