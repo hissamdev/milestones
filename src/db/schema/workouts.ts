@@ -61,7 +61,7 @@ export const sessionData = s.sqliteTable("session_data", {
         .text("session_id")
         .notNull()
         .references(() => sessions.id, { onDelete: "cascade" }),
-    exerciseId: s.text().references(() => exercises.id),
+    exerciseId: s.text("exercise_id").references(() => exercises.id),
     createdAt: s
         .integer("created_at", { mode: "timestamp" })
         .notNull()

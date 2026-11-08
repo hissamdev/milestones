@@ -15,6 +15,7 @@ import m0011 from './20261106022952_awesome_blue_shield/migration.sql';
 import m0012 from './20261106061601_far_silver_samurai/migration.sql';
 import m0013 from './20261106062711_clumsy_donald_blake/migration.sql';
 import m0014 from './20261108042535_sour_sauron/migration.sql';
+import m0015 from './20261108045252_bumpy_rawhide_kid/migration.sql';
 
   export default {
     migrations: {
@@ -32,7 +33,8 @@ import m0014 from './20261108042535_sour_sauron/migration.sql';
 "20261106022952_awesome_blue_shield": m0011,
 "20261106061601_far_silver_samurai": m0012,
 "20261106062711_clumsy_donald_blake": m0013,
-"20261108042535_sour_sauron": m0014
+"20261108042535_sour_sauron": m0014,
+"20261108045252_bumpy_rawhide_kid": m0015
 }
   }
   
