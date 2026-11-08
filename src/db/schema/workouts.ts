@@ -10,35 +10,6 @@ export const workoutDay = s.sqliteTable("workout_day", {
     // sessions
 });
 
-export const sessions = s.sqliteTable("sessions", {
-    id: s.text("id").primaryKey(),
-    workoutId: s
-        .text("workout_id")
-        .notNull()
-        .references(() => workoutDay.id),
-    routineId: s.text().references(() => routines.id),
-    createdAt: s
-        .integer("created_at", { mode: "timestamp" })
-        .notNull()
-        .$defaultFn(() => new Date()),
-});
-
-export const sessionData = s.sqliteTable("session_data", {
-    id: s.text("id").primaryKey(),
-    sessionId: s
-        .text("session_id")
-        .notNull()
-        .references(() => sessions.id),
-    exerciseId: s.text().references(() => exercises.id),
-
-    createdAt: s
-        .integer("created_at", { mode: "timestamp" })
-        .notNull()
-        .$defaultFn(() => new Date()),
-    restTime: s.integer("rest_time"),
-    workoutSequence: s.integer("sequence").notNull(),
-});
-
 // Independent list of available exercises for autocomplete
 export const exercises = s.sqliteTable("exercises", {
     id: s.text("id").primaryKey(),
@@ -74,6 +45,30 @@ export const standaloneExercises = s.sqliteTable("standalone_exercises", {
         .notNull()
         .$defaultFn(() => new Date()),
     repitition: s.integer("repetition").notNull(),
+});
+
+export const sessions = s.sqliteTable("sessions", {
+    id: s.text("id").primaryKey(),
+    createdAt: s
+        .integer("created_at", { mode: "timestamp" })
+        .notNull()
+        .$defaultFn(() => new Date()),
+});
+
+export const sessionData = s.sqliteTable("session_data", {
+    id: s.text("id").primaryKey(),
+    sessionId: s
+        .text("session_id")
+        .notNull()
+        .references(() => sessions.id, { onDelete: "cascade" }),
+    exerciseId: s.text().references(() => exercises.id),
+    createdAt: s
+        .integer("created_at", { mode: "timestamp" })
+        .notNull()
+        .$defaultFn(() => new Date()),
+    isRest: s.integer("is_rest", { mode: "boolean" }).notNull().default(false),
+    restTime: s.integer("rest_time").notNull().default(0),
+    sequence: s.integer("sequence").notNull(),
 });
 
 export const routines = s.sqliteTable("routines", {

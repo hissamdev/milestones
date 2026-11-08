@@ -1,5 +1,5 @@
 import { useRoutineStore } from "@/stores/routine-stores/routineStore";
-import { calculateEnd } from "@/utils/workouts/routineHelpers";
+import { calculateEnd } from "@/utils/workouts/focus-screen-helpers";
 import { ChevronLeft, ChevronRight, RefreshCcwIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";

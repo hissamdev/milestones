@@ -7,7 +7,6 @@ import {
     routineTemplateExercises,
     routineTemplates,
 } from "@/db/schema/workouts";
-import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 import z from "zod";
@@ -566,69 +565,6 @@ export async function updateStartTime(activityId: string, timestamp: Date) {
             }
 
             await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-    }
-}
-
-export function calculateEnd(startTime: Date, seconds: number) {
-    return new Date(startTime.getTime() + seconds * 1000);
-}
-
-const { singleRoutine } = useRoutineStore((state) => ({
-    singleRoutine: state.singleRoutine,
-}));
-
-export function resetCountdownTimers() {
-    const time = new Date();
-    singleRoutine.markStart(time);
-    singleRoutine.complexSetters.activity(
-        "endTime",
-        calculateEnd(time, singleRoutine.findSingleActivity().workAmount),
-    );
-}
-
-export function shouldResetCountdown(endTime: Date) {
-    const check = endTime < new Date();
-    return check ? true : false;
-}
-
-type InitParms =
-    | {
-          isRest: true;
-          startTime: Date | null;
-          endTime: Date | null;
-          type?: "reps" | "duration";
-      }
-    | {
-          isRest: false;
-          startTime: Date | null;
-          endTime: Date | null;
-          type: "reps" | "duration";
-      };
-
-export function initCountdown(options: InitParms) {
-    const timestamp = new Date();
-    if (!options.startTime && !options.isRest) {
-        if (!(options.type === "duration")) {
-            singleRoutine.markStart(timestamp);
-            return;
-        }
-        resetCountdownTimers();
-        return;
-    }
-    if (!options.startTime && options.isRest) {
-        resetCountdownTimers();
-        return;
-    }
-    if (options.startTime && !options.isRest && options.type === "duration") {
-        if (shouldResetCountdown(options.endTime!)) {
-            resetCountdownTimers();
-        }
-        return;
-    }
-    if (options.startTime && options.isRest) {
-        if (shouldResetCountdown(options.endTime!)) {
-            resetCountdownTimers();
         }
     }
 }
