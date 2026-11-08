@@ -45,7 +45,31 @@ export default function Sessions() {
                 </Text>
                 <Text>Session</Text>
             </TouchableOpacity>
-            <View></View>
+            <View style={{ marginTop: 20 }}>
+                {allSessionsState.map((session) => (
+                    <TouchableOpacity
+                        onPress={() => {
+                            router.push({
+                                pathname: "/sessions/session-focus-screen",
+                            });
+                        }}
+                        key={session.id}
+                        style={{
+                            paddingVertical: 8,
+                            paddingHorizontal: 10,
+                            backgroundColor: "gray",
+                            borderRadius: 4,
+                        }}
+                    >
+                        <Text>
+                            {session.createdAt.toLocaleTimeString("en-US", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
         </View>
     );
 }

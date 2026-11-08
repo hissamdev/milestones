@@ -5,12 +5,22 @@ import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
 interface SessionState {
+    singleSession: NestedSession | null;
+    loadSingleSession: (sessionId: string) => void;
     createSession: () => void;
     allSessionsState: NestedSession[];
     loadSessions: () => void;
 }
 
 export const useSessionStore = create<SessionState>()((set, get) => ({
+    singleSession: null,
+    loadSingleSession: (sessionId) => {
+        const findCurrentSession = get().allSessionsState.find(
+            (session) => session.id === sessionId,
+        )!;
+
+        set(() => ({ singleSession: findCurrentSession }));
+    },
     createSession: async () => {
         const [session] = await db
             .insert(sessions)
@@ -21,6 +31,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         set((prev) => ({
             allSessionsState: [session, ...prev.allSessionsState],
         }));
+        set(() => ({ singleSession: session }));
     },
     allSessionsState: [],
     loadSessions: async () => {

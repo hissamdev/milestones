@@ -53,6 +53,10 @@ export const sessions = s.sqliteTable("sessions", {
         .integer("created_at", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()),
+    isComplete: s
+        .integer("is_complete", { mode: "boolean" })
+        .notNull()
+        .default(false),
 });
 
 export const sessionData = s.sqliteTable("session_data", {
