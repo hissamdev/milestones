@@ -95,7 +95,7 @@ export default function Workouts() {
                 <Routines />
                 <CreateExercise />
             </SafeAreaView>
-            <Popup visible={activeModal === "exercises"} onClose={closeModal}>
+            <Popup visible={true} onClose={closeModal}>
                 <ExercisePicker />
             </Popup>
         </>
