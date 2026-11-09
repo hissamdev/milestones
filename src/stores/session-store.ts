@@ -1,12 +1,16 @@
 import { db } from "@/db/client";
 import { sessions } from "@/db/schema/workouts";
-import { NestedSession } from "@/types/session-types";
+import { Exercise } from "@/types/routineTypes";
+import { NestedSession, SessionData } from "@/types/session-types";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
 interface SessionState {
     singleSession: {
         nestedSession: NestedSession | null;
+        updateSession: {
+            insertExercise: (exercise: Exercise) => void;
+        };
         currentSequence: number;
         showExercises: boolean;
         updateShowExercises: (value: boolean) => void;
@@ -16,7 +20,7 @@ interface SessionState {
         };
     };
     loadSingleSession: (sessionId: string) => void;
-    createSession: () => void;
+    createSession: (exercise: Exercise) => void;
     allSessionsState: NestedSession[];
     loadSessions: () => void;
 }
@@ -24,6 +28,36 @@ interface SessionState {
 export const useSessionStore = create<SessionState>()((set, get) => ({
     singleSession: {
         nestedSession: null,
+        updateSession: {
+            insertExercise: (exercise) => {
+                const newData: SessionData & { exercise: Exercise } = {
+                    id: randomUUID(),
+                    sessionId: get().singleSession.nestedSession!.id,
+                    exerciseId: exercise.id,
+                    exercise: {
+                        ...exercise,
+                    },
+                    createdAt: new Date(),
+                    isRest: false,
+                    restTime: 0,
+                    sequence: get().singleSession.currentSequence,
+                };
+
+                set((prev) => ({
+                    singleSession: {
+                        ...prev.singleSession,
+                        nestedSession: {
+                            ...prev.singleSession.nestedSession!,
+                            sessionData: [
+                                ...(prev.singleSession.nestedSession!
+                                    .sessionData ?? []),
+                                newData,
+                            ],
+                        },
+                    },
+                }));
+            },
+        },
         currentSequence: 1,
         showExercises: true,
         updateShowExercises: (value) => {
@@ -58,7 +92,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             },
         }));
     },
-    createSession: async () => {
+    createSession: async (exercise) => {
         get().singleSession.updateSequence.set(1);
         const [session] = await db
             .insert(sessions)
@@ -75,6 +109,8 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 nestedSession: session,
             },
         }));
+
+        get().singleSession.updateSession.insertExercise(exercise);
     },
     allSessionsState: [],
     loadSessions: async () => {

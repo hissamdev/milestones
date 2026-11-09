@@ -3,7 +3,11 @@ import { Check, SearchIcon } from "lucide-react-native";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
-export default function ExercisePicker() {
+type Props = {
+    mode: "session-picker";
+};
+
+export default function ExercisePicker({ mode }: Props) {
     const { allExercisesState } = useWorkoutsGlobalState(
         useShallow((state) => ({ allExercisesState: state.allExercisesState })),
     );
