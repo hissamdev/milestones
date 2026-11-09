@@ -5,7 +5,16 @@ import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
 interface SessionState {
-    singleSession: NestedSession | null;
+    singleSession: {
+        nestedSession: NestedSession | null;
+        currentSequence: number;
+        showExercises: boolean;
+        updateShowExercises: (value: boolean) => void;
+        updateSequence: {
+            increment: () => void;
+            set: (value: number) => void;
+        };
+    };
     loadSingleSession: (sessionId: string) => void;
     createSession: () => void;
     allSessionsState: NestedSession[];
@@ -13,15 +22,44 @@ interface SessionState {
 }
 
 export const useSessionStore = create<SessionState>()((set, get) => ({
-    singleSession: null,
+    singleSession: {
+        nestedSession: null,
+        currentSequence: 1,
+        showExercises: true,
+        updateShowExercises: (value) => {
+            set((prev) => ({
+                singleSession: {
+                    ...prev.singleSession,
+                    showExercises: value,
+                },
+            }));
+        },
+        updateSequence: {
+            increment: () => {},
+            set: (value) => {
+                set((prev) => ({
+                    singleSession: {
+                        ...prev.singleSession,
+                        currentSequence: value,
+                    },
+                }));
+            },
+        },
+    },
     loadSingleSession: (sessionId) => {
         const findCurrentSession = get().allSessionsState.find(
             (session) => session.id === sessionId,
         )!;
 
-        set(() => ({ singleSession: findCurrentSession }));
+        set((prev) => ({
+            singleSession: {
+                ...prev.singleSession,
+                nestedSession: findCurrentSession,
+            },
+        }));
     },
     createSession: async () => {
+        get().singleSession.updateSequence.set(1);
         const [session] = await db
             .insert(sessions)
             .values({
@@ -31,7 +69,12 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         set((prev) => ({
             allSessionsState: [session, ...prev.allSessionsState],
         }));
-        set(() => ({ singleSession: session }));
+        set((prev) => ({
+            singleSession: {
+                ...prev.singleSession,
+                nestedSession: session,
+            },
+        }));
     },
     allSessionsState: [],
     loadSessions: async () => {

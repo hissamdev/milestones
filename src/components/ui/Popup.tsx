@@ -1,13 +1,14 @@
-import { SetStateAction } from "react";
 import { StyleProp, TouchableOpacity, ViewStyle } from "react-native";
 
 export default function Popup({
+    visible,
     customStyles,
-    setModal,
+    onClose,
     children,
 }: {
+    visible: boolean;
     customStyles?: StyleProp<ViewStyle>;
-    setModal: React.Dispatch<SetStateAction<boolean>>;
+    onClose: () => void;
     children: React.ReactNode;
 }) {
     const defaults = {
@@ -18,25 +19,27 @@ export default function Popup({
     } as StyleProp<ViewStyle>;
 
     return (
-        <TouchableOpacity
-            onPress={() => setModal(false)}
-            style={{
-                position: "absolute",
-                backgroundColor: "rgba(0,0,0,0.5)",
-                inset: 0,
-                zIndex: 100,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-        >
+        visible && (
             <TouchableOpacity
-                onPress={(e) => e.stopPropagation()}
-                activeOpacity={1}
-                style={[defaults, customStyles]}
+                onPress={onClose}
+                style={{
+                    position: "absolute",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    inset: 0,
+                    zIndex: 100,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
             >
-                {children}
+                <TouchableOpacity
+                    onPress={(e) => e.stopPropagation()}
+                    activeOpacity={1}
+                    style={[defaults, customStyles]}
+                >
+                    {children}
+                </TouchableOpacity>
             </TouchableOpacity>
-        </TouchableOpacity>
+        )
     );
 }

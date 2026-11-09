@@ -5,7 +5,7 @@ import { Play } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
-import Popup from "../../ui/Popup";
+import Popup from "../../../ui/Popup";
 
 export default function Routines() {
     const { allRoutinesState, loadRoutines, loadSingleRoutine } =

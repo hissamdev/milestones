@@ -1,5 +1,5 @@
-import ExerciseScreen from "@/components/sections/single-routine/ExerciseScreen";
-import RestScreen from "@/components/sections/single-routine/RestScreen";
+import ExerciseScreen from "@/components/screens/workout/routines/single-routine/ExerciseScreen";
+import RestScreen from "@/components/screens/workout/routines/single-routine/RestScreen";
 import { useRoutineStore } from "@/stores/routine-stores/routineStore";
 import { useRouter } from "expo-router";
 import { View } from "react-native";

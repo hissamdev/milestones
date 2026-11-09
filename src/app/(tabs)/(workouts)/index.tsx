@@ -1,16 +1,26 @@
-import Routines from "@/components/sections/routines/Routines";
-import Sessions from "@/components/sections/sessions/Sessions";
+import Routines from "@/components/screens/workout/routines/Routines";
+import Sessions from "@/components/screens/workout/sessions/Sessions";
 import CreateExercise from "@/components/ui/CreateExercise";
+import Popup from "@/components/ui/Popup";
+import ExercisePicker from "@/components/ui/popups/ExercisePicker";
 import { exercises } from "@/db/schema/workouts";
+import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
 import { createRoutine } from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useShallow } from "zustand/react/shallow";
 ("@/components/ui/Popup");
 
 type Exercise = typeof exercises.$inferSelect;
 
 export default function Workouts() {
+    const { activeModal, closeModal } = useWorkoutsGlobalState(
+        useShallow((state) => ({
+            activeModal: state.activeModal,
+            closeModal: state.closeModal,
+        })),
+    );
     // const [workouts, setWorkouts] = useState<WorkoutsType | null>(null);
     const [routineName, setRoutineName] = useState("");
     const [uiMessage, setUiMessage] = useState("");
@@ -77,11 +87,17 @@ export default function Workouts() {
 
     // if (!workouts) return;
     return (
-        <SafeAreaView style={{ flex: 1, position: "relative", padding: 10 }}>
-            <Sessions />
-            <Routines />
-
-            <CreateExercise />
-        </SafeAreaView>
+        <>
+            <SafeAreaView
+                style={{ flex: 1, position: "relative", padding: 10 }}
+            >
+                <Sessions />
+                <Routines />
+                <CreateExercise />
+            </SafeAreaView>
+            <Popup visible={activeModal === "exercises"} onClose={closeModal}>
+                <ExercisePicker />
+            </Popup>
+        </>
     );
 }

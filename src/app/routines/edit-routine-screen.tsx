@@ -1,4 +1,4 @@
-import EditExercises from "@/components/sections/routines/EditExercises";
+import EditExercises from "@/components/screens/workout/routines/EditExercises";
 import Popup from "@/components/ui/Popup";
 import ExercisesPopup from "@/components/ui/popups/ExercisesPopup";
 import { DayTemplateTEE } from "@/types/routineTypes";
