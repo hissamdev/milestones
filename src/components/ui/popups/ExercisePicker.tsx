@@ -1,7 +1,13 @@
-import { SearchIcon } from "lucide-react-native";
+import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
+import { Check, SearchIcon } from "lucide-react-native";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
 export default function ExercisePicker() {
+    const { allExercisesState } = useWorkoutsGlobalState(
+        useShallow((state) => ({ allExercisesState: state.allExercisesState })),
+    );
+
     const categories = ["All", "Recent", "Upper"];
 
     return (
@@ -79,7 +85,60 @@ export default function ExercisePicker() {
                     </TouchableOpacity>
                 ))}
             </View>
-            <View></View>
+            <View>
+                {allExercisesState.map((e) => (
+                    <View
+                        key={e.id}
+                        style={{
+                            backgroundColor: "#F5F3F4",
+                            padding: 10,
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <View style={{ display: "flex", flexDirection: "row" }}>
+                            <View
+                                style={{
+                                    width: 35,
+                                    height: 35,
+                                    backgroundColor: "gray",
+                                }}
+                            />
+                            <View
+                                style={{
+                                    marginLeft: 10,
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <Text>{e.displayName}</Text>
+                                <Text>{e.desc}</Text>
+                            </View>
+                        </View>
+                        <TouchableOpacity
+                            style={{
+                                width: 25,
+                                aspectRatio: 1 / 1,
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backgroundColor: "#094CB2",
+                                borderRadius: 100,
+                            }}
+                        >
+                            <Text style={{ paddingTop: 1 }}>
+                                <Check
+                                    color="white"
+                                    size={15}
+                                    strokeWidth={3}
+                                />
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                ))}
+            </View>
         </View>
     );
 }

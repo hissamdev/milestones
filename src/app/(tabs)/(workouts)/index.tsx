@@ -7,7 +7,7 @@ import { exercises } from "@/db/schema/workouts";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
 import { createRoutine } from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 ("@/components/ui/Popup");
@@ -15,12 +15,15 @@ import { useShallow } from "zustand/react/shallow";
 type Exercise = typeof exercises.$inferSelect;
 
 export default function Workouts() {
-    const { activeModal, closeModal } = useWorkoutsGlobalState(
-        useShallow((state) => ({
-            activeModal: state.activeModal,
-            closeModal: state.closeModal,
-        })),
-    );
+    const { activeModal, closeModal, allExercisesState, loadExercises } =
+        useWorkoutsGlobalState(
+            useShallow((state) => ({
+                allExercisesState: state.allExercisesState,
+                loadExercises: state.loadExercises,
+                activeModal: state.activeModal,
+                closeModal: state.closeModal,
+            })),
+        );
     // const [workouts, setWorkouts] = useState<WorkoutsType | null>(null);
     const [routineName, setRoutineName] = useState("");
     const [uiMessage, setUiMessage] = useState("");
@@ -38,15 +41,12 @@ export default function Workouts() {
     });
     const router = useRouter();
 
-    // useEffect(() => {
-    //     const load = async () => {
-    //         const res = await getCurrentDayWorkout();
-    //         if (!res) return console.error("Failed to load workouts");
-    //         setWorkouts(res);
-    //     };
-
-    //     load();
-    // }, []);
+    useEffect(() => {
+        if (!allExercisesState.length) {
+            loadExercises();
+            return;
+        }
+    }, []);
 
     const handleAddStandaloneExercise = () => {
         setStandaloneExercises((prev) => [
@@ -95,7 +95,7 @@ export default function Workouts() {
                 <Routines />
                 <CreateExercise />
             </SafeAreaView>
-            <Popup visible={true} onClose={closeModal}>
+            <Popup visible={activeModal === "exercises"} onClose={closeModal}>
                 <ExercisePicker />
             </Popup>
         </>

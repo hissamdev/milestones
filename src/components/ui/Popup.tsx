@@ -21,6 +21,7 @@ export default function Popup({
     return (
         visible && (
             <TouchableOpacity
+                activeOpacity={1}
                 onPress={onClose}
                 style={{
                     position: "absolute",

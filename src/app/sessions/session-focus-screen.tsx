@@ -20,7 +20,7 @@ export default function SessionFocusScreen() {
         <>
             {!true ? <SessionExercise /> : <SessionRest />}
             {activeModal === "exercises" && (
-                <Popup closingFunction={closeModal}>
+                <Popup onClose={closeModal}>
                     <ExercisePicker />
                 </Popup>
             )}

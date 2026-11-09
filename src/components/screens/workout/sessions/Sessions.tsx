@@ -1,4 +1,5 @@
 import { useSessionStore } from "@/stores/session-store";
+import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
 import { useRouter } from "expo-router";
 import { Plus, SportShoe } from "lucide-react-native";
 import { useEffect } from "react";
@@ -12,6 +13,9 @@ export default function Sessions() {
             loadSessions: state.loadSessions,
             createSession: state.createSession,
         })),
+    );
+    const { openModal } = useWorkoutsGlobalState(
+        useShallow((state) => ({ openModal: state.openModal })),
     );
     const router = useRouter();
 
@@ -28,7 +32,7 @@ export default function Sessions() {
             <View style={{ display: "flex", flexDirection: "row", gap: 5 }}>
                 <TouchableOpacity
                     onPress={() => {
-                        createSession();
+                        openModal("exercises");
                     }}
                     style={{
                         flex: 1,
@@ -68,11 +72,7 @@ export default function Sessions() {
             <View style={{ marginTop: 20, display: "flex", gap: 10 }}>
                 {allSessionsState.map((session) => (
                     <TouchableOpacity
-                        onPress={() => {
-                            router.push({
-                                pathname: "/sessions/session-focus-screen",
-                            });
-                        }}
+                        onPress={() => {}}
                         key={session.id}
                         style={{
                             paddingVertical: 8,
