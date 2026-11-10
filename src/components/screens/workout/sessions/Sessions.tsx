@@ -32,7 +32,7 @@ export default function Sessions() {
             <View style={{ display: "flex", flexDirection: "row", gap: 5 }}>
                 <TouchableOpacity
                     onPress={() => {
-                        openModal("exercises");
+                        openModal("exercises", "session-create");
                     }}
                     style={{
                         flex: 1,

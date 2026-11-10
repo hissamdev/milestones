@@ -1,43 +1,78 @@
 import { useSessionStore } from "@/stores/session-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
 import { Exercise } from "@/types/routineTypes";
+import { useRouter } from "expo-router";
 import { Check, Plus, SearchIcon } from "lucide-react-native";
 import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
-type Props = {
-    mode: "session-create";
+const initialCreate = {
+    name: "",
+    desc: "",
+    type: "reps" as "reps" | "duration",
 };
 
-export default function ExercisePicker({ mode }: Props) {
+export default function ExercisePicker() {
     const [showCreate, setShowCreate] = useState(false);
     const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
         null,
     );
-    const [createExercise, setCreateExercise] = useState({
-        name: "",
-        desc: "",
-        type: "",
-    });
+    const [createExercise, setCreateExercise] = useState(initialCreate);
 
-    const { allExercisesState } = useWorkoutsGlobalState(
-        useShallow((state) => ({ allExercisesState: state.allExercisesState })),
-    );
-    const { createSession } = useSessionStore(
-        useShallow((state) => ({ createSession: state.createSession })),
+    const { allExercisesState, createExerciseState, activeModal, closeModal } =
+        useWorkoutsGlobalState(
+            useShallow((state) => ({
+                allExercisesState: state.allExercisesState,
+                createExerciseState: state.createExercise,
+                activeModal: state.activeModal,
+                closeModal: state.closeModal,
+            })),
+        );
+    const { createSession, insertExercise, singleSession } = useSessionStore(
+        useShallow((state) => ({
+            createSession: state.createSession,
+            insertExercise: state.singleSession.updateSession.insertExercise,
+            singleSession: state.singleSession,
+        })),
     );
 
     const categories = ["All", "Recent", "Upper"];
 
+    const router = useRouter();
+
+    const handleCreate = () => {
+        createExerciseState(
+            createExercise.name,
+            createExercise.desc,
+            createExercise.type,
+        );
+        setShowCreate(false);
+        setCreateExercise(initialCreate);
+    };
+
     const handleFocusExercise = ({ ...e }: Exercise) => {
+        if (selectedExercise?.id === e.id) {
+            setSelectedExercise(null);
+            return;
+        }
         setSelectedExercise(e);
     };
 
     const handleSelect = () => {
         if (!selectedExercise) return;
-        if (mode === "session-create") {
+        if (activeModal.mode === "session-create") {
             createSession(selectedExercise);
+            router.push({
+                pathname: "/sessions/session-focus-screen",
+            });
+            closeModal();
+            return;
+        }
+        if (activeModal.mode === "session-picker") {
+            insertExercise(selectedExercise);
+            closeModal();
+            return;
         }
     };
 
@@ -133,9 +168,10 @@ export default function ExercisePicker({ mode }: Props) {
                             </TouchableOpacity>
                         ))}
                     </View>
-                    <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, display: "flex", gap: 10 }}>
                         {allExercisesState.map((e) => (
                             <TouchableOpacity
+                                activeOpacity={0.8}
                                 onPress={() => handleFocusExercise({ ...e })}
                                 key={e.id}
                                 style={{
@@ -171,7 +207,7 @@ export default function ExercisePicker({ mode }: Props) {
                                         <Text>{e.desc}</Text>
                                     </View>
                                 </View>
-                                <TouchableOpacity
+                                <View
                                     style={{
                                         width: 25,
                                         aspectRatio: 1 / 1,
@@ -186,13 +222,15 @@ export default function ExercisePicker({ mode }: Props) {
                                     }}
                                 >
                                     <Text style={{ paddingTop: 1 }}>
-                                        <Check
-                                            color="white"
-                                            size={15}
-                                            strokeWidth={3}
-                                        />
+                                        {selectedExercise?.id === e.id && (
+                                            <Check
+                                                color="white"
+                                                size={15}
+                                                strokeWidth={3}
+                                            />
+                                        )}
                                     </Text>
-                                </TouchableOpacity>
+                                </View>
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -206,6 +244,7 @@ export default function ExercisePicker({ mode }: Props) {
                         }}
                     >
                         <TouchableOpacity
+                            onPress={() => closeModal()}
                             style={{
                                 flex: 1,
                                 backgroundColor: "#F1EFEA",
@@ -223,6 +262,7 @@ export default function ExercisePicker({ mode }: Props) {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                            disabled={!selectedExercise}
                             onPress={handleSelect}
                             style={{
                                 flex: 1,
@@ -243,7 +283,7 @@ export default function ExercisePicker({ mode }: Props) {
                     </View>
                 </>
             ) : (
-                <View style={{ marginTop: 20 }}>
+                <View style={{ marginTop: 20, flex: 1 }}>
                     <View
                         style={{
                             paddingBottom: 8,
@@ -294,6 +334,13 @@ export default function ExercisePicker({ mode }: Props) {
                         <View>
                             <Text style={{ fontSize: 16 }}>Exercise name</Text>
                             <TextInput
+                                value={createExercise.name}
+                                onChangeText={(t) =>
+                                    setCreateExercise((prev) => ({
+                                        ...prev,
+                                        name: t,
+                                    }))
+                                }
                                 style={{
                                     paddingHorizontal: 10,
                                     marginTop: 5,
@@ -307,6 +354,13 @@ export default function ExercisePicker({ mode }: Props) {
                                 Description (optional)
                             </Text>
                             <TextInput
+                                value={createExercise.desc}
+                                onChangeText={(t) =>
+                                    setCreateExercise((prev) => ({
+                                        ...prev,
+                                        desc: t,
+                                    }))
+                                }
                                 style={{
                                     paddingHorizontal: 10,
                                     marginTop: 5,
@@ -333,38 +387,59 @@ export default function ExercisePicker({ mode }: Props) {
                                 }}
                             >
                                 <TouchableOpacity
+                                    onPress={() =>
+                                        setCreateExercise((prev) => ({
+                                            ...prev,
+                                            type: "reps",
+                                        }))
+                                    }
                                     style={{
                                         flex: 1,
                                         minWidth: 0,
-                                        backgroundColor: true
-                                            ? "#094CB2"
-                                            : "none",
+                                        backgroundColor:
+                                            createExercise.type === "reps"
+                                                ? "#094CB2"
+                                                : "transparent",
                                         borderRadius: 5,
                                     }}
                                 >
                                     <Text
                                         style={{
                                             margin: "auto",
-                                            color: true ? "white" : "black",
+                                            color:
+                                                createExercise.type === "reps"
+                                                    ? "white"
+                                                    : "black",
                                         }}
                                     >
                                         Reps
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
+                                    onPress={() =>
+                                        setCreateExercise((prev) => ({
+                                            ...prev,
+                                            type: "duration",
+                                        }))
+                                    }
                                     style={{
                                         flex: 1,
                                         minWidth: 0,
-                                        backgroundColor: !true
-                                            ? "#094CB2"
-                                            : "transparent",
+                                        backgroundColor:
+                                            createExercise.type === "duration"
+                                                ? "#094CB2"
+                                                : "transparent",
                                         borderRadius: 5,
                                     }}
                                 >
                                     <Text
                                         style={{
                                             margin: "auto",
-                                            color: !true ? "white" : "black",
+                                            color:
+                                                createExercise.type ===
+                                                "duration"
+                                                    ? "white"
+                                                    : "black",
                                         }}
                                     >
                                         Duration
@@ -373,6 +448,26 @@ export default function ExercisePicker({ mode }: Props) {
                             </View>
                         </View>
                     </View>
+                    <TouchableOpacity
+                        onPress={handleCreate}
+                        style={{
+                            marginTop: "auto",
+                            height: 40,
+                            backgroundColor: "#094CB2",
+                            borderRadius: 5,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                margin: "auto",
+                                color: "white",
+                                fontSize: 16,
+                                fontWeight: 500,
+                            }}
+                        >
+                            Create
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             )}
         </View>

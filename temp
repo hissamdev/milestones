@@ -7,3 +7,12 @@ Conceptualize
 Creating session takes the user to the focus screen, then shows the pick exercise tray
 
 After clicking create, it gives a modal to pick an exercise (before initializing creation)
+
+Concurrency
+Sessions
+
+- Select exercise, click submit
+- Create a session, insert the exercise as the first session data
+- Navigate to focus screen
+- Check whether the activity at the current sequence is rest
+- Subsequently, create the next session data and then move the sequence

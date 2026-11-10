@@ -1,3 +1,4 @@
+import { useSessionStore } from "@/stores/session-store";
 import { useRouter } from "expo-router";
 import {
     ArrowUpDown,
@@ -8,9 +9,19 @@ import {
     TrophyIcon,
 } from "lucide-react-native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
 export default function SessionExercise() {
+    const { singleSession, findActivity } = useSessionStore(
+        useShallow((state) => ({
+            singleSession: state.singleSession,
+            findActivity: state.findActivity,
+        })),
+    );
+
     const router = useRouter();
+
+    const currentActivity = findActivity.current();
 
     return (
         <View style={{ flex: 1 }}>
@@ -86,17 +97,12 @@ export default function SessionExercise() {
                     <Text
                         style={{ marginTop: 10, fontSize: 24, color: "white" }}
                     >
-                        Exercise name
+                        {currentActivity.exercise?.displayName}
                     </Text>
                     <Text
                         style={{ marginTop: 0, fontSize: 15, color: "white" }}
                     >
-                        Desc
-                    </Text>
-                    <Text
-                        style={{ marginTop: 0, fontSize: 15, color: "white" }}
-                    >
-                        hi
+                        {currentActivity.exercise?.desc}
                     </Text>
                 </View>
             </View>
@@ -263,6 +269,9 @@ export default function SessionExercise() {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                            onPress={() =>
+                                singleSession.updateSession.insertRest()
+                            }
                             style={[
                                 styles.stepButtons,
                                 {

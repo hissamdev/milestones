@@ -9,7 +9,11 @@ interface SessionState {
     singleSession: {
         nestedSession: NestedSession | null;
         updateSession: {
+            handleInsert: (
+                newData: SessionData & { exercise: Exercise | null },
+            ) => void;
             insertExercise: (exercise: Exercise) => void;
+            insertRest: () => void;
         };
         currentSequence: number;
         showExercises: boolean;
@@ -19,7 +23,11 @@ interface SessionState {
             set: (value: number) => void;
         };
     };
-    loadSingleSession: (sessionId: string) => void;
+    findActivity: {
+        current: () => NonNullable<NestedSession["sessionData"]>[0];
+        next: () => NonNullable<NestedSession["sessionData"]>[0] | undefined;
+    };
+    loadOngoingSession: (sessionId: string) => void;
     createSession: (exercise: Exercise) => void;
     allSessionsState: NestedSession[];
     loadSessions: () => void;
@@ -29,6 +37,21 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
     singleSession: {
         nestedSession: null,
         updateSession: {
+            handleInsert: (newData) => {
+                set((prev) => ({
+                    singleSession: {
+                        ...prev.singleSession,
+                        nestedSession: {
+                            ...prev.singleSession.nestedSession!,
+                            sessionData: [
+                                ...prev.singleSession.nestedSession!
+                                    .sessionData!,
+                                newData,
+                            ],
+                        },
+                    },
+                }));
+            },
             insertExercise: (exercise) => {
                 const newData: SessionData & { exercise: Exercise } = {
                     id: randomUUID(),
@@ -40,22 +63,24 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     createdAt: new Date(),
                     isRest: false,
                     restTime: 0,
-                    sequence: get().singleSession.currentSequence,
+                    sequence: get().singleSession.currentSequence + 1,
                 };
 
-                set((prev) => ({
-                    singleSession: {
-                        ...prev.singleSession,
-                        nestedSession: {
-                            ...prev.singleSession.nestedSession!,
-                            sessionData: [
-                                ...(prev.singleSession.nestedSession!
-                                    .sessionData ?? []),
-                                newData,
-                            ],
-                        },
-                    },
-                }));
+                get().singleSession.updateSession.handleInsert(newData);
+            },
+            insertRest: () => {
+                const newData: SessionData & { exercise: Exercise | null } = {
+                    id: randomUUID(),
+                    sessionId: get().singleSession.nestedSession!.id,
+                    exercise: null,
+                    exerciseId: null,
+                    createdAt: new Date(),
+                    isRest: true,
+                    restTime: 0,
+                    sequence: get().singleSession.currentSequence + 1,
+                };
+                get().singleSession.updateSession.handleInsert(newData);
+                get().singleSession.updateSequence.increment();
             },
         },
         currentSequence: 1,
@@ -69,7 +94,14 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             }));
         },
         updateSequence: {
-            increment: () => {},
+            increment: () => {
+                set((prev) => ({
+                    singleSession: {
+                        ...prev.singleSession,
+                        currentSequence: prev.singleSession.currentSequence + 1,
+                    },
+                }));
+            },
             set: (value) => {
                 set((prev) => ({
                     singleSession: {
@@ -80,7 +112,24 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             },
         },
     },
-    loadSingleSession: (sessionId) => {
+    findActivity: {
+        current: () => {
+            const current =
+                get().singleSession.nestedSession!.sessionData!.find(
+                    (sd) => sd.sequence === get().singleSession.currentSequence,
+                )!;
+
+            return current;
+        },
+        next: () => {
+            const next = get().singleSession.nestedSession!.sessionData!.find(
+                (sd) => sd.sequence === get().singleSession.currentSequence + 1,
+            );
+
+            return next;
+        },
+    },
+    loadOngoingSession: (sessionId) => {
         const findCurrentSession = get().allSessionsState.find(
             (session) => session.id === sessionId,
         )!;
@@ -105,7 +154,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         }));
         const newData: SessionData & { exercise: Exercise } = {
             id: randomUUID(),
-            sessionId: get().singleSession.nestedSession!.id,
+            sessionId: session.id,
             exerciseId: exercise.id,
             exercise: {
                 ...exercise,

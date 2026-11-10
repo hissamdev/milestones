@@ -5,10 +5,14 @@ import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
 type ModalName = "exercises" | "create-exercise";
+type ModalMode = "session-create" | "session-picker" | "session-swap";
 
 interface WorkoutsState {
-    activeModal: ModalName | null;
-    openModal: (modal: ModalName) => void;
+    activeModal: {
+        modal: ModalName | null;
+        mode: ModalMode | null;
+    };
+    openModal: (modal: ModalName, mode: ModalMode) => void;
     closeModal: () => void;
     allExercisesState: Exercise[];
     loadExercises: () => void;
@@ -20,12 +24,15 @@ interface WorkoutsState {
 }
 
 export const useWorkoutsGlobalState = create<WorkoutsState>()((set, get) => ({
-    activeModal: null,
-    openModal: (modal) => {
-        set({ activeModal: modal });
+    activeModal: {
+        modal: null,
+        mode: null,
+    },
+    openModal: (modal, mode) => {
+        set({ activeModal: { modal, mode } });
     },
     closeModal: () => {
-        set({ activeModal: null });
+        set({ activeModal: { modal: null, mode: null } });
     },
     allExercisesState: [],
     loadExercises: async () => {
