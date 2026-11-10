@@ -1,6 +1,7 @@
 import { db } from "@/db/client";
 import { exercises } from "@/db/schema/workouts";
 import { Exercise } from "@/types/routineTypes";
+import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
 type ModalName = "exercises" | "create-exercise";
@@ -11,6 +12,11 @@ interface WorkoutsState {
     closeModal: () => void;
     allExercisesState: Exercise[];
     loadExercises: () => void;
+    createExercise: (
+        name: string,
+        desc: string,
+        type: "reps" | "duration",
+    ) => void;
 }
 
 export const useWorkoutsGlobalState = create<WorkoutsState>()((set, get) => ({
@@ -29,5 +35,20 @@ export const useWorkoutsGlobalState = create<WorkoutsState>()((set, get) => ({
         } catch (err) {
             throw err;
         }
+    },
+    createExercise: async (name, desc, type) => {
+        const [res] = await db
+            .insert(exercises)
+            .values({
+                id: randomUUID(),
+                name: name.trim().toLocaleLowerCase(),
+                displayName: name,
+                desc,
+                type,
+            })
+            .returning();
+        set((prev) => ({
+            allExercisesState: [res, ...prev.allExercisesState],
+        }));
     },
 }));

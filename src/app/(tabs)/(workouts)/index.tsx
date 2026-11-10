@@ -96,7 +96,7 @@ export default function Workouts() {
                 <CreateExercise />
             </SafeAreaView>
             <Popup visible={activeModal === "exercises"} onClose={closeModal}>
-                <ExercisePicker />
+                <ExercisePicker mode="session-create" />
             </Popup>
         </>
     );

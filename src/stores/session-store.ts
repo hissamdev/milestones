@@ -103,14 +103,27 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
         set((prev) => ({
             allSessionsState: [session, ...prev.allSessionsState],
         }));
+        const newData: SessionData & { exercise: Exercise } = {
+            id: randomUUID(),
+            sessionId: get().singleSession.nestedSession!.id,
+            exerciseId: exercise.id,
+            exercise: {
+                ...exercise,
+            },
+            createdAt: new Date(),
+            isRest: false,
+            restTime: 0,
+            sequence: get().singleSession.currentSequence,
+        };
         set((prev) => ({
             singleSession: {
                 ...prev.singleSession,
-                nestedSession: session,
+                nestedSession: {
+                    ...session,
+                    sessionData: [newData],
+                },
             },
         }));
-
-        get().singleSession.updateSession.insertExercise(exercise);
     },
     allSessionsState: [],
     loadSessions: async () => {

@@ -1,21 +1,41 @@
+import { useSessionStore } from "@/stores/session-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
-import { Check, SearchIcon } from "lucide-react-native";
+import { Exercise } from "@/types/routineTypes";
+import { Check, Plus, SearchIcon } from "lucide-react-native";
+import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
 type Props = {
-    mode: "session-picker";
+    mode: "session-create";
 };
 
 export default function ExercisePicker({ mode }: Props) {
+    const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
+        null,
+    );
     const { allExercisesState } = useWorkoutsGlobalState(
         useShallow((state) => ({ allExercisesState: state.allExercisesState })),
+    );
+    const { createSession } = useSessionStore(
+        useShallow((state) => ({ createSession: state.createSession })),
     );
 
     const categories = ["All", "Recent", "Upper"];
 
+    const handleFocusExercise = ({ ...e }: Exercise) => {
+        setSelectedExercise(e);
+    };
+
+    const handleSelect = () => {
+        if (!selectedExercise) return;
+        if (mode === "session-create") {
+            createSession(selectedExercise);
+        }
+    };
+
     return (
-        <View style={{ padding: 20 }}>
+        <View style={{ padding: 20, flex: 1 }}>
             <View
                 style={{
                     display: "flex",
@@ -41,6 +61,18 @@ export default function ExercisePicker({ mode }: Props) {
                 >
                     Choose Exercise
                 </Text>
+                <TouchableOpacity
+                    style={{
+                        marginLeft: 10,
+                        padding: 2,
+                        backgroundColor: "#285FC5",
+                        borderRadius: 4,
+                    }}
+                >
+                    <Text>
+                        <Plus size={15} color="white" />
+                    </Text>
+                </TouchableOpacity>
             </View>
             <View
                 style={{
@@ -89,9 +121,10 @@ export default function ExercisePicker({ mode }: Props) {
                     </TouchableOpacity>
                 ))}
             </View>
-            <View>
+            <View style={{ flex: 1 }}>
                 {allExercisesState.map((e) => (
-                    <View
+                    <TouchableOpacity
+                        onPress={() => handleFocusExercise({ ...e })}
                         key={e.id}
                         style={{
                             backgroundColor: "#F5F3F4",
@@ -128,7 +161,10 @@ export default function ExercisePicker({ mode }: Props) {
                                 display: "flex",
                                 justifyContent: "center",
                                 alignItems: "center",
-                                backgroundColor: "#094CB2",
+                                backgroundColor:
+                                    selectedExercise?.id === e.id
+                                        ? "#094CB2"
+                                        : "gray",
                                 borderRadius: 100,
                             }}
                         >
@@ -140,8 +176,53 @@ export default function ExercisePicker({ mode }: Props) {
                                 />
                             </Text>
                         </TouchableOpacity>
-                    </View>
+                    </TouchableOpacity>
                 ))}
+            </View>
+            <View
+                style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "stretch",
+                    height: 40,
+                    gap: 10,
+                }}
+            >
+                <TouchableOpacity
+                    style={{
+                        flex: 1,
+                        backgroundColor: "#F1EFEA",
+                        borderWidth: 1,
+                        borderColor: "#D6D3D1",
+                        borderRadius: 5,
+                    }}
+                >
+                    <Text
+                        style={{
+                            margin: "auto",
+                        }}
+                    >
+                        Cancel
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleSelect}
+                    style={{
+                        flex: 1,
+                        backgroundColor: "#285FC5",
+                        borderRadius: 5,
+                    }}
+                >
+                    <Text
+                        style={{
+                            color: "white",
+                            margin: "auto",
+                            fontWeight: "500",
+                        }}
+                    >
+                        Select
+                    </Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
