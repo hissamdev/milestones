@@ -5,7 +5,11 @@ import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
 type ModalName = "exercises" | "create-exercise";
-type ModalMode = "session-create" | "session-picker" | "session-swap";
+type ModalMode =
+    | "session-create"
+    | "session-picker"
+    | "session-swap-current"
+    | "session-swap-next";
 
 interface WorkoutsState {
     activeModal: {

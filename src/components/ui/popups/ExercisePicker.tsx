@@ -29,13 +29,16 @@ export default function ExercisePicker() {
                 closeModal: state.closeModal,
             })),
         );
-    const { createSession, insertExercise, singleSession } = useSessionStore(
-        useShallow((state) => ({
-            createSession: state.createSession,
-            insertExercise: state.singleSession.updateSession.insertExercise,
-            singleSession: state.singleSession,
-        })),
-    );
+    const { createSession, insertExercise, singleSession, handleSwap } =
+        useSessionStore(
+            useShallow((state) => ({
+                createSession: state.createSession,
+                insertExercise:
+                    state.singleSession.updateSession.insertExercise,
+                singleSession: state.singleSession,
+                handleSwap: state.handleSwap,
+            })),
+        );
 
     const categories = ["All", "Recent", "Upper"];
 
@@ -72,6 +75,14 @@ export default function ExercisePicker() {
         if (activeModal.mode === "session-picker") {
             insertExercise(selectedExercise);
             closeModal();
+            return;
+        }
+        if (activeModal.mode === "session-swap-current") {
+            handleSwap("current", selectedExercise);
+            return;
+        }
+        if (activeModal.mode === "session-swap-next") {
+            handleSwap("next", selectedExercise);
             return;
         }
     };

@@ -33,6 +33,7 @@ interface SessionState {
             set: (value: number) => void;
         };
     };
+    handleSwap: (mode: "current" | "next", exercise: Exercise) => void;
     findActivity: {
         current: () => NonNullable<NestedSession["sessionData"]>[0];
         next: () => NonNullable<NestedSession["sessionData"]>[0] | undefined;
@@ -183,6 +184,55 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 }));
             },
         },
+    },
+    handleSwap: (mode, exercise) => {
+        if (mode === "current") {
+            set((prev) => ({
+                singleSession: {
+                    ...prev.singleSession,
+                    nestedSession: {
+                        ...prev.singleSession.nestedSession!,
+                        sessionData:
+                            prev.singleSession.nestedSession!.sessionData!.map(
+                                (sd) =>
+                                    sd.sequence ===
+                                    get().singleSession.currentSequence
+                                        ? {
+                                              ...sd,
+                                              exerciseId: exercise.id,
+                                              exercise,
+                                              startTime: null,
+                                              endTiem: null,
+                                          }
+                                        : { ...sd },
+                            ),
+                    },
+                },
+            }));
+            return;
+        }
+        set((prev) => ({
+            singleSession: {
+                ...prev.singleSession,
+                nestedSession: {
+                    ...prev.singleSession.nestedSession!,
+                    sessionData:
+                        prev.singleSession.nestedSession!.sessionData!.map(
+                            (sd) =>
+                                sd.sequence ===
+                                get().singleSession.currentSequence + 1
+                                    ? {
+                                          ...sd,
+                                          exerciseId: exercise.id,
+                                          exercise,
+                                          startTime: null,
+                                          endTiem: null,
+                                      }
+                                    : { ...sd },
+                        ),
+                },
+            },
+        }));
     },
     findActivity: {
         current: () => {
