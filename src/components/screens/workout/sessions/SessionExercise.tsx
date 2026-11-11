@@ -1,4 +1,7 @@
 import { useSessionStore } from "@/stores/session-store";
+import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
+import { initSessionActivity } from "@/utils/workouts/session-helpers";
+import { markSessionActivityComplete } from "@/utils/workouts/session-queries";
 import { useRouter } from "expo-router";
 import {
     ArrowUpDown,
@@ -8,6 +11,7 @@ import {
     History,
     TrophyIcon,
 } from "lucide-react-native";
+import { useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 import RepsControls from "./ui/RepsControls";
@@ -20,9 +24,37 @@ export default function SessionExercise() {
         })),
     );
 
+    const { openModal } = useWorkoutsGlobalState(
+        useShallow((state) => ({ openModal: state.openModal })),
+    );
+
     const router = useRouter();
 
-    const currentActivity = findActivity.current();
+    useEffect(() => {
+        initSessionActivity();
+    }, []);
+
+    const handleComplete = () => {
+        const current = singleSession.nestedSession!.sessionData!.find(
+            (sd) => sd.sequence === singleSession.currentSequence,
+        )!;
+
+        const updated = {
+            ...current,
+            endTime: new Date(),
+            isComplete: true,
+        };
+
+        markSessionActivityComplete(updated).catch(() => {
+            console.error("Completion failed");
+            return;
+        });
+        singleSession.complexSetters.sessionData({
+            endTime: new Date(),
+            isComplete: true,
+        });
+        singleSession.updateSession.insertRest();
+    };
 
     return (
         <View style={{ flex: 1 }}>
@@ -42,6 +74,7 @@ export default function SessionExercise() {
                     }}
                 >
                     <TouchableOpacity
+                        onPress={() => singleSession.updateSequence.decrement()}
                         style={{
                             paddingHorizontal: 10,
                             paddingVertical: 4,
@@ -59,6 +92,9 @@ export default function SessionExercise() {
                         <Text style={{ color: "white" }}>Previous</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
+                        onPress={() =>
+                            openModal("exercises", "session-swap-current")
+                        }
                         style={{
                             paddingHorizontal: 10,
                             paddingVertical: 4,
@@ -98,13 +134,17 @@ export default function SessionExercise() {
                     <Text
                         style={{ marginTop: 10, fontSize: 24, color: "white" }}
                     >
-                        {currentActivity.exercise?.displayName}
+                        {
+                            singleSession.nestedSession!.sessionData!.find(
+                                (sd) =>
+                                    sd.sequence ===
+                                    singleSession.currentSequence,
+                            )!.exercise?.displayName
+                        }
                     </Text>
                     <Text
                         style={{ marginTop: 0, fontSize: 15, color: "white" }}
-                    >
-                        {currentActivity.exercise?.desc}
-                    </Text>
+                    ></Text>
                 </View>
             </View>
             <View
@@ -271,9 +311,9 @@ export default function SessionExercise() {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            onPress={() =>
-                                singleSession.updateSession.insertRest()
-                            }
+                            onPress={() => {
+                                handleComplete();
+                            }}
                             style={[
                                 styles.stepButtons,
                                 {

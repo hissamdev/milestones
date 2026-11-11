@@ -1,9 +1,10 @@
 import { useSessionStore } from "@/stores/session-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
 import {
-    initSessionRest,
+    initSessionActivity,
     updateDisplay,
 } from "@/utils/workouts/session-helpers";
+import { markSessionActivityComplete } from "@/utils/workouts/session-queries";
 import {
     ArrowUpDown,
     ChevronLeft,
@@ -26,7 +27,7 @@ export default function SessionRest() {
     );
 
     useEffect(() => {
-        initSessionRest();
+        initSessionActivity();
 
         const repeat = () => {
             const seconds = updateDisplay();
@@ -37,6 +38,33 @@ export default function SessionRest() {
         const timer = setInterval(repeat, 100);
         return () => clearInterval(timer);
     }, []);
+
+    const handleComplete = () => {
+        const next = singleSession.nestedSession!.sessionData!.find(
+            (sd) => sd.sequence === singleSession.currentSequence + 1,
+        )!;
+        if (!next) {
+            openModal("exercises", "session-picker");
+            return;
+        }
+        const current = singleSession.nestedSession!.sessionData!.find(
+            (sd) => sd.sequence === singleSession.currentSequence,
+        )!;
+        const updated = {
+            ...current,
+            endTime: new Date(),
+            isComplete: true,
+        };
+        markSessionActivityComplete(updated).catch(() => {
+            console.error("Failed");
+            return;
+        });
+        singleSession.complexSetters.sessionData({
+            endTime: new Date(),
+            isComplete: true,
+        });
+        singleSession.updateSequence.increment();
+    };
 
     return (
         <>
@@ -208,6 +236,7 @@ export default function SessionRest() {
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
+                        onPress={handleComplete}
                         style={{
                             backgroundColor: "gray",
                             display: "flex",

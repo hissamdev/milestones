@@ -1,0 +1,1 @@
+ALTER TABLE `session_data` ADD `is_complete` integer DEFAULT false NOT NULL;

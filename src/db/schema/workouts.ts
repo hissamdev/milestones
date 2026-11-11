@@ -73,6 +73,10 @@ export const sessionData = s.sqliteTable("session_data", {
     // Exercise
     amount: s.integer("amount").notNull().default(0),
     sequence: s.integer("sequence").notNull(),
+    isComplete: s
+        .integer("is_complete", { mode: "boolean" })
+        .notNull()
+        .default(false),
 });
 
 export const routines = s.sqliteTable("routines", {

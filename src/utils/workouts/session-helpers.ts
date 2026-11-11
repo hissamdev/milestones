@@ -1,6 +1,6 @@
 import { useSessionStore } from "@/stores/session-store";
 
-export function initSessionRest() {
+export function initSessionActivity() {
     const singleSession = useSessionStore.getState().singleSession;
     const useStopwatch = true;
     console.log("Function body", !!singleSession.nestedSession);
@@ -10,7 +10,7 @@ export function initSessionRest() {
 
     if (!currentActivity.startTime) {
         const timestamp = new Date();
-        singleSession.complexSetters.sessionData("startTime", timestamp);
+        singleSession.complexSetters.sessionData({ startTime: timestamp });
         return timestamp;
     }
 }

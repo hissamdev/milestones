@@ -17,9 +17,8 @@ interface SessionState {
         };
         currentSequence: number;
         complexSetters: {
-            sessionData: <K extends keyof SessionData>(
-                key: K,
-                value: SessionData[K],
+            sessionData: <K extends object>(
+                multipleKeys: Partial<SessionData>,
             ) => void;
         };
         updateAmount: (
@@ -30,6 +29,7 @@ interface SessionState {
         updateShowExercises: (value: boolean) => void;
         updateSequence: {
             increment: () => void;
+            decrement: () => void;
             set: (value: number) => void;
         };
     };
@@ -77,6 +77,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     startTime: null,
                     endTime: null,
                     sequence: get().singleSession.currentSequence + 1,
+                    isComplete: false,
                 };
 
                 get().singleSession.updateSession.handleInsert(newData);
@@ -93,13 +94,14 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     startTime: null,
                     endTime: null,
                     sequence: get().singleSession.currentSequence + 1,
+                    isComplete: false,
                 };
                 get().singleSession.updateSession.handleInsert(newData);
                 get().singleSession.updateSequence.increment();
             },
         },
         complexSetters: {
-            sessionData: (key, value) => {
+            sessionData: (multiple) => {
                 set((prev) => ({
                     singleSession: {
                         ...prev.singleSession,
@@ -112,7 +114,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                                         get().singleSession.currentSequence
                                             ? {
                                                   ...sd,
-                                                  [key]: value,
+                                                  ...multiple,
                                               }
                                             : {
                                                   ...sd,
@@ -130,31 +132,27 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 )!.amount;
             if (mode === "add") {
                 if (type === "reps") {
-                    get().singleSession.complexSetters.sessionData(
-                        "amount",
-                        lastValue + 1,
-                    );
+                    get().singleSession.complexSetters.sessionData({
+                        amount: lastValue + 1,
+                    });
                     return;
                 }
-                get().singleSession.complexSetters.sessionData(
-                    "amount",
-                    lastValue + 10,
-                );
+                get().singleSession.complexSetters.sessionData({
+                    amount: lastValue + 10,
+                });
                 return;
             }
             if (type === "reps") {
                 const safeSubtract = lastValue - 1 <= 0 ? 0 : lastValue - 1;
-                get().singleSession.complexSetters.sessionData(
-                    "amount",
-                    safeSubtract,
-                );
+                get().singleSession.complexSetters.sessionData({
+                    amount: safeSubtract,
+                });
                 return;
             }
             const safeSubtract = lastValue - 10 ? 0 : lastValue - 10;
-            get().singleSession.complexSetters.sessionData(
-                "amount",
-                safeSubtract,
-            );
+            get().singleSession.complexSetters.sessionData({
+                amount: safeSubtract,
+            });
         },
         currentSequence: 1,
         showExercises: true,
@@ -172,6 +170,17 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     singleSession: {
                         ...prev.singleSession,
                         currentSequence: prev.singleSession.currentSequence + 1,
+                    },
+                }));
+            },
+            decrement: () => {
+                set((prev) => ({
+                    singleSession: {
+                        ...prev.singleSession,
+                        currentSequence:
+                            prev.singleSession.currentSequence - 1 <= 1
+                                ? 1
+                                : prev.singleSession.currentSequence - 1,
                     },
                 }));
             },
@@ -287,6 +296,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             startTime: null,
             endTime: null,
             sequence: get().singleSession.currentSequence,
+            isComplete: false,
         };
         set((prev) => ({
             singleSession: {
