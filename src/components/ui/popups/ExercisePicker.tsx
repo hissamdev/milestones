@@ -79,10 +79,12 @@ export default function ExercisePicker() {
         }
         if (activeModal.mode === "session-swap-current") {
             handleSwap("current", selectedExercise);
+            closeModal();
             return;
         }
         if (activeModal.mode === "session-swap-next") {
             handleSwap("next", selectedExercise);
+            closeModal();
             return;
         }
     };

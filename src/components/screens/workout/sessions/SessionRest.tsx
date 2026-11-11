@@ -124,13 +124,14 @@ export default function SessionRest() {
                         <TouchableOpacity
                             onPress={() => {
                                 const nextExists =
-                                    !singleSession.nestedSession!.sessionData!.find(
+                                    singleSession.nestedSession!.sessionData!.find(
                                         (sd) =>
                                             sd.sequence ===
                                             singleSession.currentSequence + 1,
                                     );
                                 if (!nextExists) {
                                     openModal("exercises", "session-picker");
+                                    return;
                                 }
                                 openModal("exercises", "session-swap-next");
                             }}
