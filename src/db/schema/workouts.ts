@@ -66,12 +66,12 @@ export const sessionData = s.sqliteTable("session_data", {
         .notNull()
         .references(() => sessions.id, { onDelete: "cascade" }),
     exerciseId: s.text("exercise_id").references(() => exercises.id),
-    createdAt: s
-        .integer("created_at", { mode: "timestamp" })
-        .notNull()
-        .$defaultFn(() => new Date()),
+    startTime: s.integer("start_time", { mode: "timestamp" }),
+    endTime: s.integer("end_time", { mode: "timestamp" }),
     isRest: s.integer("is_rest", { mode: "boolean" }).notNull().default(false),
     restTime: s.integer("rest_time").notNull().default(0),
+    // Exercise
+    amount: s.integer("amount").notNull().default(0),
     sequence: s.integer("sequence").notNull(),
 });
 

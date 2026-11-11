@@ -17,6 +17,7 @@ import m0013 from './20261106062711_clumsy_donald_blake/migration.sql';
 import m0014 from './20261108042535_sour_sauron/migration.sql';
 import m0015 from './20261108045252_bumpy_rawhide_kid/migration.sql';
 import m0016 from './20261108052206_curly_stature/migration.sql';
+import m0017 from './20261111041913_fuzzy_whistler/migration.sql';
 
   export default {
     migrations: {
@@ -36,7 +37,8 @@ import m0016 from './20261108052206_curly_stature/migration.sql';
 "20261106062711_clumsy_donald_blake": m0013,
 "20261108042535_sour_sauron": m0014,
 "20261108045252_bumpy_rawhide_kid": m0015,
-"20261108052206_curly_stature": m0016
+"20261108052206_curly_stature": m0016,
+"20261111041913_fuzzy_whistler": m0017
 }
   }
   

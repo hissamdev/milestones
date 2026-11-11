@@ -10,6 +10,7 @@ import {
 } from "lucide-react-native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
+import RepsControls from "./ui/RepsControls";
 
 export default function SessionExercise() {
     const { singleSession, findActivity } = useSessionStore(
@@ -114,6 +115,7 @@ export default function SessionExercise() {
             >
                 <View style={{}}>
                     {/* {"reps" === "reps" ? <RepControls /> : <DurationControls />} */}
+                    <RepsControls />
 
                     <View>
                         <View
