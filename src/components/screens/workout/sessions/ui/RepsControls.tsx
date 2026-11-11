@@ -22,6 +22,9 @@ export default function RepsControls() {
                 }}
             >
                 <TouchableOpacity
+                    onPress={() =>
+                        singleSession.updateAmount("subtract", "reps")
+                    }
                     style={{
                         backgroundColor: "#EFEDEE",
                         aspectRatio: 1 / 1,
@@ -47,12 +50,13 @@ export default function RepsControls() {
                                 (sd) =>
                                     sd.sequence ===
                                     singleSession.currentSequence,
-                            )!
+                            )!.amount
                         }
                     </Text>
                     <Text style={{ marginTop: 8, marginLeft: 4 }}>Reps</Text>
                 </View>
                 <TouchableOpacity
+                    onPress={() => singleSession.updateAmount("add", "reps")}
                     style={{
                         backgroundColor: "#094CB2",
                         aspectRatio: 1 / 1,

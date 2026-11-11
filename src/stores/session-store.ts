@@ -16,6 +16,16 @@ interface SessionState {
             insertRest: () => void;
         };
         currentSequence: number;
+        complexSetters: {
+            sessionData: <K extends keyof SessionData>(
+                key: K,
+                value: SessionData[K],
+            ) => void;
+        };
+        updateAmount: (
+            mode: "add" | "subtract",
+            type: "reps" | "duration",
+        ) => void;
         showExercises: boolean;
         updateShowExercises: (value: boolean) => void;
         updateSequence: {
@@ -60,9 +70,11 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     exercise: {
                         ...exercise,
                     },
-                    createdAt: new Date(),
                     isRest: false,
                     restTime: 0,
+                    amount: 0,
+                    startTime: null,
+                    endTime: null,
                     sequence: get().singleSession.currentSequence + 1,
                 };
 
@@ -74,14 +86,74 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     sessionId: get().singleSession.nestedSession!.id,
                     exercise: null,
                     exerciseId: null,
-                    createdAt: new Date(),
                     isRest: true,
                     restTime: 0,
+                    amount: 0,
+                    startTime: null,
+                    endTime: null,
                     sequence: get().singleSession.currentSequence + 1,
                 };
                 get().singleSession.updateSession.handleInsert(newData);
                 get().singleSession.updateSequence.increment();
             },
+        },
+        complexSetters: {
+            sessionData: (key, value) => {
+                set((prev) => ({
+                    singleSession: {
+                        ...prev.singleSession,
+                        nestedSession: {
+                            ...prev.singleSession.nestedSession!,
+                            sessionData:
+                                prev.singleSession.nestedSession!.sessionData!.map(
+                                    (sd) =>
+                                        sd.sequence ===
+                                        get().singleSession.currentSequence
+                                            ? {
+                                                  ...sd,
+                                                  [key]: value,
+                                              }
+                                            : {
+                                                  ...sd,
+                                              },
+                                ),
+                        },
+                    },
+                }));
+            },
+        },
+        updateAmount: (mode, type) => {
+            const lastValue =
+                get().singleSession.nestedSession!.sessionData!.find(
+                    (sd) => sd.sequence === get().singleSession.currentSequence,
+                )!.amount;
+            if (mode === "add") {
+                if (type === "reps") {
+                    get().singleSession.complexSetters.sessionData(
+                        "amount",
+                        lastValue + 1,
+                    );
+                    return;
+                }
+                get().singleSession.complexSetters.sessionData(
+                    "amount",
+                    lastValue + 10,
+                );
+                return;
+            }
+            if (type === "reps") {
+                const safeSubtract = lastValue - 1 <= 0 ? 0 : lastValue - 1;
+                get().singleSession.complexSetters.sessionData(
+                    "amount",
+                    safeSubtract,
+                );
+                return;
+            }
+            const safeSubtract = lastValue - 10 ? 0 : lastValue - 10;
+            get().singleSession.complexSetters.sessionData(
+                "amount",
+                safeSubtract,
+            );
         },
         currentSequence: 1,
         showExercises: true,
@@ -159,9 +231,11 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             exercise: {
                 ...exercise,
             },
-            createdAt: new Date(),
             isRest: false,
             restTime: 0,
+            amount: 0,
+            startTime: null,
+            endTime: null,
             sequence: get().singleSession.currentSequence,
         };
         set((prev) => ({
