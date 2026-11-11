@@ -258,20 +258,41 @@ export default function SessionExercise() {
                                 </View>
                             </View>
 
-                            {/* {singleRoutine
-                                .nestedRoutine!.routineData[0].dataExercises.filter(
-                                    (de) =>
-                                        !de.isRest &&
-                                        de.sequence !==
-                                            singleRoutine.currentSequence,
+                            {singleSession
+                                .nestedSession!.sessionData!.filter(
+                                    (sd) => !sd.isRest && sd.isComplete,
                                 )
-                                .map((de) => (
-                                    <View key={de.id}>
-                                        <Text>
-                                            {de.exerciseName} {de.sequence}
-                                        </Text>
+                                .map((sd) => (
+                                    <View
+                                        key={sd.id}
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            marginTop: 10,
+                                            paddingBottom: 4,
+                                            borderBottomWidth: 1.5,
+                                            borderBottomColor: "#EAEAEF",
+                                        }}
+                                    >
+                                        <View style={{ flex: 1 }}>
+                                            <Text>
+                                                {sd.exercise?.displayName}
+                                            </Text>
+                                        </View>
+                                        <View style={{ flex: 1 / 3 }}>
+                                            <Text>{sd.amount}</Text>
+                                        </View>
+                                        <View>
+                                            <Text>
+                                                {Math.round(
+                                                    (sd.endTime!.getTime() -
+                                                        sd.startTime!.getTime()) /
+                                                        1000,
+                                                )}
+                                            </Text>
+                                        </View>
                                     </View>
-                                ))} */}
+                                ))}
                         </View>
                     </View>
                 </View>
