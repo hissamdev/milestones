@@ -49,6 +49,7 @@ export const standaloneExercises = s.sqliteTable("standalone_exercises", {
 
 export const sessions = s.sqliteTable("sessions", {
     id: s.text("id").primaryKey(),
+    templateId: s.text("template_id").references(() => routineTemplates.id),
     createdAt: s
         .integer("created_at", { mode: "timestamp" })
         .notNull()
@@ -69,7 +70,6 @@ export const sessionData = s.sqliteTable("session_data", {
     startTime: s.integer("start_time", { mode: "timestamp" }),
     endTime: s.integer("end_time", { mode: "timestamp" }),
     isRest: s.integer("is_rest", { mode: "boolean" }).notNull().default(false),
-    restTime: s.integer("rest_time").notNull().default(0),
     // Exercise
     amount: s.integer("amount").notNull().default(0),
     sequence: s.integer("sequence").notNull(),
@@ -115,12 +115,12 @@ export const routineTemplateExercises = s.sqliteTable(
             .notNull()
             .references(() => routineTemplates.id),
         exerciseId: s.text("exercise_id").references(() => exercises.id),
-        displayAmount: s.integer("display_amount").default(0), // Number of Seconds or Reps. The exercise key contains the type of duration or reps
+        displayAmount: s.integer("display_amount").notNull().default(0), // Number of Seconds or Reps. The exercise key contains the type of duration or reps
         isRestType: s
             .integer("is_rest_type", { mode: "boolean" })
             .notNull()
             .default(false),
-        displayRestAmount: s.integer("rest_time"),
+        displayRestAmount: s.integer("rest_time").notNull().default(0),
         useStopwatch: s
             .integer("use_stopwatch", { mode: "boolean" })
             .notNull()

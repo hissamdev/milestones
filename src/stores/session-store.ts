@@ -5,6 +5,16 @@ import { NestedSession, SessionData } from "@/types/session-types";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
+type CreateSession =
+    | {
+          mode: "session";
+          exercise: Exercise;
+      }
+    | {
+          mode: "template";
+          templateId: string;
+      };
+
 interface SessionState {
     singleSession: {
         nestedSession: NestedSession | null;
@@ -39,7 +49,7 @@ interface SessionState {
         next: () => NonNullable<NestedSession["sessionData"]>[0] | undefined;
     };
     loadOngoingSession: (sessionId: string) => void;
-    createSession: (exercise: Exercise) => void;
+    createSession: (p: CreateSession) => void;
     allSessionsState: NestedSession[];
     loadSessions: () => void;
 }
@@ -72,7 +82,6 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                         ...exercise,
                     },
                     isRest: false,
-                    restTime: 0,
                     amount: 0,
                     startTime: null,
                     endTime: null,
@@ -89,7 +98,6 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     exercise: null,
                     exerciseId: null,
                     isRest: true,
-                    restTime: 0,
                     amount: 0,
                     startTime: null,
                     endTime: null,
@@ -272,38 +280,98 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             },
         }));
     },
-    createSession: async (exercise) => {
+    createSession: async (p) => {
+        get().singleSession.updateSequence.set(1);
+        if (p.mode === "session") {
+            const [session] = await db
+                .insert(sessions)
+                .values({
+                    id: randomUUID(),
+                })
+                .returning();
+            set((prev) => ({
+                allSessionsState: [session, ...prev.allSessionsState],
+            }));
+            const newData: SessionData & { exercise: Exercise } = {
+                id: randomUUID(),
+                sessionId: session.id,
+                exerciseId: p.exercise.id,
+                exercise: {
+                    ...p.exercise,
+                },
+                isRest: false,
+                amount: 0,
+                startTime: null,
+                endTime: null,
+                sequence: get().singleSession.currentSequence,
+                isComplete: false,
+            };
+            set((prev) => ({
+                singleSession: {
+                    ...prev.singleSession,
+                    nestedSession: {
+                        ...session,
+                        sessionData: [newData],
+                    },
+                },
+            }));
+            return;
+        }
         get().singleSession.updateSequence.set(1);
         const [session] = await db
             .insert(sessions)
             .values({
                 id: randomUUID(),
+                templateId: p.templateId,
             })
             .returning();
-        set((prev) => ({
-            allSessionsState: [session, ...prev.allSessionsState],
-        }));
-        const newData: SessionData & { exercise: Exercise } = {
-            id: randomUUID(),
-            sessionId: session.id,
-            exerciseId: exercise.id,
-            exercise: {
-                ...exercise,
-            },
-            isRest: false,
-            restTime: 0,
-            amount: 0,
-            startTime: null,
-            endTime: null,
-            sequence: get().singleSession.currentSequence,
-            isComplete: false,
-        };
+        const templateExercises =
+            await db.query.routineTemplateExercises.findMany({
+                orderBy: {
+                    sequence: "asc",
+                },
+                with: {
+                    exercise: true,
+                },
+            });
+
+        const prepared: (SessionData & { exercise: Exercise | null })[] =
+            templateExercises.map((te) =>
+                te.isRestType
+                    ? {
+                          id: randomUUID(),
+                          sessionId: session.id,
+                          exerciseId: null,
+                          isRest: te.isRestType,
+                          exercise: null,
+                          amount: te.displayAmount,
+                          startTime: null,
+                          endTime: null,
+                          isComplete: false,
+                          sequence: te.sequence,
+                      }
+                    : {
+                          id: randomUUID(),
+                          sessionId: session.id,
+                          exerciseId: te.exerciseId,
+                          isRest: te.isRestType,
+                          exercise: {
+                              ...te.exercise!,
+                          },
+                          amount: te.displayAmount,
+                          startTime: null,
+                          endTime: null,
+                          isComplete: false,
+                          sequence: te.sequence,
+                      },
+            );
+
         set((prev) => ({
             singleSession: {
                 ...prev.singleSession,
                 nestedSession: {
-                    ...session,
-                    sessionData: [newData],
+                    ...prev.singleSession.nestedSession!,
+                    sessionData: [...prepared],
                 },
             },
         }));
