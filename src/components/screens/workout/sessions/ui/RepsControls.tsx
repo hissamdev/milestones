@@ -1,5 +1,7 @@
 import { useSessionStore } from "@/stores/session-store";
+import { initSessionActivity } from "@/utils/workouts/session-helpers";
 import { Minus, Plus } from "lucide-react-native";
+import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
@@ -7,6 +9,9 @@ export default function RepsControls() {
     const { singleSession } = useSessionStore(
         useShallow((state) => ({ singleSession: state.singleSession })),
     );
+    useEffect(() => {
+        initSessionActivity();
+    }, []);
 
     return (
         <View>

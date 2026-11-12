@@ -18,10 +18,7 @@ export default function Sessions() {
     );
 
     useEffect(() => {
-        if (!allSessionsState.length) {
-            loadSessions();
-            return;
-        }
+        loadSessions();
     }, []);
 
     return (
@@ -135,6 +132,7 @@ export default function Sessions() {
                                     (sd) =>
                                         !sd.isRest && (
                                             <View
+                                                key={sd.id}
                                                 style={{
                                                     display: "flex",
                                                     flexDirection: "row",

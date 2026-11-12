@@ -14,6 +14,7 @@ import {
 import { useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
+import DurationControls from "./ui/DurationControls";
 import RepsControls from "./ui/RepsControls";
 
 export default function SessionExercise() {
@@ -155,7 +156,13 @@ export default function SessionExercise() {
             >
                 <View style={{}}>
                     {/* {"reps" === "reps" ? <RepControls /> : <DurationControls />} */}
-                    <RepsControls />
+                    {singleSession.nestedSession!.sessionData!.find(
+                        (sd) => sd.sequence === singleSession.currentSequence,
+                    )!.exercise!.type === "reps" ? (
+                        <RepsControls />
+                    ) : (
+                        <DurationControls />
+                    )}
 
                     <View>
                         <View
