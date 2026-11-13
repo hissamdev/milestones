@@ -20,6 +20,7 @@ import m0016 from './20261108052206_curly_stature/migration.sql';
 import m0017 from './20261111041913_fuzzy_whistler/migration.sql';
 import m0018 from './20261111135010_wonderful_black_crow/migration.sql';
 import m0019 from './20261112160705_jazzy_bill_hollister/migration.sql';
+import m0020 from './20261112161303_faithful_marvel_zombies/migration.sql';
 
   export default {
     migrations: {
@@ -42,7 +43,8 @@ import m0019 from './20261112160705_jazzy_bill_hollister/migration.sql';
 "20261108052206_curly_stature": m0016,
 "20261111041913_fuzzy_whistler": m0017,
 "20261111135010_wonderful_black_crow": m0018,
-"20261112160705_jazzy_bill_hollister": m0019
+"20261112160705_jazzy_bill_hollister": m0019,
+"20261112161303_faithful_marvel_zombies": m0020
 }
   }
   

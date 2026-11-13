@@ -50,6 +50,10 @@ export const standaloneExercises = s.sqliteTable("standalone_exercises", {
 export const sessions = s.sqliteTable("sessions", {
     id: s.text("id").primaryKey(),
     templateId: s.text("template_id").references(() => routineTemplates.id),
+    useTemplate: s
+        .integer("use_template", { mode: "boolean" })
+        .notNull()
+        .default(false),
     createdAt: s
         .integer("created_at", { mode: "timestamp" })
         .notNull()
@@ -104,6 +108,7 @@ export const daysOtw = s.sqliteTable("days_otw", {
 export const routineTemplates = s.sqliteTable("routine_templates", {
     id: s.text("id").primaryKey(),
     restDay: s.integer({ mode: "boolean" }).notNull().default(false),
+    title: s.text("title").notNull().default(""),
 });
 
 export const routineTemplateExercises = s.sqliteTable(

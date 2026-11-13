@@ -22,8 +22,11 @@ interface SessionState {
             handleInsert: (
                 newData: SessionData & { exercise: Exercise | null },
             ) => void;
+            handlePush: (
+                newData: SessionData & { exercise: Exercise | null },
+            ) => void;
             insertExercise: (exercise: Exercise) => void;
-            insertRest: () => void;
+            insertRest: (mode: "push" | "insert") => void;
         };
         currentSequence: number;
         complexSetters: {
@@ -73,6 +76,26 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     },
                 }));
             },
+            handlePush: (newData) => {
+                set((prev) => ({
+                    singleSession: {
+                        ...prev.singleSession,
+                        nestedSession: {
+                            ...prev.singleSession.nestedSession!,
+                            sessionData: prev.singleSession
+                                .nestedSession!.sessionData!.toSpliced(
+                                    get().singleSession.currentSequence,
+                                    0,
+                                    newData,
+                                )
+                                .map((sd, idx) => ({
+                                    ...sd,
+                                    sequence: idx + 1,
+                                })),
+                        },
+                    },
+                }));
+            },
             insertExercise: (exercise) => {
                 const newData: SessionData & { exercise: Exercise } = {
                     id: randomUUID(),
@@ -91,7 +114,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
 
                 get().singleSession.updateSession.handleInsert(newData);
             },
-            insertRest: () => {
+            insertRest: (mode) => {
                 const newData: SessionData & { exercise: Exercise | null } = {
                     id: randomUUID(),
                     sessionId: get().singleSession.nestedSession!.id,
@@ -104,7 +127,12 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     sequence: get().singleSession.currentSequence + 1,
                     isComplete: false,
                 };
-                get().singleSession.updateSession.handleInsert(newData);
+                if (mode === "insert") {
+                    get().singleSession.updateSession.handleInsert(newData);
+                    get().singleSession.updateSequence.increment();
+                    return;
+                }
+                get().singleSession.updateSession.handlePush(newData);
                 get().singleSession.updateSequence.increment();
             },
         },
@@ -323,6 +351,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             .values({
                 id: randomUUID(),
                 templateId: p.templateId,
+                useTemplate: true,
             })
             .returning();
         const templateExercises =

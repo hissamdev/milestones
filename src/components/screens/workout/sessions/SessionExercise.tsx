@@ -1,6 +1,5 @@
 import { useSessionStore } from "@/stores/session-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
-import { initSessionActivity } from "@/utils/workouts/session-helpers";
 import { markSessionActivityComplete } from "@/utils/workouts/session-queries";
 import { useRouter } from "expo-router";
 import {
@@ -11,7 +10,6 @@ import {
     History,
     TrophyIcon,
 } from "lucide-react-native";
-import { useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 import DurationControls from "./ui/DurationControls";
@@ -30,10 +28,6 @@ export default function SessionExercise() {
     );
 
     const router = useRouter();
-
-    useEffect(() => {
-        initSessionActivity();
-    }, []);
 
     const handleComplete = () => {
         const current = singleSession.nestedSession!.sessionData!.find(
@@ -54,7 +48,11 @@ export default function SessionExercise() {
             endTime: new Date(),
             isComplete: true,
         });
-        singleSession.updateSession.insertRest();
+        if (singleSession.nestedSession!.templateId) {
+            singleSession.updateSession.insertRest("insert");
+            return;
+        }
+        singleSession.updateSession.insertRest("push");
     };
 
     return (
