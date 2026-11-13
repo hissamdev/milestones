@@ -1,6 +1,6 @@
 import { useTemplateStore } from "@/stores/template-store";
 import { useLocalSearchParams } from "expo-router";
-import { ChevronDown, ChevronUp, Minus, X } from "lucide-react-native";
+import { ChevronDown, ChevronUp, Minus, Plus, X } from "lucide-react-native";
 import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
@@ -22,10 +22,17 @@ export default function EditExercises() {
         }
     }, []);
 
+    if (!template) {
+        return;
+    }
+
+    console.log("In component body", JSON.stringify(template, null, 2));
+
     return (
         <View style={{ display: "flex", gap: 10 }}>
-            {template!.templateExercises.map((te) => (
+            {template!.templateExercises.map((te, idx) => (
                 <View
+                    key={te.id}
                     style={{
                         padding: 10,
                         backgroundColor: "white",
@@ -57,7 +64,9 @@ export default function EditExercises() {
                                 }}
                             />
                             <View>
-                                <Text>{te.exercise?.displayName}</Text>
+                                <Text>
+                                    {te.exercise?.displayName} {te.sequence}
+                                </Text>
                                 <Text>{te.exercise?.desc}</Text>
                             </View>
                         </View>
@@ -88,6 +97,15 @@ export default function EditExercises() {
                             }}
                         >
                             <TouchableOpacity
+                                onPressIn={() =>
+                                    actions.updateAmount(
+                                        te.id,
+                                        te.exercise!.type as
+                                            | "reps"
+                                            | "duration",
+                                        "subtract",
+                                    )
+                                }
                                 style={{
                                     display: "flex",
                                     justifyContent: "center",
@@ -110,6 +128,15 @@ export default function EditExercises() {
                                 {te.displayAmount}
                             </Text>
                             <TouchableOpacity
+                                onPressIn={() =>
+                                    actions.updateAmount(
+                                        te.id,
+                                        te.exercise!.type as
+                                            | "reps"
+                                            | "duration",
+                                        "add",
+                                    )
+                                }
                                 style={{
                                     display: "flex",
                                     justifyContent: "center",
@@ -119,7 +146,7 @@ export default function EditExercises() {
                                 }}
                             >
                                 <Text>
-                                    <Minus size={15} />
+                                    <Plus size={15} />
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -137,6 +164,7 @@ export default function EditExercises() {
                             }}
                         >
                             <TouchableOpacity
+                                onPress={() => actions.updateOrder(idx, "next")}
                                 style={{
                                     display: "flex",
                                     justifyContent: "center",
@@ -151,6 +179,9 @@ export default function EditExercises() {
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
+                                onPress={() =>
+                                    actions.updateOrder(idx, "previous")
+                                }
                                 style={{
                                     display: "flex",
                                     justifyContent: "center",

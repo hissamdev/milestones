@@ -1,4 +1,5 @@
 import { useSessionStore } from "@/stores/session-store";
+import { useTemplateStore } from "@/stores/template-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
 import { Exercise } from "@/types/routineTypes";
 import { useRouter } from "expo-router";
@@ -39,6 +40,12 @@ export default function ExercisePicker() {
                 handleSwap: state.handleSwap,
             })),
         );
+    const { template, actions } = useTemplateStore(
+        useShallow((state) => ({
+            template: state.template,
+            actions: state.actions,
+        })),
+    );
 
     const categories = ["All", "Recent", "Upper"];
 
@@ -65,7 +72,7 @@ export default function ExercisePicker() {
     const handleSelect = () => {
         if (!selectedExercise) return;
         if (activeModal.mode === "session-create") {
-            createSession(selectedExercise);
+            createSession({ mode: "session", exercise: selectedExercise });
             router.push({
                 pathname: "/sessions/session-focus-screen",
             });
@@ -84,6 +91,13 @@ export default function ExercisePicker() {
         }
         if (activeModal.mode === "session-swap-next") {
             handleSwap("next", selectedExercise);
+            closeModal();
+            return;
+        }
+
+        // Templates
+        if (activeModal.mode === "template-picker") {
+            actions.insertExercise(template!.id, selectedExercise);
             closeModal();
             return;
         }

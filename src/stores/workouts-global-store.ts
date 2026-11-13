@@ -9,7 +9,8 @@ type ModalMode =
     | "session-create"
     | "session-picker"
     | "session-swap-current"
-    | "session-swap-next";
+    | "session-swap-next"
+    | "template-picker";
 
 interface WorkoutsState {
     activeModal: {
