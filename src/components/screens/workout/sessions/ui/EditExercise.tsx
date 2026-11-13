@@ -1,238 +1,172 @@
-import { DayTemplateTEE } from "@/app/routines/edit-routine-screen";
-import {
-    ChevronDown,
-    ChevronUp,
-    Minus,
-    TimerResetIcon,
-    X,
-} from "lucide-react-native";
+import { useTemplateStore } from "@/stores/template-store";
+import { useLocalSearchParams } from "expo-router";
+import { ChevronDown, ChevronUp, Minus, X } from "lucide-react-native";
+import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
-export default function EditExercises({
-    fetchedCurrentDay,
-    handleUpdateAmount,
-    handleRemove,
-    handleReorder,
-}: {
-    fetchedCurrentDay: DayTemplateTEE;
-    handleUpdateAmount: (
-        templateExerciseId: string,
-        mode: "add" | "subtract",
-    ) => void;
-    handleRemove: (templateExerciseId: string) => void;
-    handleReorder: (
-        mode: "previous" | "next",
-        index: number,
-        prevState: DayTemplateTEE["routineTemplate"]["templateExercises"],
-    ) => void;
-}) {
+export default function EditExercises() {
+    const { template, actions } = useTemplateStore(
+        useShallow((state) => ({
+            template: state.template,
+            actions: state.actions,
+        })),
+    );
+
+    const { templateId }: { templateId: string } = useLocalSearchParams();
+
+    useEffect(() => {
+        if (!template) {
+            actions.fetchSingleTemplate(templateId);
+            return;
+        }
+    }, []);
+
     return (
         <View style={{ display: "flex", gap: 10 }}>
-            {fetchedCurrentDay.routineTemplate?.templateExercises.map(
-                (e, idx) =>
-                    e.isRestType ? (
+            {template!.templateExercises.map((te) => (
+                <View
+                    style={{
+                        padding: 10,
+                        backgroundColor: "white",
+                        borderRadius: 10,
+                    }}
+                >
+                    <View
+                        style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                        }}
+                    >
                         <View
-                            key={e.id}
                             style={{
-                                paddingVertical: 10,
+                                boxSizing: "content-box",
+                                padding: 5,
+                                height: 30,
                                 display: "flex",
                                 flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
+                                gap: 10,
                             }}
                         >
                             <View
                                 style={{
+                                    width: 40,
+                                    aspectRatio: 1 / 1,
+                                    backgroundColor: "gray",
+                                }}
+                            />
+                            <View>
+                                <Text>{te.exercise?.displayName}</Text>
+                                <Text>{te.exercise?.desc}</Text>
+                            </View>
+                        </View>
+                        <TouchableOpacity>
+                            <Text>
+                                <X size={17} />
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View
+                        style={{
+                            marginTop: 10,
+                            display: "flex",
+                            flexDirection: "row",
+                            gap: 20,
+                        }}
+                    >
+                        <View
+                            style={{
+                                boxSizing: "content-box",
+                                padding: 5,
+                                height: 30,
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "stretch",
+                                backgroundColor: "#F5F3F4",
+                                borderRadius: 5,
+                            }}
+                        >
+                            <TouchableOpacity
+                                style={{
                                     display: "flex",
-                                    flexDirection: "row",
+                                    justifyContent: "center",
                                     alignItems: "center",
-                                    gap: 3,
+                                    backgroundColor: "#EFEDEE",
+                                    aspectRatio: 1 / 1,
+                                    borderRadius: 5,
                                 }}
                             >
                                 <Text>
-                                    <TimerResetIcon size={15} />
+                                    <Minus size={15} />
                                 </Text>
-                                <Text>Rest</Text>
-                            </View>
+                            </TouchableOpacity>
+                            <Text
+                                style={{
+                                    paddingHorizontal: 10,
+                                    textAlignVertical: "center",
+                                }}
+                            >
+                                {te.displayAmount}
+                            </Text>
                             <TouchableOpacity
-                                onPress={() => handleRemove(e.id)}
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    backgroundColor: "#EFEDEE",
+                                    aspectRatio: 1 / 1,
+                                }}
                             >
                                 <Text>
-                                    <X size={15} />
+                                    <Minus size={15} />
                                 </Text>
                             </TouchableOpacity>
                         </View>
-                    ) : (
                         <View
-                            key={e.id}
                             style={{
-                                padding: 10,
-                                backgroundColor: "white",
-                                borderRadius: 10,
+                                boxSizing: "content-box",
+                                padding: 5,
+                                height: 30,
+                                display: "flex",
+                                flexDirection: "row",
+                                gap: 5,
+                                alignItems: "stretch",
+                                backgroundColor: "#F5F3F4",
+                                borderRadius: 5,
                             }}
                         >
-                            <View
+                            <TouchableOpacity
                                 style={{
                                     display: "flex",
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    backgroundColor: "#EFEDEE",
+                                    aspectRatio: 1 / 1,
+                                    borderRadius: 5,
                                 }}
                             >
-                                <View
-                                    style={{
-                                        boxSizing: "content-box",
-                                        padding: 5,
-                                        height: 30,
-                                        display: "flex",
-                                        flexDirection: "row",
-                                        gap: 10,
-                                    }}
-                                >
-                                    <View
-                                        style={{
-                                            width: 40,
-                                            aspectRatio: 1 / 1,
-                                            backgroundColor: "gray",
-                                        }}
-                                    />
-                                    <View>
-                                        <Text>{e.exercise?.displayName}</Text>
-                                        <Text>{e.exercise?.desc}</Text>
-                                    </View>
-                                </View>
-                                <TouchableOpacity
-                                    onPress={() => handleRemove(e.id)}
-                                >
-                                    <Text>
-                                        <X size={17} />
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View
+                                <Text>
+                                    <ChevronDown size={15} />
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
                                 style={{
-                                    marginTop: 10,
                                     display: "flex",
-                                    flexDirection: "row",
-                                    gap: 20,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    backgroundColor: "#EFEDEE",
+                                    aspectRatio: 1 / 1,
                                 }}
                             >
-                                <View
-                                    style={{
-                                        boxSizing: "content-box",
-                                        padding: 5,
-                                        height: 30,
-                                        display: "flex",
-                                        flexDirection: "row",
-                                        alignItems: "stretch",
-                                        backgroundColor: "#F5F3F4",
-                                        borderRadius: 5,
-                                    }}
-                                >
-                                    <TouchableOpacity
-                                        onPress={() =>
-                                            handleUpdateAmount(e.id, "subtract")
-                                        }
-                                        style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            backgroundColor: "#EFEDEE",
-                                            aspectRatio: 1 / 1,
-                                            borderRadius: 5,
-                                        }}
-                                    >
-                                        <Text>
-                                            <Minus size={15} />
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <Text
-                                        style={{
-                                            paddingHorizontal: 10,
-                                            textAlignVertical: "center",
-                                        }}
-                                    >
-                                        {e.displayAmount}
-                                    </Text>
-                                    <TouchableOpacity
-                                        onPress={() =>
-                                            handleUpdateAmount(e.id, "add")
-                                        }
-                                        style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            backgroundColor: "#EFEDEE",
-                                            aspectRatio: 1 / 1,
-                                        }}
-                                    >
-                                        <Text>
-                                            <Minus size={15} />
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View
-                                    style={{
-                                        boxSizing: "content-box",
-                                        padding: 5,
-                                        height: 30,
-                                        display: "flex",
-                                        flexDirection: "row",
-                                        gap: 5,
-                                        alignItems: "stretch",
-                                        backgroundColor: "#F5F3F4",
-                                        borderRadius: 5,
-                                    }}
-                                >
-                                    <TouchableOpacity
-                                        onPress={() =>
-                                            handleReorder(
-                                                "next",
-                                                idx,
-                                                fetchedCurrentDay
-                                                    .routineTemplate
-                                                    .templateExercises,
-                                            )
-                                        }
-                                        style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            backgroundColor: "#EFEDEE",
-                                            aspectRatio: 1 / 1,
-                                            borderRadius: 5,
-                                        }}
-                                    >
-                                        <Text>
-                                            <ChevronDown size={15} />
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() =>
-                                            handleReorder(
-                                                "previous",
-                                                idx,
-                                                fetchedCurrentDay
-                                                    .routineTemplate
-                                                    .templateExercises,
-                                            )
-                                        }
-                                        style={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            backgroundColor: "#EFEDEE",
-                                            aspectRatio: 1 / 1,
-                                        }}
-                                    >
-                                        <Text>
-                                            <ChevronUp size={15} />
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
+                                <Text>
+                                    <ChevronUp size={15} />
+                                </Text>
+                            </TouchableOpacity>
                         </View>
-                    ),
-            )}
+                    </View>
+                </View>
+            ))}
         </View>
     );
 }

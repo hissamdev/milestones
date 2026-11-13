@@ -1,0 +1,1 @@
+ALTER TABLE `routine_templates` ADD `title` text DEFAULT '' NOT NULL;

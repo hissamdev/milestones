@@ -94,12 +94,13 @@ export const workoutRelations = defineRelationsPart(
             }),
         },
         routineTemplates: {
-            templateExercises: r.many.routineTemplateExercises(),
+            templateExercises: r.many.routineTemplateExercises({}),
         },
         routineTemplateExercises: {
             template: r.one.routineTemplates({
                 from: r.routineTemplateExercises.templateId,
                 to: r.routineTemplates.id,
+                optional: false,
             }),
             exercise: r.one.exercises({
                 from: r.routineTemplateExercises.exerciseId,

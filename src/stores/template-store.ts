@@ -8,6 +8,8 @@ interface TemplateState {
     template: NestedTemplate | null;
     actions: {
         createTemplate: (title: string) => Promise<string>;
+        loadSingleTemplate: (template: NestedTemplate) => void;
+        fetchSingleTemplate: (templateId: string) => void;
     };
 }
 
@@ -31,6 +33,37 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
             });
 
             return template.id;
+        },
+        loadSingleTemplate: (template) => {
+            set({
+                template: {
+                    ...template,
+                    templateExercises: [],
+                },
+            });
+        },
+        fetchSingleTemplate: async (templateId) => {
+            const res = await db.query.routineTemplates.findFirst({
+                where: {
+                    id: templateId,
+                },
+                with: {
+                    templateExercises: {
+                        orderBy: {
+                            sequence: "asc",
+                        },
+                        with: {
+                            exercise: true,
+                        },
+                    },
+                },
+            });
+
+            set({
+                template: {
+                    ...res!,
+                },
+            });
         },
     },
 }));

@@ -1,5 +1,6 @@
 import Routines from "@/components/screens/workout/routines/Routines";
 import Sessions from "@/components/screens/workout/sessions/Sessions";
+import Templates from "@/components/screens/workout/sessions/ui/Templates";
 import CreateExercise from "@/components/ui/CreateExercise";
 import Popup from "@/components/ui/Popup";
 import ExercisePicker from "@/components/ui/popups/ExercisePicker";
@@ -91,6 +92,7 @@ export default function Workouts() {
             <SafeAreaView
                 style={{ flex: 1, position: "relative", padding: 10 }}
             >
+                <Templates />
                 <Sessions />
                 <Routines />
                 <CreateExercise />
