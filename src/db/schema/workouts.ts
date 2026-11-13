@@ -120,6 +120,7 @@ export const routineTemplateExercises = s.sqliteTable(
             .notNull()
             .references(() => routineTemplates.id),
         exerciseId: s.text("exercise_id").references(() => exercises.id),
+        targetSets: s.integer("target_sets").notNull().default(1),
         displayAmount: s.integer("display_amount").notNull().default(0), // Number of Seconds or Reps. The exercise key contains the type of duration or reps
         isRestType: s
             .integer("is_rest_type", { mode: "boolean" })

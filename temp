@@ -16,3 +16,11 @@ Sessions
 - Navigate to focus screen
 - Check whether the activity at the current sequence is rest
 - Subsequently, create the next session data and then move the sequence
+
+Grouped sets
+
+- Session data contains currentSetPosition
+- Template exercise contains targetSets
+- During preparation, create extra session data to make up for the set repetitions.
+- Add rest during prep or after mark complete.
+    - Adding during prep is more complex

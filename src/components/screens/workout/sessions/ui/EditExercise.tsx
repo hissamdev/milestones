@@ -18,6 +18,7 @@ export default function EditExercises() {
     useEffect(() => {
         if (!template) {
             actions.fetchSingleTemplate(templateId);
+            console.log("Refetched");
             return;
         }
     }, []);
@@ -26,10 +27,18 @@ export default function EditExercises() {
         return;
     }
 
-    console.log("In component body", JSON.stringify(template, null, 2));
-
     return (
         <View style={{ display: "flex", gap: 10 }}>
+            <TouchableOpacity
+                onPress={() => actions.saveTemplate(template.templateExercises)}
+                style={{
+                    width: 100,
+                    height: 40,
+                    backgroundColor: "lightblue",
+                }}
+            >
+                <Text style={{ margin: "auto" }}>Save</Text>
+            </TouchableOpacity>
             {template!.templateExercises.map((te, idx) => (
                 <View
                     key={te.id}
@@ -70,7 +79,9 @@ export default function EditExercises() {
                                 <Text>{te.exercise?.desc}</Text>
                             </View>
                         </View>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => actions.removeExercise(te.id)}
+                        >
                             <Text>
                                 <X size={17} />
                             </Text>

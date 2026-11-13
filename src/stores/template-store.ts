@@ -1,7 +1,11 @@
 import { db } from "@/db/client";
-import { routineTemplates } from "@/db/schema/workouts";
+import {
+    routineTemplateExercises,
+    routineTemplates,
+} from "@/db/schema/workouts";
 import { Exercise, TemplateExercises } from "@/types/routineTypes";
 import { NestedTemplate } from "@/types/template-types";
+import { and, eq, notInArray, sql } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
@@ -25,6 +29,8 @@ interface TemplateState {
             mode: "add" | "subtract",
         ) => void;
         updateOrder: (index: number, mode: "previous" | "next") => void;
+        removeExercise: (templateExerciseId: string) => void;
+        saveTemplate: (templateExercises: TemplateExercises[]) => void;
     };
 }
 
@@ -53,7 +59,7 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
             set({
                 template: {
                     ...template,
-                    templateExercises: [],
+                    templateExercises: [...template.templateExercises],
                 },
             });
         },
@@ -137,15 +143,6 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
                 (te) => te.id === templateExerciseId,
             )!;
 
-            console.log(
-                "Found template e",
-                prevValue,
-                "\n Prev value",
-                JSON.stringify(get().template!.templateExercises, null, 2),
-                "\n Received id",
-                templateExerciseId,
-            );
-
             if (mode === "add") {
                 if (type === "reps") {
                     get().actions.complexSetters.templateExercise(
@@ -225,6 +222,58 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
                         },
                     };
                 });
+            }
+        },
+        removeExercise: (templateExerciseId) => {
+            set((prev) => ({
+                ...prev,
+                template: {
+                    ...prev.template!,
+                    templateExercises: prev
+                        .template!.templateExercises.filter(
+                            (te) => !(te.id === templateExerciseId),
+                        )
+                        .map((te, idx) => ({
+                            ...te,
+                            sequence: idx + 1,
+                        })),
+                },
+            }));
+        },
+        saveTemplate: (templateExercises) => {
+            try {
+                db.transaction((tx) => {
+                    tx.insert(routineTemplateExercises)
+                        .values(templateExercises)
+                        .onConflictDoUpdate({
+                            target: routineTemplateExercises.id,
+                            set: {
+                                sequence: sql.raw(`excluded.sequence`),
+                                displayAmount: sql.raw(
+                                    `excluded.display_amount`,
+                                ),
+                            },
+                        })
+                        .run();
+                    const matchIds = templateExercises.map((te) => te.id);
+                    tx.delete(routineTemplateExercises)
+                        .where(
+                            and(
+                                eq(
+                                    routineTemplateExercises.templateId,
+                                    templateExercises[0].templateId,
+                                ),
+                                notInArray(
+                                    routineTemplateExercises.id,
+                                    matchIds,
+                                ),
+                            ),
+                        )
+                        .run();
+                });
+                console.log("Success transaction");
+            } catch (err) {
+                console.error(err);
             }
         },
     },

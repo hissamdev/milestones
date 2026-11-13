@@ -1,0 +1,1 @@
+ALTER TABLE `routine_template_exercises` ADD `target_sets` integer DEFAULT 1 NOT NULL;

@@ -1,7 +1,10 @@
 import EditExercises from "@/components/screens/workout/sessions/ui/EditExercise";
 import ExercisePicker from "@/components/ui/popups/ExercisePicker";
 import Popup from "@/components/ui/popups/Popup";
+import { useTemplateStore } from "@/stores/template-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
@@ -14,6 +17,20 @@ export default function TemplateEditScreen() {
             closeModal: state.closeModal,
         })),
     );
+
+    const { templateId }: { templateId: string } = useLocalSearchParams();
+
+    const { template, actions } = useTemplateStore(
+        useShallow((state) => ({
+            template: state.template,
+            actions: state.actions,
+        })),
+    );
+
+    useEffect(() => {
+        actions.fetchSingleTemplate(templateId);
+        console.log("Refetched");
+    }, []);
 
     return (
         <>
@@ -38,14 +55,6 @@ export default function TemplateEditScreen() {
                             <Text style={{ margin: "auto" }}>
                                 Insert Exercise
                             </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={{
-                                flex: 1 / 4,
-                                backgroundColor: "lightblue",
-                            }}
-                        >
-                            <Text style={{ margin: "auto" }}>Save</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={{ marginTop: 20 }}>
