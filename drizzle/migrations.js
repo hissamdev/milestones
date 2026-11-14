@@ -23,6 +23,7 @@ import m0019 from './20261112160705_jazzy_bill_hollister/migration.sql';
 import m0020 from './20261112161303_faithful_marvel_zombies/migration.sql';
 import m0021 from './20261113073458_charming_caretaker/migration.sql';
 import m0022 from './20261113163424_conscious_the_phantom/migration.sql';
+import m0023 from './20261113164151_robust_fantastic_four/migration.sql';
 
   export default {
     migrations: {
@@ -48,7 +49,8 @@ import m0022 from './20261113163424_conscious_the_phantom/migration.sql';
 "20261112160705_jazzy_bill_hollister": m0019,
 "20261112161303_faithful_marvel_zombies": m0020,
 "20261113073458_charming_caretaker": m0021,
-"20261113163424_conscious_the_phantom": m0022
+"20261113163424_conscious_the_phantom": m0022,
+"20261113164151_robust_fantastic_four": m0023
 }
   }
   

@@ -94,11 +94,13 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
                 exercise: {
                     ...exercise,
                 },
+                targetSets: 1,
+                autoSets: true,
                 displayAmount: 0,
                 displayRestAmount: 0,
                 isRestType: false,
                 sequence: 0,
-                useStopwatch: false,
+                useStopwatch: true,
             };
 
             set((prev) => ({

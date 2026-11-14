@@ -106,6 +106,8 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     },
                     isRest: false,
                     amount: 0,
+                    targetSets: 1,
+                    currentSetNum: 1,
                     startTime: null,
                     endTime: null,
                     sequence: get().singleSession.currentSequence + 1,
@@ -122,6 +124,8 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     exerciseId: null,
                     isRest: true,
                     amount: 0,
+                    targetSets: 1,
+                    currentSetNum: 1,
                     startTime: null,
                     endTime: null,
                     sequence: get().singleSession.currentSequence + 1,
@@ -329,6 +333,8 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 },
                 isRest: false,
                 amount: 0,
+                targetSets: 1,
+                currentSetNum: 1,
                 startTime: null,
                 endTime: null,
                 sequence: get().singleSession.currentSequence,
@@ -345,6 +351,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             }));
             return;
         }
+        // Template
         get().singleSession.updateSequence.set(1);
         const [session] = await db
             .insert(sessions)
@@ -356,6 +363,9 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             .returning();
         const templateExercises =
             await db.query.routineTemplateExercises.findMany({
+                where: {
+                    id: p.templateId,
+                },
                 orderBy: {
                     sequence: "asc",
                 },
@@ -364,43 +374,41 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 },
             });
 
-        const prepared: (SessionData & { exercise: Exercise | null })[] =
-            templateExercises.map((te) =>
-                te.isRestType
-                    ? {
-                          id: randomUUID(),
-                          sessionId: session.id,
-                          exerciseId: null,
-                          isRest: te.isRestType,
-                          exercise: null,
-                          amount: te.displayAmount,
-                          startTime: null,
-                          endTime: null,
-                          isComplete: false,
-                          sequence: te.sequence,
-                      }
-                    : {
-                          id: randomUUID(),
-                          sessionId: session.id,
-                          exerciseId: te.exerciseId,
-                          isRest: te.isRestType,
-                          exercise: {
-                              ...te.exercise!,
-                          },
-                          amount: te.displayAmount,
-                          startTime: null,
-                          endTime: null,
-                          isComplete: false,
-                          sequence: te.sequence,
-                      },
-            );
+        const converted: (SessionData & { exercise: Exercise | null })[] =
+            templateExercises
+                .filter((te) => !te.isRestType)
+                .map((te) => ({
+                    id: randomUUID(),
+                    sessionId: session.id,
+                    exerciseId: te.exerciseId,
+                    isRest: false,
+                    exercise: {
+                        ...te.exercise!,
+                    },
+                    amount: te.displayAmount,
+                    autoSets: true,
+                    targetSets: te.targetSets,
+                    currentSetNum: 1,
+                    startTime: null,
+                    endTime: null,
+                    isComplete: false,
+                    sequence: te.sequence,
+                }));
+
+        const preparedSets = converted.flatMap((te, idx) =>
+            Array.from({ length: te.targetSets }, (_, setIdx) => ({
+                ...te,
+                currentSetNum: setIdx + 1,
+                sequence: idx + 1,
+            })),
+        );
 
         set((prev) => ({
             singleSession: {
                 ...prev.singleSession,
                 nestedSession: {
                     ...prev.singleSession.nestedSession!,
-                    sessionData: [...prepared],
+                    sessionData: [...preparedSets],
                 },
             },
         }));

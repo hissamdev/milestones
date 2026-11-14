@@ -76,6 +76,8 @@ export const sessionData = s.sqliteTable("session_data", {
     isRest: s.integer("is_rest", { mode: "boolean" }).notNull().default(false),
     // Exercise
     amount: s.integer("amount").notNull().default(0),
+    targetSets: s.integer("target_sets").notNull().default(1),
+    currentSetNum: s.integer("current_set_num").notNull().default(1),
     sequence: s.integer("sequence").notNull(),
     isComplete: s
         .integer("is_complete", { mode: "boolean" })
