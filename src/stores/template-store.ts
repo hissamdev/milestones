@@ -28,9 +28,17 @@ interface TemplateState {
             type: "reps" | "duration",
             mode: "add" | "subtract",
         ) => void;
+        updateSetCount: (
+            templateExerciseId: string,
+            mode: "add" | "subtract",
+        ) => void;
         updateOrder: (index: number, mode: "previous" | "next") => void;
+
         removeExercise: (templateExerciseId: string) => void;
-        saveTemplate: (templateExercises: TemplateExercises[]) => void;
+        saveTemplate: (
+            templateId: string,
+            templateExercises: TemplateExercises[],
+        ) => void;
     };
 }
 
@@ -87,6 +95,13 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
             });
         },
         insertExercise: (templateId, exercise) => {
+            const checkExists = get().template!.templateExercises.find(
+                (te) => te.exercise!.id === exercise.id,
+            );
+            if (checkExists) {
+                return;
+            }
+
             const newTe: NestedTemplate["templateExercises"][0] = {
                 id: randomUUID(),
                 templateId,
@@ -95,7 +110,6 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
                     ...exercise,
                 },
                 targetSets: 1,
-                autoSets: true,
                 displayAmount: 0,
                 displayRestAmount: 0,
                 isRestType: false,
@@ -183,6 +197,29 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
                 durSubtract,
             );
         },
+        updateSetCount: (templateExerciseId, mode) => {
+            const prevValue = get().template!.templateExercises.find(
+                (te) => te.id === templateExerciseId,
+            )!;
+            if (mode === "add") {
+                get().actions.complexSetters.templateExercise(
+                    templateExerciseId,
+                    "targetSets",
+                    prevValue.targetSets + 1,
+                );
+            }
+            if (mode === "subtract") {
+                const safeSubtract =
+                    prevValue.targetSets - 0 <= 1
+                        ? 1
+                        : prevValue.targetSets - 1;
+                get().actions.complexSetters.templateExercise(
+                    templateExerciseId,
+                    "targetSets",
+                    safeSubtract,
+                );
+            }
+        },
         updateOrder: (index, mode) => {
             const prevArray = [...get().template!.templateExercises];
             if (mode === "previous") {
@@ -242,7 +279,13 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
                 },
             }));
         },
-        saveTemplate: (templateExercises) => {
+        saveTemplate: async (templateId, templateExercises) => {
+            if (!templateExercises.length) {
+                await db
+                    .delete(routineTemplateExercises)
+                    .where(eq(routineTemplateExercises.templateId, templateId));
+                return;
+            }
             try {
                 db.transaction((tx) => {
                     tx.insert(routineTemplateExercises)
@@ -250,6 +293,7 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
                         .onConflictDoUpdate({
                             target: routineTemplateExercises.id,
                             set: {
+                                targetSets: sql.raw(`excluded.target_sets`),
                                 sequence: sql.raw(`excluded.sequence`),
                                 displayAmount: sql.raw(
                                     `excluded.display_amount`,

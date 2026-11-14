@@ -48,8 +48,9 @@ export default function SessionExercise() {
             endTime: new Date(),
             isComplete: true,
         });
-        if (singleSession.nestedSession!.templateId) {
+        if (!singleSession.nestedSession!.useTemplate) {
             singleSession.updateSession.insertRest("insert");
+            console.log("Inserted");
             return;
         }
         singleSession.updateSession.insertRest("push");

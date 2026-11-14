@@ -110,6 +110,10 @@ export const daysOtw = s.sqliteTable("days_otw", {
 export const routineTemplates = s.sqliteTable("routine_templates", {
     id: s.text("id").primaryKey(),
     restDay: s.integer({ mode: "boolean" }).notNull().default(false),
+    autoSets: s
+        .integer("auto_sets", { mode: "boolean" })
+        .notNull()
+        .default(false),
     title: s.text("title").notNull().default(""),
 });
 

@@ -4,6 +4,7 @@ import { Exercise } from "@/types/routineTypes";
 import { NestedSession, SessionData } from "@/types/session-types";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
+import { useTemplateStore } from "./template-store";
 
 type CreateSession =
     | {
@@ -136,8 +137,23 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     get().singleSession.updateSequence.increment();
                     return;
                 }
+
                 get().singleSession.updateSession.handlePush(newData);
                 get().singleSession.updateSequence.increment();
+                console.log(
+                    "Details",
+                    JSON.stringify(
+                        get().singleSession.nestedSession!.sessionData?.map(
+                            (sd) => ({
+                                isExercise: !sd.isRest,
+                                set: sd.currentSetNum,
+                                sequence: sd.sequence,
+                            }),
+                        ),
+                        null,
+                        2,
+                    ),
+                );
             },
         },
         complexSetters: {
@@ -361,18 +377,20 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 useTemplate: true,
             })
             .returning();
+        // const templateExercises =
+        //     await db.query.routineTemplateExercises.findMany({
+        //         where: {
+        //             id: p.templateId,
+        //         },
+        //         orderBy: {
+        //             sequence: "asc",
+        //         },
+        //         with: {
+        //             exercise: true,
+        //         },
+        //     });
         const templateExercises =
-            await db.query.routineTemplateExercises.findMany({
-                where: {
-                    id: p.templateId,
-                },
-                orderBy: {
-                    sequence: "asc",
-                },
-                with: {
-                    exercise: true,
-                },
-            });
+            useTemplateStore.getState().template!.templateExercises;
 
         const converted: (SessionData & { exercise: Exercise | null })[] =
             templateExercises
@@ -407,7 +425,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             singleSession: {
                 ...prev.singleSession,
                 nestedSession: {
-                    ...prev.singleSession.nestedSession!,
+                    ...session,
                     sessionData: [...preparedSets],
                 },
             },

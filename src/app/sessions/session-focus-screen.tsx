@@ -4,7 +4,6 @@ import Popup from "@/components/ui/Popup";
 import ExercisePicker from "@/components/ui/popups/ExercisePicker";
 import { useSessionStore } from "@/stores/session-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
-import { useRouter } from "expo-router";
 import { useShallow } from "zustand/react/shallow";
 
 export default function SessionFocusScreen() {
@@ -20,7 +19,12 @@ export default function SessionFocusScreen() {
         })),
     );
 
-    const router = useRouter();
+    if (
+        !singleSession.nestedSession?.sessionData?.find(
+            (sd) => sd.sequence === singleSession.currentSequence,
+        )
+    )
+        return;
 
     return (
         <>

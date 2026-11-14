@@ -40,19 +40,27 @@ export default function SessionRest() {
     }, []);
 
     const handleComplete = () => {
-        const next = singleSession.nestedSession!.sessionData!.find(
-            (sd) => sd.sequence === singleSession.currentSequence + 1,
-        )!;
-        if (!next) {
-            openModal("exercises", "session-picker");
-            return;
+        if (!singleSession.nestedSession!.useTemplate) {
+            const next = singleSession.nestedSession!.sessionData!.find(
+                (sd) => sd.sequence === singleSession.currentSequence + 1,
+            )!;
+            if (!next) {
+                openModal("exercises", "session-picker");
+                return;
+            }
         }
         const current = singleSession.nestedSession!.sessionData!.find(
             (sd) => sd.sequence === singleSession.currentSequence,
         )!;
+
+        const completionTime = new Date();
+        const restAmount = Math.round(
+            (completionTime.getTime() - current.startTime!.getTime()) / 1000,
+        );
         const updated = {
             ...current,
-            endTime: new Date(),
+            amount: restAmount,
+            endTime: completionTime,
             isComplete: true,
         };
         markSessionActivityComplete(updated).catch(() => {
@@ -60,6 +68,7 @@ export default function SessionRest() {
             return;
         });
         singleSession.complexSetters.sessionData({
+            amount: restAmount,
             endTime: new Date(),
             isComplete: true,
         });
@@ -134,7 +143,15 @@ export default function SessionRest() {
                                 )?.exercise?.displayName
                             }
                         </Text>
-                        <Text></Text>
+                        <Text>
+                            {
+                                singleSession.nestedSession!.sessionData!.find(
+                                    (sd) =>
+                                        sd.sequence ===
+                                        singleSession.currentSequence + 1,
+                                )!.currentSetNum
+                            }
+                        </Text>
                     </View>
                     <View
                         style={{
@@ -149,53 +166,59 @@ export default function SessionRest() {
                         <Text style={{ fontSize: 30, color: "white" }}>
                             Elapsed
                         </Text>
-                        <TouchableOpacity
-                            onPress={() => {
-                                const nextExists =
-                                    singleSession.nestedSession!.sessionData!.find(
+                        {!singleSession.nestedSession!.useTemplate && (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    const nextExists =
+                                        singleSession.nestedSession!.sessionData!.find(
+                                            (sd) =>
+                                                sd.sequence ===
+                                                singleSession.currentSequence +
+                                                    1,
+                                        );
+                                    if (!nextExists) {
+                                        openModal(
+                                            "exercises",
+                                            "session-picker",
+                                        );
+                                        return;
+                                    }
+                                    openModal("exercises", "session-swap-next");
+                                }}
+                                style={{
+                                    marginTop: 20,
+                                    paddingHorizontal: 10,
+                                    paddingVertical: 4,
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    gap: 4,
+                                    backgroundColor: "white",
+                                    borderWidth: 2,
+                                    borderColor: "#7D9FEA",
+                                    borderRadius: 100,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        fontSize: 18,
+                                        color: "#1A56DB",
+                                        fontWeight: 500,
+                                    }}
+                                >
+                                    {singleSession.nestedSession!.sessionData!.find(
                                         (sd) =>
                                             sd.sequence ===
                                             singleSession.currentSequence + 1,
-                                    );
-                                if (!nextExists) {
-                                    openModal("exercises", "session-picker");
-                                    return;
-                                }
-                                openModal("exercises", "session-swap-next");
-                            }}
-                            style={{
-                                marginTop: 20,
-                                paddingHorizontal: 10,
-                                paddingVertical: 4,
-                                display: "flex",
-                                flexDirection: "row",
-                                alignItems: "center",
-                                gap: 4,
-                                backgroundColor: "white",
-                                borderWidth: 2,
-                                borderColor: "#7D9FEA",
-                                borderRadius: 100,
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontSize: 18,
-                                    color: "#1A56DB",
-                                    fontWeight: 500,
-                                }}
-                            >
-                                {singleSession.nestedSession!.sessionData!.find(
-                                    (sd) =>
-                                        sd.sequence ===
-                                        singleSession.currentSequence + 1,
-                                )
-                                    ? "Swap"
-                                    : "Select next exercise"}
-                            </Text>
-                            <Text>
-                                <ArrowUpDown color="#1A56DB" size={16} />
-                            </Text>
-                        </TouchableOpacity>
+                                    )
+                                        ? "Swap upcoming exercise"
+                                        : "Select next exercise"}
+                                </Text>
+                                <Text>
+                                    <ArrowUpDown color="#1A56DB" size={16} />
+                                </Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
                 <View

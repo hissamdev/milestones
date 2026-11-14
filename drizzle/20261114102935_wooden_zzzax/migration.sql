@@ -1,0 +1,1 @@
+ALTER TABLE `routine_templates` ADD `auto_sets` integer DEFAULT false NOT NULL;
