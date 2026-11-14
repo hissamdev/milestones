@@ -140,20 +140,6 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
 
                 get().singleSession.updateSession.handlePush(newData);
                 get().singleSession.updateSequence.increment();
-                console.log(
-                    "Details",
-                    JSON.stringify(
-                        get().singleSession.nestedSession!.sessionData?.map(
-                            (sd) => ({
-                                isExercise: !sd.isRest,
-                                set: sd.currentSetNum,
-                                sequence: sd.sequence,
-                            }),
-                        ),
-                        null,
-                        2,
-                    ),
-                );
             },
         },
         complexSetters: {

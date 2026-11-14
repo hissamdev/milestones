@@ -30,7 +30,7 @@ export default function SessionRest() {
         initSessionActivity();
 
         const repeat = () => {
-            const seconds = updateDisplay();
+            const seconds = updateDisplay(true);
 
             setDisplay(seconds);
         };

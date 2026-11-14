@@ -1,5 +1,6 @@
 import { useSessionStore } from "@/stores/session-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
+import { formatSeconds } from "@/utils/workouts/session-helpers";
 import { markSessionActivityComplete } from "@/utils/workouts/session-queries";
 import { useRouter } from "expo-router";
 import {
@@ -10,6 +11,7 @@ import {
     History,
     TrophyIcon,
 } from "lucide-react-native";
+import { useRef } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 import DurationControls from "./ui/DurationControls";
@@ -27,16 +29,19 @@ export default function SessionExercise() {
         useShallow((state) => ({ openModal: state.openModal })),
     );
 
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
     const router = useRouter();
 
     const handleComplete = () => {
+        clearInterval(timerRef.current);
         const current = singleSession.nestedSession!.sessionData!.find(
             (sd) => sd.sequence === singleSession.currentSequence,
         )!;
 
         const updated = {
             ...current,
-            endTime: new Date(),
+            endTime: current.endTime ? current.endTime : new Date(),
             isComplete: true,
         };
 
@@ -154,13 +159,12 @@ export default function SessionExercise() {
                 }}
             >
                 <View style={{}}>
-                    {/* {"reps" === "reps" ? <RepControls /> : <DurationControls />} */}
                     {singleSession.nestedSession!.sessionData!.find(
                         (sd) => sd.sequence === singleSession.currentSequence,
                     )!.exercise!.type === "reps" ? (
                         <RepsControls />
                     ) : (
-                        <DurationControls />
+                        <DurationControls timerRef={timerRef} />
                     )}
 
                     <View>
@@ -256,11 +260,25 @@ export default function SessionExercise() {
                                 <View style={{ flex: 1 }}>
                                     <Text>Completed</Text>
                                 </View>
-                                <View style={{ flex: 1 / 3 }}>
-                                    <Text>Amount</Text>
+                                <View
+                                    style={{
+                                        width: "20%",
+                                        minWidth: 0,
+                                    }}
+                                >
+                                    <Text style={{ textAlign: "center" }}>
+                                        Amount
+                                    </Text>
                                 </View>
-                                <View>
-                                    <Text>Duration</Text>
+                                <View
+                                    style={{
+                                        width: "20%",
+                                        minWidth: 0,
+                                    }}
+                                >
+                                    <Text style={{ textAlign: "center" }}>
+                                        Duration
+                                    </Text>
                                 </View>
                             </View>
 
@@ -270,7 +288,7 @@ export default function SessionExercise() {
                                 )
                                 .map((sd) => (
                                     <View
-                                        key={sd.id}
+                                        key={sd.sequence}
                                         style={{
                                             display: "flex",
                                             flexDirection: "row",
@@ -285,15 +303,35 @@ export default function SessionExercise() {
                                                 {sd.exercise?.displayName}
                                             </Text>
                                         </View>
-                                        <View style={{ flex: 1 / 3 }}>
-                                            <Text>{sd.amount}</Text>
+                                        <View
+                                            style={{
+                                                width: "20%",
+                                                minWidth: 0,
+                                            }}
+                                        >
+                                            <Text
+                                                style={{ textAlign: "center" }}
+                                            >
+                                                {sd.exercise!.type === "reps"
+                                                    ? `${String(sd.amount).padStart(2, "0")}`
+                                                    : formatSeconds(sd.amount)}
+                                            </Text>
                                         </View>
-                                        <View>
-                                            <Text>
-                                                {Math.round(
-                                                    (sd.endTime!.getTime() -
-                                                        sd.startTime!.getTime()) /
-                                                        1000,
+                                        <View
+                                            style={{
+                                                width: "20%",
+                                                minWidth: 0,
+                                            }}
+                                        >
+                                            <Text
+                                                style={{ textAlign: "center" }}
+                                            >
+                                                {formatSeconds(
+                                                    Math.round(
+                                                        (sd.endTime!.getTime() -
+                                                            sd.startTime!.getTime()) /
+                                                            1000,
+                                                    ),
                                                 )}
                                             </Text>
                                         </View>
@@ -316,7 +354,7 @@ export default function SessionExercise() {
                                 styles.stepButtons,
                                 {
                                     backgroundColor: "#FFE4E6",
-                                    borderWidth: 1,
+
                                     borderColor: "#FDA4AF",
                                 },
                             ]}
@@ -338,6 +376,13 @@ export default function SessionExercise() {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                            disabled={
+                                !singleSession.nestedSession!.sessionData?.find(
+                                    (sd) =>
+                                        sd.sequence ===
+                                        singleSession.currentSequence,
+                                )!.startTime
+                            }
                             onPress={() => {
                                 handleComplete();
                             }}

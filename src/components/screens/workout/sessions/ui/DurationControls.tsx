@@ -1,7 +1,60 @@
+import { useSessionStore } from "@/stores/session-store";
+import {
+    resetCountdownTimers,
+    updateDisplay,
+} from "@/utils/workouts/session-helpers";
 import { Minus, Play, Plus, TimerResetIcon } from "lucide-react-native";
+import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
-export default function DurationControls() {
+export default function DurationControls({
+    timerRef,
+}: {
+    timerRef: {
+        current: number | null;
+    };
+}) {
+    const { singleSession } = useSessionStore(
+        useShallow((state) => ({ singleSession: state.singleSession })),
+    );
+    const [timerState, setTimerState] = useState<
+        "initial" | "running" | "complete"
+    >("initial");
+    const [seconds, setSeconds] = useState(
+        singleSession.nestedSession!.sessionData!.find(
+            (sd) => sd.sequence === singleSession.currentSequence,
+        )!.amount,
+    );
+
+    useEffect(() => {}, []);
+
+    const handleTimerUpdate = () => {
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+        }
+        timerRef.current = setInterval(() => {
+            const seconds = updateDisplay(false);
+            setSeconds(seconds);
+        }, 100);
+    };
+
+    const handleTimerRun = () => {
+        if (timerState === "initial") {
+            resetCountdownTimers();
+            setTimerState("running");
+            handleTimerUpdate();
+            return;
+        }
+        if (timerState === "running") {
+            clearInterval(timerRef.current);
+            setTimerState("complete");
+            singleSession.complexSetters.sessionData({ endTime: new Date() });
+            return;
+        }
+        clearInterval(timerRef.current);
+    };
+
     return (
         <View
             style={{ maxWidth: "60%", width: "100%", marginHorizontal: "auto" }}
@@ -31,7 +84,7 @@ export default function DurationControls() {
                     </Text>
                 </TouchableOpacity>
                 <View style={{ display: "flex", flexDirection: "row" }}>
-                    <Text style={{ fontSize: 20 }}>60</Text>
+                    <Text style={{ fontSize: 20 }}>{seconds}</Text>
                     <Text style={{ marginTop: 6 }}>s</Text>
                 </View>
                 <TouchableOpacity
@@ -61,6 +114,17 @@ export default function DurationControls() {
                 }}
             >
                 <TouchableOpacity
+                    onPress={() => {
+                        clearInterval(timerRef.current);
+                        setTimerState("initial");
+                        setSeconds(
+                            singleSession.nestedSession!.sessionData!.find(
+                                (sd) =>
+                                    sd.sequence ===
+                                    singleSession.currentSequence,
+                            )!.amount,
+                        );
+                    }}
                     style={{
                         flex: 1 / 2,
                         display: "flex",
@@ -78,6 +142,8 @@ export default function DurationControls() {
                     <Text>Reset</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                    disabled={timerState === "complete"}
+                    onPress={handleTimerRun}
                     style={{
                         flex: 1,
                         display: "flex",
@@ -92,7 +158,13 @@ export default function DurationControls() {
                     <Text>
                         <Play color="white" size={16} fill="white" />
                     </Text>
-                    <Text style={{ color: "white" }}>Start</Text>
+                    <Text style={{ color: "white" }}>
+                        {timerState === "initial"
+                            ? "Start"
+                            : timerState === "running"
+                              ? "Stop"
+                              : "Done"}
+                    </Text>
                 </TouchableOpacity>
             </View>
         </View>
