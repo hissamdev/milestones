@@ -5,7 +5,13 @@ import { Exercise } from "@/types/routineTypes";
 import { useRouter } from "expo-router";
 import { Check, Plus, SearchIcon } from "lucide-react-native";
 import { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
 const initialCreate = {
@@ -175,7 +181,7 @@ export default function ExercisePicker() {
                     </View>
                     <View
                         style={{
-                            marginVertical: 20,
+                            marginTop: 20,
                             display: "flex",
                             flexDirection: "row",
                             gap: 5,
@@ -195,7 +201,14 @@ export default function ExercisePicker() {
                             </TouchableOpacity>
                         ))}
                     </View>
-                    <View style={{ flex: 1, display: "flex", gap: 10 }}>
+                    <ScrollView
+                        contentContainerStyle={{
+                            paddingTop: 20,
+                            paddingBottom: 40,
+                            display: "flex",
+                            gap: 10,
+                        }}
+                    >
                         {allExercisesState.map((e) => (
                             <TouchableOpacity
                                 activeOpacity={0.8}
@@ -260,7 +273,7 @@ export default function ExercisePicker() {
                                 </View>
                             </TouchableOpacity>
                         ))}
-                    </View>
+                    </ScrollView>
                     <View
                         style={{
                             display: "flex",

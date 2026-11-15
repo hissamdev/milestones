@@ -1,9 +1,10 @@
 import { db, expoDb } from "@/db/client";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { Stack } from "expo-router";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import migrations from "../../drizzle/migrations";
 
+import { initExerciseList } from "@/utils/workouts/init-exercises";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 
 export default function RootLayout() {
@@ -16,8 +17,14 @@ export default function RootLayout() {
     }
 
     if (!success) {
-        return <Text>Loading</Text>;
+        return (
+            <View style={{ flex: 1 }}>
+                <Text style={{ margin: "auto" }}>Migrating</Text>
+            </View>
+        );
     }
+
+    initExerciseList();
 
     return (
         <Stack screenOptions={{ headerShown: false }}>

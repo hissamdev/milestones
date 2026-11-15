@@ -25,6 +25,7 @@ import m0021 from './20261113073458_charming_caretaker/migration.sql';
 import m0022 from './20261113163424_conscious_the_phantom/migration.sql';
 import m0023 from './20261113164151_robust_fantastic_four/migration.sql';
 import m0024 from './20261114102935_wooden_zzzax/migration.sql';
+import m0025 from './20261115134129_overconfident_miek/migration.sql';
 
   export default {
     migrations: {
@@ -52,7 +53,8 @@ import m0024 from './20261114102935_wooden_zzzax/migration.sql';
 "20261113073458_charming_caretaker": m0021,
 "20261113163424_conscious_the_phantom": m0022,
 "20261113164151_robust_fantastic_four": m0023,
-"20261114102935_wooden_zzzax": m0024
+"20261114102935_wooden_zzzax": m0024,
+"20261115134129_overconfident_miek": m0025
 }
   }
   

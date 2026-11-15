@@ -24,3 +24,8 @@ Grouped sets
 - During preparation, create extra session data to make up for the set repetitions.
 - Add rest during prep or after mark complete.
     - Adding during prep is more complex
+
+Completion behavior
+
+- If template and last item, mark exercise and session complete
+- If session and end, do the same

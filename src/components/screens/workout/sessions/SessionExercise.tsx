@@ -1,7 +1,10 @@
 import { useSessionStore } from "@/stores/session-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
 import { formatSeconds } from "@/utils/workouts/session-helpers";
-import { markSessionActivityComplete } from "@/utils/workouts/session-queries";
+import {
+    markSessionActivityComplete,
+    markSessionComplete,
+} from "@/utils/workouts/session-queries";
 import { useRouter } from "expo-router";
 import {
     ArrowUpDown,
@@ -11,23 +14,26 @@ import {
     History,
     TrophyIcon,
 } from "lucide-react-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 import DurationControls from "./ui/DurationControls";
 import RepsControls from "./ui/RepsControls";
 
 export default function SessionExercise() {
-    const { singleSession, findActivity } = useSessionStore(
+    const { singleSession, findActivity, sessionComplete } = useSessionStore(
         useShallow((state) => ({
             singleSession: state.singleSession,
             findActivity: state.findActivity,
+            sessionComplete: state.setSessionEnd,
         })),
     );
 
     const { openModal } = useWorkoutsGlobalState(
         useShallow((state) => ({ openModal: state.openModal })),
     );
+
+    const [durStoppedSafely, setDurStoppedSafely] = useState(false);
 
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -45,33 +51,71 @@ export default function SessionExercise() {
             (sd) => sd.sequence === singleSession.currentSequence,
         )!;
 
-        const recalculateAmount = Math.round(
-            (current.endTime!.getTime() - current.startTime!.getTime()) / 1000,
-        );
-
-        const updated = {
-            ...current,
-            endTime: current.endTime ? current.endTime : new Date(),
-            amount: current.endTime ? recalculateAmount : current.amount,
-            isComplete: true,
-        };
-
-        console.log("Mark complete amount", updated.amount);
-
-        markSessionActivityComplete(updated).catch(() => {
-            console.error("Completion failed");
+        if (!singleSession.nestedSession!.useTemplate) {
+            // Regular session
+            handleExerciseComplete();
+            handleForward();
             return;
-        });
-        singleSession.complexSetters.sessionData({
-            amount: recalculateAmount,
-            endTime: current.endTime ? current.endTime : new Date(),
-            isComplete: true,
-        });
+        }
+        // Template
+        if (
+            current.sequence >= singleSession.nestedSession!.sessionData!.length
+        ) {
+            handleExerciseComplete();
+            handleSessionComplete();
+            return;
+        }
+        handleExerciseComplete();
+        handleForward();
+    };
+
+    const handleForward = () => {
         if (!singleSession.nestedSession!.useTemplate) {
             singleSession.updateSession.insertRest("insert");
             return;
         }
         singleSession.updateSession.insertRest("push");
+    };
+
+    const handleExerciseComplete = () => {
+        const current = singleSession.nestedSession!.sessionData!.find(
+            (sd) => sd.sequence === singleSession.currentSequence,
+        )!;
+        const safeEnd = durStoppedSafely ? current.endTime! : new Date();
+        const recalculateAmount = Math.round(
+            (safeEnd.getTime() - current.startTime!.getTime()) / 1000,
+        );
+        const updated = {
+            ...current,
+            endTime: safeEnd,
+            amount:
+                current.exercise!.type === "reps"
+                    ? current.amount
+                    : recalculateAmount,
+            isComplete: true,
+        };
+
+        singleSession.complexSetters.sessionData({
+            endTime: safeEnd,
+            amount:
+                current.exercise!.type === "reps"
+                    ? current.amount
+                    : recalculateAmount,
+
+            isComplete: true,
+        });
+        markSessionActivityComplete(updated).catch(() => {
+            console.error("Completion failed");
+            return;
+        });
+    };
+
+    const handleSessionComplete = () => {
+        handleExerciseComplete();
+        markSessionComplete();
+        router.push({
+            pathname: "/",
+        });
     };
 
     return (
@@ -177,7 +221,10 @@ export default function SessionExercise() {
                     )!.exercise!.type === "reps" ? (
                         <RepsControls />
                     ) : (
-                        <DurationControls timerRef={timerRef} />
+                        <DurationControls
+                            setSafelyStopped={setDurStoppedSafely}
+                            timerRef={timerRef}
+                        />
                     )}
 
                     <View>
@@ -417,7 +464,14 @@ export default function SessionExercise() {
                             <Text
                                 style={[styles.buttonText, { color: "white" }]}
                             >
-                                Rest
+                                {singleSession.nestedSession!.sessionData!.find(
+                                    (sd) => sd.sequence,
+                                )!.sequence ===
+                                singleSession.nestedSession!.sessionData!.length
+                                    ? singleSession.nestedSession!.useTemplate
+                                        ? "Next"
+                                        : "Rest"
+                                    : "Complete"}
                             </Text>
                         </TouchableOpacity>
                     </View>

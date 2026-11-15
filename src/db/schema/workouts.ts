@@ -62,6 +62,10 @@ export const sessions = s.sqliteTable("sessions", {
         .integer("is_complete", { mode: "boolean" })
         .notNull()
         .default(false),
+    startTime: s
+        .integer("start_time", { mode: "timestamp" })
+        .$defaultFn(() => new Date()),
+    endTime: s.integer("end_time", { mode: "timestamp" }),
 });
 
 export const sessionData = s.sqliteTable("session_data", {

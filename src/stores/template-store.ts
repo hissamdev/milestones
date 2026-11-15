@@ -95,12 +95,12 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
             });
         },
         insertExercise: (templateId, exercise) => {
-            const checkExists = get().template!.templateExercises.find(
-                (te) => te.exercise!.id === exercise.id,
-            );
-            if (checkExists) {
-                return;
-            }
+            // const checkExists = get().template!.templateExercises.find(
+            //     (te) => te.exercise!.id === exercise.id,
+            // );
+            // if (checkExists) {
+            //     return;
+            // }
 
             const newTe: NestedTemplate["templateExercises"][0] = {
                 id: randomUUID(),

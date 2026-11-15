@@ -4,16 +4,18 @@ import {
     updateDisplay,
 } from "@/utils/workouts/session-helpers";
 import { Minus, Play, Plus, TimerResetIcon } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
 export default function DurationControls({
     timerRef,
+    setSafelyStopped,
 }: {
     timerRef: {
         current: number | null;
     };
+    setSafelyStopped: React.Dispatch<SetStateAction<boolean>>;
 }) {
     const { singleSession } = useSessionStore(
         useShallow((state) => ({ singleSession: state.singleSession })),
@@ -27,71 +29,41 @@ export default function DurationControls({
         )!.amount,
     );
 
-    useEffect(() => {}, []);
+    useEffect(() => {
+        if (!(timerState === "running")) return;
 
-    const handleTimerStart = () => {
-        if (timerRef.current) {
-            clearInterval(timerRef.current);
-        }
-        timerRef.current = setInterval(() => {
+        const startTimer = () => {
             if (
-                useSessionStore
-                    .getState()
-                    .singleSession.nestedSession!.sessionData!.find(
-                        (sd) => sd.sequence === singleSession.currentSequence,
-                    )!.endTime! <= new Date()
+                singleSession.nestedSession!.sessionData!.find(
+                    (sd) => sd.sequence === singleSession.currentSequence,
+                )!.endTime! <= new Date()
             ) {
-                console.log(
-                    "End expired",
-                    singleSession.nestedSession!.sessionData!.find(
-                        (sd) => sd.sequence === singleSession.currentSequence,
-                    )!.endTime!,
-                );
                 handleTimerRun();
                 return;
             }
-
             const seconds = updateDisplay(false);
             setSeconds(seconds);
-        }, 100);
-    };
+        };
+
+        timerRef.current = setInterval(startTimer, 100);
+
+        return () => clearInterval(timerRef.current);
+    }, [timerState]);
 
     const handleTimerRun = () => {
-        console.log(
-            "Handler ran, end time is",
-            singleSession.nestedSession!.sessionData!.find(
-                (sd) => sd.sequence === singleSession.currentSequence,
-            )!.endTime!,
-            "State is",
-            timerState,
-        );
         if (timerState === "initial") {
-            console.log(
-                "Starting",
-                singleSession.nestedSession!.sessionData!.find(
-                    (sd) => sd.sequence === singleSession.currentSequence,
-                )!.endTime!,
-            );
             resetCountdownTimers();
             setTimerState("running");
-            console.log("State changed to running", timerState);
-            handleTimerStart();
+            setSafelyStopped(false);
             return;
         }
         if (timerState === "running") {
-            console.log(
-                "Stopping",
-                singleSession.nestedSession!.sessionData!.find(
-                    (sd) => sd.sequence === singleSession.currentSequence,
-                )!.endTime!,
-                "State is",
-                timerState,
-            );
             clearInterval(timerRef.current);
             setTimerState("complete");
             singleSession.complexSetters.sessionData({
                 endTime: new Date(),
             });
+            setSafelyStopped(true);
             return;
         }
     };

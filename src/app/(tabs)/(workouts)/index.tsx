@@ -9,6 +9,7 @@ import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
 import { createRoutine } from "@/utils/workouts/routineHelpers";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 ("@/components/ui/Popup");
@@ -92,10 +93,12 @@ export default function Workouts() {
             <SafeAreaView
                 style={{ flex: 1, position: "relative", padding: 10 }}
             >
-                <Templates />
-                <Sessions />
-                <Routines />
-                <CreateExercise />
+                <ScrollView>
+                    <Templates />
+                    <Sessions />
+                    <Routines />
+                    <CreateExercise />
+                </ScrollView>
             </SafeAreaView>
             <Popup
                 visible={activeModal.modal === "exercises"}

@@ -54,6 +54,7 @@ interface SessionState {
     };
     loadOngoingSession: (sessionId: string) => void;
     createSession: (p: CreateSession) => void;
+    setSessionEnd: () => void;
     allSessionsState: NestedSession[];
     loadSessions: () => void;
 }
@@ -451,5 +452,18 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             },
         });
         set(() => ({ allSessionsState: sessions }));
+    },
+    setSessionEnd: () => {
+        set((prev) => ({
+            ...prev,
+            singleSession: {
+                ...prev.singleSession,
+                nestedSession: {
+                    ...prev.singleSession.nestedSession!,
+                    isComplete: true,
+                    endTime: new Date(),
+                },
+            },
+        }));
     },
 }));
