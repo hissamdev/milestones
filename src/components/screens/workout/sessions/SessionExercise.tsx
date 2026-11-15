@@ -11,7 +11,7 @@ import {
     History,
     TrophyIcon,
 } from "lucide-react-native";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 import DurationControls from "./ui/DurationControls";
@@ -33,29 +33,42 @@ export default function SessionExercise() {
 
     const router = useRouter();
 
+    useEffect(() => {
+        console.log(
+            JSON.stringify(singleSession.nestedSession!.sessionData!, null, 2),
+        );
+    }, []);
+
     const handleComplete = () => {
         clearInterval(timerRef.current);
         const current = singleSession.nestedSession!.sessionData!.find(
             (sd) => sd.sequence === singleSession.currentSequence,
         )!;
 
+        const recalculateAmount = Math.round(
+            (current.endTime!.getTime() - current.startTime!.getTime()) / 1000,
+        );
+
         const updated = {
             ...current,
             endTime: current.endTime ? current.endTime : new Date(),
+            amount: current.endTime ? recalculateAmount : current.amount,
             isComplete: true,
         };
+
+        console.log("Mark complete amount", updated.amount);
 
         markSessionActivityComplete(updated).catch(() => {
             console.error("Completion failed");
             return;
         });
         singleSession.complexSetters.sessionData({
-            endTime: new Date(),
+            amount: recalculateAmount,
+            endTime: current.endTime ? current.endTime : new Date(),
             isComplete: true,
         });
         if (!singleSession.nestedSession!.useTemplate) {
             singleSession.updateSession.insertRest("insert");
-            console.log("Inserted");
             return;
         }
         singleSession.updateSession.insertRest("push");

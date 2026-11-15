@@ -57,4 +57,5 @@ export function resetCountdownTimers() {
         startTime: timestamp,
         endTime: projectedEnd,
     });
+    console.log("Reset timers", timestamp, projectedEnd);
 }

@@ -38,7 +38,7 @@ interface SessionState {
         updateAmount: (
             mode: "add" | "subtract",
             type: "reps" | "duration",
-        ) => void;
+        ) => number;
         showExercises: boolean;
         updateShowExercises: (value: boolean) => void;
         updateSequence: {
@@ -177,24 +177,25 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     get().singleSession.complexSetters.sessionData({
                         amount: lastValue + 1,
                     });
-                    return;
+                    return lastValue + 1;
                 }
                 get().singleSession.complexSetters.sessionData({
                     amount: lastValue + 10,
                 });
-                return;
+                return lastValue + 10;
             }
             if (type === "reps") {
                 const safeSubtract = lastValue - 1 <= 0 ? 0 : lastValue - 1;
                 get().singleSession.complexSetters.sessionData({
                     amount: safeSubtract,
                 });
-                return;
+                return safeSubtract;
             }
-            const safeSubtract = lastValue - 10 ? 0 : lastValue - 10;
+            const safeSubtract = lastValue - 10 <= 0 ? 0 : lastValue - 10;
             get().singleSession.complexSetters.sessionData({
                 amount: safeSubtract,
             });
+            return safeSubtract;
         },
         currentSequence: 1,
         showExercises: true,
@@ -399,13 +400,17 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     sequence: te.sequence,
                 }));
 
-        const preparedSets = converted.flatMap((te, idx) =>
-            Array.from({ length: te.targetSets }, (_, setIdx) => ({
-                ...te,
-                currentSetNum: setIdx + 1,
+        const preparedSets = converted
+            .flatMap((te) =>
+                Array.from({ length: te.targetSets }, (_, setIdx) => ({
+                    ...te,
+                    currentSetNum: setIdx + 1,
+                })),
+            )
+            .map((ps, idx) => ({
+                ...ps,
                 sequence: idx + 1,
-            })),
-        );
+            }));
 
         set((prev) => ({
             singleSession: {

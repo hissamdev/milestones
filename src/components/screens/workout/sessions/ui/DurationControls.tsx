@@ -29,30 +29,81 @@ export default function DurationControls({
 
     useEffect(() => {}, []);
 
-    const handleTimerUpdate = () => {
+    const handleTimerStart = () => {
         if (timerRef.current) {
             clearInterval(timerRef.current);
         }
         timerRef.current = setInterval(() => {
+            if (
+                useSessionStore
+                    .getState()
+                    .singleSession.nestedSession!.sessionData!.find(
+                        (sd) => sd.sequence === singleSession.currentSequence,
+                    )!.endTime! <= new Date()
+            ) {
+                console.log(
+                    "End expired",
+                    singleSession.nestedSession!.sessionData!.find(
+                        (sd) => sd.sequence === singleSession.currentSequence,
+                    )!.endTime!,
+                );
+                handleTimerRun();
+                return;
+            }
+
             const seconds = updateDisplay(false);
             setSeconds(seconds);
         }, 100);
     };
 
     const handleTimerRun = () => {
+        console.log(
+            "Handler ran, end time is",
+            singleSession.nestedSession!.sessionData!.find(
+                (sd) => sd.sequence === singleSession.currentSequence,
+            )!.endTime!,
+            "State is",
+            timerState,
+        );
         if (timerState === "initial") {
+            console.log(
+                "Starting",
+                singleSession.nestedSession!.sessionData!.find(
+                    (sd) => sd.sequence === singleSession.currentSequence,
+                )!.endTime!,
+            );
             resetCountdownTimers();
             setTimerState("running");
-            handleTimerUpdate();
+            console.log("State changed to running", timerState);
+            handleTimerStart();
             return;
         }
         if (timerState === "running") {
+            console.log(
+                "Stopping",
+                singleSession.nestedSession!.sessionData!.find(
+                    (sd) => sd.sequence === singleSession.currentSequence,
+                )!.endTime!,
+                "State is",
+                timerState,
+            );
             clearInterval(timerRef.current);
             setTimerState("complete");
-            singleSession.complexSetters.sessionData({ endTime: new Date() });
+            singleSession.complexSetters.sessionData({
+                endTime: new Date(),
+            });
             return;
         }
-        clearInterval(timerRef.current);
+    };
+
+    const handleUpdateAmount = (mode: "add" | "subtract") => {
+        if (mode === "add") {
+            const res = singleSession.updateAmount("add", "duration");
+            setSeconds(res);
+            return;
+        }
+        const res = singleSession.updateAmount("subtract", "duration");
+        setSeconds(res);
     };
 
     return (
@@ -68,6 +119,8 @@ export default function DurationControls({
                 }}
             >
                 <TouchableOpacity
+                    onPress={() => handleUpdateAmount("subtract")}
+                    disabled={!(timerState === "initial")}
                     style={{
                         backgroundColor: "#e4e8ec",
                         aspectRatio: 1 / 1,
@@ -88,6 +141,8 @@ export default function DurationControls({
                     <Text style={{ marginTop: 6 }}>s</Text>
                 </View>
                 <TouchableOpacity
+                    disabled={!(timerState === "initial")}
+                    onPress={() => handleUpdateAmount("add")}
                     style={{
                         backgroundColor: "#225FD7",
                         aspectRatio: 1 / 1,
@@ -124,6 +179,10 @@ export default function DurationControls({
                                     singleSession.currentSequence,
                             )!.amount,
                         );
+                        singleSession.complexSetters.sessionData({
+                            startTime: null,
+                            endTime: null,
+                        });
                     }}
                     style={{
                         flex: 1 / 2,
