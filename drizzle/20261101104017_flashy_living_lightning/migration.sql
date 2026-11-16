@@ -1,1 +1,0 @@
-ALTER TABLE `routine_exercise_data` ADD `current_set_end_time` integer;

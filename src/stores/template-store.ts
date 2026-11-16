@@ -317,7 +317,6 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
                         )
                         .run();
                 });
-                console.log("Success transaction");
             } catch (err) {
                 console.error(err);
             }

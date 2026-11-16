@@ -1,1 +1,0 @@
-ALTER TABLE `sessions` ADD `use_template` integer DEFAULT false NOT NULL;

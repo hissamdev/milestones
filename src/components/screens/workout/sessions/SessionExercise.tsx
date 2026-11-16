@@ -410,6 +410,7 @@ export default function SessionExercise() {
                         }}
                     >
                         <TouchableOpacity
+                            onPress={handleSessionComplete}
                             style={[
                                 styles.stepButtons,
                                 {
@@ -464,14 +465,15 @@ export default function SessionExercise() {
                             <Text
                                 style={[styles.buttonText, { color: "white" }]}
                             >
-                                {singleSession.nestedSession!.sessionData!.find(
-                                    (sd) => sd.sequence,
-                                )!.sequence ===
-                                singleSession.nestedSession!.sessionData!.length
-                                    ? singleSession.nestedSession!.useTemplate
-                                        ? "Next"
-                                        : "Rest"
-                                    : "Complete"}
+                                {singleSession.nestedSession!.useTemplate
+                                    ? singleSession.nestedSession!.sessionData!.find(
+                                          (sd) => sd.sequence,
+                                      )!.sequence ===
+                                      singleSession.nestedSession!.sessionData!
+                                          .length
+                                        ? "Complete"
+                                        : "Next"
+                                    : "Rest"}
                             </Text>
                         </TouchableOpacity>
                     </View>

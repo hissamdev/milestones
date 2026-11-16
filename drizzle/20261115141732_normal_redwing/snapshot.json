@@ -1,9 +1,9 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "c6c22c22-ff70-4482-a48b-b84c09421018",
+  "id": "372473c4-59e5-4d60-a1ad-832c1cfc01c8",
   "prevIds": [
-    "58343ed3-93b5-431c-9398-0651f93d16b5"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
     {
@@ -1139,7 +1139,7 @@
     },
     {
       "table": "session_data",
-      "name": "fk_session_data_exerciseId_exercises_id_fk",
+      "name": "fk_session_data_exercise_id_exercises_id_fk",
       "columns": [
         "exercise_id"
       ],
@@ -1169,7 +1169,7 @@
     },
     {
       "table": "standalone_exercises",
-      "name": "fk_standalone_exercises_workout_id_workouts_id_fk",
+      "name": "fk_standalone_exercises_workout_id_workout_day_id_fk",
       "columns": [
         "workout_id"
       ],
@@ -1316,7 +1316,7 @@
     },
     {
       "table": "workout_day",
-      "name": "workouts_pk",
+      "name": "workout_day_pk",
       "columns": [
         "id"
       ],

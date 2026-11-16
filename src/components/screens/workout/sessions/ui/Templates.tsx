@@ -36,7 +36,7 @@ export default function Templates() {
         };
 
         load();
-    }, []);
+    }, [templates]);
 
     return (
         <View>

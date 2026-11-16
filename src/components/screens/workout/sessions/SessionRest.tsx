@@ -144,13 +144,12 @@ export default function SessionRest() {
                             }
                         </Text>
                         <Text>
-                            {
+                            {singleSession.nestedSession!.useTemplate &&
                                 singleSession.nestedSession!.sessionData!.find(
                                     (sd) =>
                                         sd.sequence ===
                                         singleSession.currentSequence + 1,
-                                )!.currentSetNum
-                            }
+                                )!.currentSetNum}
                         </Text>
                     </View>
                     <View

@@ -134,7 +134,6 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
         markEnd: (time) => {
             const activity = get().singleRoutine.findSingleActivity();
             get().singleRoutine.complexSetters.activity("endTime", time);
-            console.log("End marked in zustand", activity.endTime);
         },
     },
     runRoutineStart: async () => {
@@ -292,8 +291,6 @@ export const useRoutineStore = create<RoutinesState>()((set, get) => ({
         // const isAvailable = day!.routineTemplate.templateExercises.find(
         //     (te) => te.sequence === nextSeq,
         // );
-
-        console.log("Found seq", get().singleRoutine.currentSequence);
 
         const available =
             get().singleRoutine.nestedRoutine?.routineData?.[0]?.dataExercises?.find(

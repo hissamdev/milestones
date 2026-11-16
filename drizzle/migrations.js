@@ -1,60 +1,10 @@
 // This file is required for Expo/React Native SQLite migrations - https://orm.drizzle.team/quick-sqlite/expo
 
-import m0000 from './20261025211851_blushing_darkstar/migration.sql';
-import m0001 from './20261031224646_overconfident_bloodstrike/migration.sql';
-import m0002 from './20261031225414_vengeful_ser_duncan/migration.sql';
-import m0003 from './20261101104017_flashy_living_lightning/migration.sql';
-import m0004 from './20261101110636_mushy_arachne/migration.sql';
-import m0005 from './20261101110711_closed_energizer/migration.sql';
-import m0006 from './20261102022021_misty_blacklash/migration.sql';
-import m0007 from './20261102040230_secret_shadow_king/migration.sql';
-import m0008 from './20261102092436_polite_spacker_dave/migration.sql';
-import m0009 from './20261103020224_married_rage/migration.sql';
-import m0010 from './20261104234710_burly_red_skull/migration.sql';
-import m0011 from './20261106022952_awesome_blue_shield/migration.sql';
-import m0012 from './20261106061601_far_silver_samurai/migration.sql';
-import m0013 from './20261106062711_clumsy_donald_blake/migration.sql';
-import m0014 from './20261108042535_sour_sauron/migration.sql';
-import m0015 from './20261108045252_bumpy_rawhide_kid/migration.sql';
-import m0016 from './20261108052206_curly_stature/migration.sql';
-import m0017 from './20261111041913_fuzzy_whistler/migration.sql';
-import m0018 from './20261111135010_wonderful_black_crow/migration.sql';
-import m0019 from './20261112160705_jazzy_bill_hollister/migration.sql';
-import m0020 from './20261112161303_faithful_marvel_zombies/migration.sql';
-import m0021 from './20261113073458_charming_caretaker/migration.sql';
-import m0022 from './20261113163424_conscious_the_phantom/migration.sql';
-import m0023 from './20261113164151_robust_fantastic_four/migration.sql';
-import m0024 from './20261114102935_wooden_zzzax/migration.sql';
-import m0025 from './20261115134129_overconfident_miek/migration.sql';
+import m0000 from './20261115141732_normal_redwing/migration.sql';
 
   export default {
     migrations: {
-      "20261025211851_blushing_darkstar": m0000,
-"20261031224646_overconfident_bloodstrike": m0001,
-"20261031225414_vengeful_ser_duncan": m0002,
-"20261101104017_flashy_living_lightning": m0003,
-"20261101110636_mushy_arachne": m0004,
-"20261101110711_closed_energizer": m0005,
-"20261102022021_misty_blacklash": m0006,
-"20261102040230_secret_shadow_king": m0007,
-"20261102092436_polite_spacker_dave": m0008,
-"20261103020224_married_rage": m0009,
-"20261104234710_burly_red_skull": m0010,
-"20261106022952_awesome_blue_shield": m0011,
-"20261106061601_far_silver_samurai": m0012,
-"20261106062711_clumsy_donald_blake": m0013,
-"20261108042535_sour_sauron": m0014,
-"20261108045252_bumpy_rawhide_kid": m0015,
-"20261108052206_curly_stature": m0016,
-"20261111041913_fuzzy_whistler": m0017,
-"20261111135010_wonderful_black_crow": m0018,
-"20261112160705_jazzy_bill_hollister": m0019,
-"20261112161303_faithful_marvel_zombies": m0020,
-"20261113073458_charming_caretaker": m0021,
-"20261113163424_conscious_the_phantom": m0022,
-"20261113164151_robust_fantastic_four": m0023,
-"20261114102935_wooden_zzzax": m0024,
-"20261115134129_overconfident_miek": m0025
+      "20261115141732_normal_redwing": m0000
 }
   }
   

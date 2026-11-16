@@ -51,8 +51,8 @@ CREATE TABLE `routine_tl_data` (
 	`id` text PRIMARY KEY,
 	`routine_id` text NOT NULL,
 	`interaction_time` integer NOT NULL,
-	`completion` integer NOT NULL,
-	`is_complete` integer NOT NULL,
+	`completion_percentage` integer NOT NULL,
+	`is_complete` integer DEFAULT false NOT NULL,
 	CONSTRAINT `fk_routine_tl_data_routine_id_routines_id_fk` FOREIGN KEY (`routine_id`) REFERENCES `routines`(`id`)
 );
 --> statement-breakpoint
@@ -61,6 +61,17 @@ CREATE TABLE `routine_exercise_data` (
 	`routine_id` text,
 	`parent_metadata_id` text NOT NULL,
 	`exercise_id` text,
+	`is_rest` integer DEFAULT false NOT NULL,
+	`use_stopwatch` integer DEFAULT false NOT NULL,
+	`is_complete` integer DEFAULT false NOT NULL,
+	`exercise_name` text,
+	`exercise_display_name` text,
+	`exercise_desc` text,
+	`exercise_type` text,
+	`work_amount` integer DEFAULT 0 NOT NULL,
+	`current_set_start_time` integer,
+	`current_set_end_time` integer,
+	`sequence` integer NOT NULL,
 	CONSTRAINT `fk_routine_exercise_data_routine_id_routines_id_fk` FOREIGN KEY (`routine_id`) REFERENCES `routines`(`id`),
 	CONSTRAINT `fk_routine_exercise_data_parent_metadata_id_routine_tl_data_id_fk` FOREIGN KEY (`parent_metadata_id`) REFERENCES `routine_tl_data`(`id`),
 	CONSTRAINT `fk_routine_exercise_data_exercise_id_exercises_id_fk` FOREIGN KEY (`exercise_id`) REFERENCES `exercises`(`id`)
@@ -70,9 +81,11 @@ CREATE TABLE `routine_template_exercises` (
 	`id` text PRIMARY KEY,
 	`template_id` text NOT NULL,
 	`exercise_id` text,
-	`display_amount` integer DEFAULT 0,
+	`target_sets` integer DEFAULT 1 NOT NULL,
+	`display_amount` integer DEFAULT 0 NOT NULL,
 	`is_rest_type` integer DEFAULT false NOT NULL,
-	`rest_time` integer,
+	`rest_time` integer DEFAULT 0 NOT NULL,
+	`use_stopwatch` integer DEFAULT false NOT NULL,
 	`sequence` integer NOT NULL,
 	CONSTRAINT `fk_routine_template_exercises_template_id_routine_templates_id_fk` FOREIGN KEY (`template_id`) REFERENCES `routine_templates`(`id`),
 	CONSTRAINT `fk_routine_template_exercises_exercise_id_exercises_id_fk` FOREIGN KEY (`exercise_id`) REFERENCES `exercises`(`id`)
@@ -80,36 +93,42 @@ CREATE TABLE `routine_template_exercises` (
 --> statement-breakpoint
 CREATE TABLE `routine_templates` (
 	`id` text PRIMARY KEY,
-	`restDay` integer DEFAULT false NOT NULL
+	`restDay` integer DEFAULT false NOT NULL,
+	`auto_sets` integer DEFAULT false NOT NULL,
+	`title` text DEFAULT '' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `routines` (
 	`id` text PRIMARY KEY,
 	`created_at` integer NOT NULL,
-	`creation_day` text NOT NULL,
 	`name` text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `session_data` (
 	`id` text PRIMARY KEY,
 	`session_id` text NOT NULL,
-	`exerciseId` text,
-	`created_at` integer NOT NULL,
-	`creation_day` text NOT NULL,
-	`rest_time` integer,
+	`exercise_id` text,
+	`start_time` integer,
+	`end_time` integer,
+	`is_rest` integer DEFAULT false NOT NULL,
+	`amount` integer DEFAULT 0 NOT NULL,
+	`target_sets` integer DEFAULT 1 NOT NULL,
+	`current_set_num` integer DEFAULT 1 NOT NULL,
 	`sequence` integer NOT NULL,
-	CONSTRAINT `fk_session_data_session_id_sessions_id_fk` FOREIGN KEY (`session_id`) REFERENCES `sessions`(`id`),
-	CONSTRAINT `fk_session_data_exerciseId_exercises_id_fk` FOREIGN KEY (`exerciseId`) REFERENCES `exercises`(`id`)
+	`is_complete` integer DEFAULT false NOT NULL,
+	CONSTRAINT `fk_session_data_session_id_sessions_id_fk` FOREIGN KEY (`session_id`) REFERENCES `sessions`(`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_session_data_exercise_id_exercises_id_fk` FOREIGN KEY (`exercise_id`) REFERENCES `exercises`(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `sessions` (
 	`id` text PRIMARY KEY,
-	`workout_id` text NOT NULL,
-	`routineId` text,
+	`template_id` text,
+	`use_template` integer DEFAULT false NOT NULL,
 	`created_at` integer NOT NULL,
-	`creation_day` text NOT NULL,
-	CONSTRAINT `fk_sessions_workout_id_workouts_id_fk` FOREIGN KEY (`workout_id`) REFERENCES `workouts`(`id`),
-	CONSTRAINT `fk_sessions_routineId_routines_id_fk` FOREIGN KEY (`routineId`) REFERENCES `routines`(`id`)
+	`is_complete` integer DEFAULT false NOT NULL,
+	`start_time` integer,
+	`end_time` integer,
+	CONSTRAINT `fk_sessions_template_id_routine_templates_id_fk` FOREIGN KEY (`template_id`) REFERENCES `routine_templates`(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `standalone_exercises` (
@@ -117,14 +136,12 @@ CREATE TABLE `standalone_exercises` (
 	`workout_id` text NOT NULL,
 	`exercise_id` text NOT NULL,
 	`created_at` integer NOT NULL,
-	`creation_day` text NOT NULL,
 	`repetition` integer NOT NULL,
-	CONSTRAINT `fk_standalone_exercises_workout_id_workouts_id_fk` FOREIGN KEY (`workout_id`) REFERENCES `workouts`(`id`),
+	CONSTRAINT `fk_standalone_exercises_workout_id_workout_day_id_fk` FOREIGN KEY (`workout_id`) REFERENCES `workout_day`(`id`),
 	CONSTRAINT `fk_standalone_exercises_exercise_id_exercises_id_fk` FOREIGN KEY (`exercise_id`) REFERENCES `exercises`(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `workouts` (
+CREATE TABLE `workout_day` (
 	`id` text PRIMARY KEY,
-	`created_at` integer NOT NULL,
-	`creation_day` text NOT NULL
+	`created_at` integer NOT NULL
 );
