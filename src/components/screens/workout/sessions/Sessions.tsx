@@ -23,7 +23,6 @@ export default function Sessions() {
 
     return (
         <View>
-            <Text style={{ fontSize: 24, fontWeight: 500 }}>Sessions</Text>
             <View style={{ display: "flex", flexDirection: "row", gap: 5 }}>
                 <TouchableOpacity
                     onPress={() => {

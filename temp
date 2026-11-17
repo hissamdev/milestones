@@ -1,31 +1,3 @@
-Conceptualize
+Screen decision
 
-- Create session
-    - Reset sequence
-    -
-
-Creating session takes the user to the focus screen, then shows the pick exercise tray
-
-After clicking create, it gives a modal to pick an exercise (before initializing creation)
-
-Concurrency
-Sessions
-
-- Select exercise, click submit
-- Create a session, insert the exercise as the first session data
-- Navigate to focus screen
-- Check whether the activity at the current sequence is rest
-- Subsequently, create the next session data and then move the sequence
-
-Grouped sets
-
-- Session data contains currentSetPosition
-- Template exercise contains targetSets
-- During preparation, create extra session data to make up for the set repetitions.
-- Add rest during prep or after mark complete.
-    - Adding during prep is more complex
-
-Completion behavior
-
-- If template and last item, mark exercise and session complete
-- If session and end, do the same
+Separate tabs for workouts and milestones

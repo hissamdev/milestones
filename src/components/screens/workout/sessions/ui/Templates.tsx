@@ -2,6 +2,7 @@ import { db } from "@/db/client";
 import { useTemplateStore } from "@/stores/template-store";
 import { NestedTemplate } from "@/types/template-types";
 import { useRouter } from "expo-router";
+import { Play, Plus } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
@@ -15,6 +16,7 @@ export default function Templates() {
     );
 
     const [templates, setTemplates] = useState<NestedTemplate[]>([]);
+    const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
 
     const router = useRouter();
 
@@ -40,31 +42,111 @@ export default function Templates() {
 
     return (
         <View>
-            <Text>Templates</Text>
-            <TouchableOpacity
-                onPress={() => actions.createTemplate("New template")}
+            <View
+                style={{
+                    marginTop: 20,
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                }}
             >
-                <Text>Create Template</Text>
-            </TouchableOpacity>
+                <View>
+                    <Text>Predefined set of exercises</Text>
+                </View>
+                <TouchableOpacity
+                    onPress={() => actions.createTemplate("New template")}
+                    style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                    }}
+                >
+                    <Text>
+                        <Plus size={18} />
+                    </Text>
+                    <Text>New</Text>
+                </TouchableOpacity>
+            </View>
             <View style={{ marginTop: 30 }}>
-                {templates.map((t) => (
-                    <TouchableOpacity
-                        key={t.id}
-                        onPress={() => {
-                            actions.loadSingleTemplate(t);
-                            router.push({
-                                pathname: "/sessions/template-edit-screen",
-                                params: {
-                                    templateId: t.id,
-                                },
-                            });
-                        }}
-                    >
-                        <Text>
-                            {t.title} {t.id}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
+                <Text>Select a template</Text>
+                <View
+                    style={{
+                        marginTop: 10,
+                        display: "flex",
+                        gap: 10,
+                        borderRadius: 5,
+                    }}
+                >
+                    {templates.map((t) => (
+                        <View
+                            key={t.id}
+                            // onPress={() => {
+                            //     actions.loadSingleTemplate(t);
+                            //     router.push({
+                            //         pathname: "/sessions/template-edit-screen",
+                            //         params: {
+                            //             templateId: t.id,
+                            //         },
+                            //     });
+                            // }}
+                            style={{
+                                backgroundColor: "white",
+                                padding: 15,
+                            }}
+                        >
+                            <View
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <View>
+                                    <Text style={{ fontSize: 18 }}>
+                                        {t.title}
+                                    </Text>
+                                    <Text>
+                                        {t.templateExercises.length} activities
+                                    </Text>
+                                </View>
+                                <TouchableOpacity>
+                                    <Text>Edit</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    gap: 6,
+                                }}
+                            >
+                                {t.templateExercises.map((te) => (
+                                    <Text key={te.sequence}>
+                                        {te.exercise!.displayName}
+                                    </Text>
+                                ))}
+                            </View>
+                            <TouchableOpacity
+                                style={{
+                                    marginTop: 10,
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    gap: 10,
+                                    height: 40,
+                                    backgroundColor: "#E8ECE2",
+                                }}
+                            >
+                                <Text>
+                                    <Play size={18} />
+                                </Text>
+                                <Text>Start Session</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </View>
             </View>
         </View>
     );
