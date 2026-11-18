@@ -1,8 +1,8 @@
 import { useSessionStore } from "@/stores/session-store";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
-import { Plus, SportShoe } from "lucide-react-native";
+import { formatSeconds } from "@/utils/workouts/session-helpers";
 import { useEffect } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
 export default function Sessions() {
@@ -23,49 +23,11 @@ export default function Sessions() {
 
     return (
         <View>
-            <View style={{ display: "flex", flexDirection: "row", gap: 5 }}>
-                <TouchableOpacity
-                    onPress={() => {
-                        openModal("exercises", "session-create");
-                    }}
-                    style={{
-                        flex: 1,
-                        marginTop: 10,
-                        backgroundColor: "gray",
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingVertical: 10,
-                        borderRadius: 5,
-                    }}
-                >
-                    <Text>
-                        <Plus size={18} />
-                    </Text>
-                    <Text>Session</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={{
-                        paddingHorizontal: 20,
-                        marginTop: 10,
-                        backgroundColor: "gray",
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingVertical: 10,
-                        borderRadius: 5,
-                    }}
-                >
-                    <Text>
-                        <SportShoe size={18} />
-                    </Text>
-                </TouchableOpacity>
-            </View>
-            <Text style={{ marginTop: 20 }}>Completed sessions</Text>
+            <Text style={{ marginTop: 20, fontSize: 20, fontWeight: 500 }}>
+                Today's sessions
+            </Text>
             <View style={{ marginTop: 15, display: "flex", gap: 10 }}>
-                {allSessionsState.map((session) => {
+                {allSessionsState.map((session, sessionIdx) => {
                     const filterExercises = session.sessionData?.filter(
                         (sd) => !sd.isRest,
                     );
@@ -77,8 +39,10 @@ export default function Sessions() {
                         <View
                             key={session.id}
                             style={{
-                                borderLeftWidth: 1,
-                                paddingHorizontal: 10,
+                                paddingHorizontal: 15,
+                                paddingVertical: 15,
+                                backgroundColor: "white",
+                                borderRadius: 10,
                             }}
                         >
                             <View
@@ -86,90 +50,138 @@ export default function Sessions() {
                                     display: "flex",
                                     flexDirection: "row",
                                     justifyContent: "space-between",
-                                    alignItems: "flex-start",
-                                    paddingBottom: 5,
-                                    borderBottomWidth: 1,
                                 }}
                             >
                                 <View>
-                                    <Text>
-                                        {session.createdAt.toLocaleTimeString(
-                                            "en-US",
-                                            {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            },
-                                        )}
-                                    </Text>
-                                    <View
+                                    <Text
                                         style={{
-                                            marginTop: 10,
-                                            display: "flex",
-                                            flexDirection: "row",
-                                            gap: 10,
+                                            fontSize: 17,
+                                            fontWeight: 500,
                                         }}
                                     >
-                                        <Text>
+                                        Session #
+                                        {allSessionsState.length - sessionIdx}
+                                    </Text>
+                                    <View style={{ marginTop: 2 }}>
+                                        <Text
+                                            style={{
+                                                fontSize: 11,
+                                                color: "#71796F",
+                                            }}
+                                        >
                                             {filterExercises?.length} Exercises
+                                            · {numUnique.length} Unique
+                                            {session.useTemplate &&
+                                                " · Template"}
                                         </Text>
-                                        <Text>{numUnique.length} Unique</Text>
                                     </View>
                                 </View>
-                                <TouchableOpacity
+                                <Text>Right</Text>
+                            </View>
+                            <View
+                                style={{
+                                    marginTop: 10,
+                                    width: "100%",
+                                    height: 1.5,
+                                    backgroundColor: "#E9ECE4",
+                                }}
+                            />
+                            <View style={{ marginTop: 10 }}>
+                                <View
                                     style={{
-                                        paddingHorizontal: 15,
-                                        paddingVertical: 5,
-                                        backgroundColor: "gray",
-                                        borderRadius: 100,
+                                        display: "flex",
+                                        flexDirection: "row",
                                     }}
                                 >
-                                    <Text>Open</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{ marginTop: 10 }}>
-                                {session.sessionData?.map(
-                                    (sd) =>
-                                        !sd.isRest && (
-                                            <View
-                                                key={sd.id}
-                                                style={{
-                                                    display: "flex",
-                                                    flexDirection: "row",
-                                                    alignItems: "center",
-                                                    justifyContent:
-                                                        "space-between",
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        display: "flex",
-                                                        flexDirection: "row",
-                                                        alignItems: "center",
-                                                        gap: 8,
-                                                    }}
-                                                >
-                                                    <View
-                                                        style={{
-                                                            width: 8,
-                                                            aspectRatio: 1 / 1,
-                                                            backgroundColor:
-                                                                "green",
-                                                            borderRadius: 100,
-                                                        }}
-                                                    />
-                                                    <Text>
-                                                        {
-                                                            sd.exercise
-                                                                ?.displayName
-                                                        }
-                                                    </Text>
-                                                </View>
-                                                <View>
-                                                    <Text>{sd.amount}</Text>
-                                                </View>
-                                            </View>
-                                        ),
-                                )}
+                                    <Text
+                                        style={{
+                                            textTransform: "uppercase",
+                                            fontWeight: 500,
+                                            color: "#71796F",
+                                            fontSize: 9,
+                                            width: "60%",
+                                        }}
+                                    >
+                                        Exercises
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            textTransform: "uppercase",
+                                            fontWeight: 500,
+                                            color: "#71796F",
+                                            fontSize: 9,
+                                            width: "20%",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        Amount
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            textTransform: "uppercase",
+                                            fontWeight: 500,
+                                            color: "#71796F",
+                                            fontSize: 9,
+                                            width: "20%",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        Duration
+                                    </Text>
+                                </View>
+                                {filterExercises?.map((e, idx) => (
+                                    <View
+                                        key={e.sequence}
+                                        style={{
+                                            borderTopWidth: idx === 0 ? 0 : 1,
+                                            borderTopColor: "#E9ECE4",
+                                            height: 35,
+                                            display: "flex",
+                                            flexDirection: "row",
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                                marginVertical: "auto",
+                                                fontSize: 13,
+                                                fontWeight: 500,
+                                                width: "60%",
+                                            }}
+                                        >
+                                            {e.exercise?.displayName}
+                                        </Text>
+                                        <Text
+                                            style={{
+                                                marginVertical: "auto",
+                                                fontSize: 13,
+                                                fontWeight: 500,
+
+                                                width: "20%",
+                                                textAlign: "center",
+                                            }}
+                                        >
+                                            {e.amount}
+                                        </Text>
+                                        <Text
+                                            style={{
+                                                marginVertical: "auto",
+                                                fontSize: 13,
+                                                fontWeight: 500,
+
+                                                width: "20%",
+                                                textAlign: "center",
+                                            }}
+                                        >
+                                            {formatSeconds(
+                                                Math.round(
+                                                    (e.endTime!.getTime() -
+                                                        e.startTime!.getTime()) /
+                                                        1000,
+                                                ),
+                                            )}
+                                        </Text>
+                                    </View>
+                                ))}
                             </View>
                         </View>
                     );

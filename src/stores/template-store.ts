@@ -72,27 +72,32 @@ export const useTemplateStore = create<TemplateState>()((set, get) => ({
             });
         },
         fetchSingleTemplate: async (templateId) => {
-            const res = await db.query.routineTemplates.findFirst({
-                where: {
-                    id: templateId,
-                },
-                with: {
-                    templateExercises: {
-                        orderBy: {
-                            sequence: "asc",
-                        },
-                        with: {
-                            exercise: true,
+            try {
+                const res = await db.query.routineTemplates.findFirst({
+                    where: {
+                        id: templateId,
+                    },
+                    with: {
+                        templateExercises: {
+                            orderBy: {
+                                sequence: "asc",
+                            },
+                            with: {
+                                exercise: true,
+                            },
                         },
                     },
-                },
-            });
+                });
 
-            set({
-                template: {
-                    ...res!,
-                },
-            });
+                set({
+                    template: {
+                        ...res!,
+                    },
+                });
+            } catch (err) {
+                console.error("Failed to fetch template", err);
+                throw err;
+            }
         },
         insertExercise: (templateId, exercise) => {
             // const checkExists = get().template!.templateExercises.find(

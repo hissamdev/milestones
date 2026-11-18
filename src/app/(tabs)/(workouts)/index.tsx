@@ -1,5 +1,7 @@
 import Sessions from "@/components/screens/workout/sessions/Sessions";
 import Templates from "@/components/screens/workout/sessions/ui/Templates";
+import Popup from "@/components/ui/Popup";
+import ExercisePicker from "@/components/ui/popups/ExercisePicker";
 import { exercises } from "@/db/schema/workouts";
 import { useWorkoutsGlobalState } from "@/stores/workouts-global-store";
 import { Plus, SportShoe } from "lucide-react-native";
@@ -12,15 +14,21 @@ import { useShallow } from "zustand/react/shallow";
 type Exercise = typeof exercises.$inferSelect;
 
 export default function Workouts() {
-    const { activeModal, closeModal, allExercisesState, loadExercises } =
-        useWorkoutsGlobalState(
-            useShallow((state) => ({
-                allExercisesState: state.allExercisesState,
-                loadExercises: state.loadExercises,
-                activeModal: state.activeModal,
-                closeModal: state.closeModal,
-            })),
-        );
+    const {
+        activeModal,
+        closeModal,
+        allExercisesState,
+        openModal,
+        loadExercises,
+    } = useWorkoutsGlobalState(
+        useShallow((state) => ({
+            allExercisesState: state.allExercisesState,
+            loadExercises: state.loadExercises,
+            activeModal: state.activeModal,
+            openModal: state.openModal,
+            closeModal: state.closeModal,
+        })),
+    );
     const [view, setView] = useState<"sessions" | "templates" | "routines">(
         "sessions",
     );
@@ -41,7 +49,7 @@ export default function Workouts() {
                     padding: 10,
                 }}
             >
-                <ScrollView contentContainerStyle={{ flex: 1 }}>
+                <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                     <Text style={{ fontSize: 22, fontWeight: 500 }}>
                         {view === "sessions" ? "Sessions" : "Templates"}
                     </Text>
@@ -108,57 +116,70 @@ export default function Workouts() {
                     {view === "sessions" && <Sessions />}
                     {view === "templates" && <Templates />}
                 </ScrollView>
-                <View
-                    style={{
-                        position: "absolute",
-                        left: 0,
-                        right: 0,
-                        bottom: 50,
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        gap: 10,
-                    }}
-                >
-                    <TouchableOpacity
+                {view === "sessions" && (
+                    <View
                         style={{
-                            position: "relative",
-                            height: 50,
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            bottom: 50,
                             display: "flex",
                             flexDirection: "row",
-                            alignItems: "center",
                             justifyContent: "center",
-                            paddingHorizontal: 20,
-                            paddingVertical: 5,
-                            borderRadius: 100,
-                            backgroundColor: "blue",
-                            gap: 5,
+                            gap: 10,
                         }}
                     >
-                        <Text>
-                            <Plus color="white" size={17} />
-                        </Text>
-                        <Text style={{ color: "white" }}>Start Session</Text>
                         <TouchableOpacity
+                            onPress={() =>
+                                openModal("exercises", "session-create")
+                            }
                             style={{
-                                position: "absolute",
+                                position: "relative",
+                                height: 50,
                                 display: "flex",
+                                flexDirection: "row",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                aspectRatio: 1 / 1,
-                                backgroundColor: "blue",
+                                paddingHorizontal: 20,
+                                paddingVertical: 5,
                                 borderRadius: 100,
-                                right: -60,
-                                top: 4,
-                                bottom: 4,
+                                backgroundColor: "blue",
+                                gap: 5,
                             }}
                         >
                             <Text>
-                                <SportShoe color="white" size={16} />
+                                <Plus color="white" size={17} />
                             </Text>
+                            <Text style={{ color: "white" }}>
+                                Start Session
+                            </Text>
+                            <TouchableOpacity
+                                style={{
+                                    position: "absolute",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    aspectRatio: 1 / 1,
+                                    backgroundColor: "blue",
+                                    borderRadius: 100,
+                                    right: -60,
+                                    top: 4,
+                                    bottom: 4,
+                                }}
+                            >
+                                <Text>
+                                    <SportShoe color="white" size={16} />
+                                </Text>
+                            </TouchableOpacity>
                         </TouchableOpacity>
-                    </TouchableOpacity>
-                </View>
+                    </View>
+                )}
+                <Popup
+                    onClose={closeModal}
+                    visible={activeModal.modal === "exercises"}
+                >
+                    <ExercisePicker />
+                </Popup>
             </SafeAreaView>
         </>
     );

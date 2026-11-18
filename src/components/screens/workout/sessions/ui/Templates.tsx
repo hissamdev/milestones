@@ -1,4 +1,5 @@
 import { db } from "@/db/client";
+import { useSessionStore } from "@/stores/session-store";
 import { useTemplateStore } from "@/stores/template-store";
 import { NestedTemplate } from "@/types/template-types";
 import { useRouter } from "expo-router";
@@ -8,6 +9,9 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
 export default function Templates() {
+    const { createSession } = useSessionStore(
+        useShallow((state) => ({ createSession: state.createSession })),
+    );
     const { templateState, actions } = useTemplateStore(
         useShallow((state) => ({
             templateState: state.template,
@@ -55,7 +59,15 @@ export default function Templates() {
                     <Text>Predefined set of exercises</Text>
                 </View>
                 <TouchableOpacity
-                    onPress={() => actions.createTemplate("New template")}
+                    onPress={() => {
+                        actions.createTemplate("New template");
+                        router.push({
+                            pathname: "/sessions/template-edit-screen",
+                            params: {
+                                templateId: templateState!.id,
+                            },
+                        });
+                    }}
                     style={{
                         display: "flex",
                         flexDirection: "row",
@@ -110,7 +122,18 @@ export default function Templates() {
                                         {t.templateExercises.length} activities
                                     </Text>
                                 </View>
-                                <TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        actions.loadSingleTemplate(t);
+                                        router.push({
+                                            pathname:
+                                                "/sessions/template-edit-screen",
+                                            params: {
+                                                templateId: t.id,
+                                            },
+                                        });
+                                    }}
+                                >
                                     <Text>Edit</Text>
                                 </TouchableOpacity>
                             </View>
@@ -128,6 +151,17 @@ export default function Templates() {
                                 ))}
                             </View>
                             <TouchableOpacity
+                                onPress={() => {
+                                    actions.loadSingleTemplate(t);
+                                    createSession({
+                                        mode: "template",
+                                        templateId: t.id,
+                                    });
+                                    router.push({
+                                        pathname:
+                                            "/sessions/session-focus-screen",
+                                    });
+                                }}
                                 style={{
                                     marginTop: 10,
                                     display: "flex",
