@@ -87,7 +87,7 @@ export default function EditExercises() {
                                 <Text>
                                     {te.exercise?.displayName} {te.sequence}
                                 </Text>
-                                <Text>{te.exercise?.desc}</Text>
+                                {/* <Text>{te.exercise?.desc}</Text> */}
                             </View>
                         </View>
                         <TouchableOpacity

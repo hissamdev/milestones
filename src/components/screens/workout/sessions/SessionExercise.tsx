@@ -21,11 +21,12 @@ import DurationControls from "./ui/DurationControls";
 import RepsControls from "./ui/RepsControls";
 
 export default function SessionExercise() {
-    const { singleSession, findActivity, sessionComplete } = useSessionStore(
+    const { singleSession, pushSplit } = useSessionStore(
         useShallow((state) => ({
             singleSession: state.singleSession,
             findActivity: state.findActivity,
             sessionComplete: state.setSessionEnd,
+            pushSplit: state.pushSecondSplit,
         })),
     );
 
@@ -34,60 +35,47 @@ export default function SessionExercise() {
     );
 
     const [durStoppedSafely, setDurStoppedSafely] = useState(false);
+    const [sideChosen, setSideChosen] = useState(false);
 
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const router = useRouter();
 
-    useEffect(() => {
-        console.log(
-            JSON.stringify(singleSession.nestedSession!.sessionData!, null, 2),
-        );
-    }, []);
-
-    const handleComplete = () => {
-        clearInterval(timerRef.current);
-        const current = singleSession.nestedSession!.sessionData!.find(
-            (sd) => sd.sequence === singleSession.currentSequence,
-        )!;
-
-        if (!singleSession.nestedSession!.useTemplate) {
-            // Regular session
-            handleExerciseComplete();
-            handleForward();
-            return;
-        }
-        // Template
-        if (
-            current.sequence >= singleSession.nestedSession!.sessionData!.length
-        ) {
-            handleExerciseComplete();
-            handleSessionComplete();
-            return;
-        }
-        handleExerciseComplete();
-        handleForward();
-    };
+    useEffect(() => {}, []);
 
     const handleForward = () => {
         if (!singleSession.nestedSession!.useTemplate) {
+            // Session
             singleSession.updateSession.insertRest("insert");
+            return;
+        }
+        if (
+            singleSession.currentSequence >=
+            singleSession.nestedSession!.sessionData!.length
+        ) {
+            console.log("Running session complete");
+            handleSessionComplete();
             return;
         }
         singleSession.updateSession.insertRest("push");
     };
 
     const handleExerciseComplete = () => {
+        clearInterval(timerRef.current);
         const current = singleSession.nestedSession!.sessionData!.find(
             (sd) => sd.sequence === singleSession.currentSequence,
         )!;
+        const prevSeq = singleSession.nestedSession!.sessionData!.find(
+            (sd) => sd.sequence === singleSession.currentSequence - 1,
+        )!;
+
         const safeEnd = durStoppedSafely ? current.endTime! : new Date();
         const recalculateAmount = Math.round(
             (safeEnd.getTime() - current.startTime!.getTime()) / 1000,
         );
         const updated = {
             ...current,
-            endTime: safeEnd,
+            endTime: current.exercise!.type === "reps" ? new Date() : safeEnd,
             amount:
                 current.exercise!.type === "reps"
                     ? current.amount
@@ -96,26 +84,73 @@ export default function SessionExercise() {
         };
 
         singleSession.complexSetters.sessionData({
-            endTime: safeEnd,
-            amount:
-                current.exercise!.type === "reps"
-                    ? current.amount
-                    : recalculateAmount,
-
+            endTime: updated.endTime,
+            amount: updated.amount,
             isComplete: true,
+            splitSide: updated.splitSide,
         });
         markSessionActivityComplete(updated).catch(() => {
             console.error("Completion failed");
             return;
         });
+
+        if (current.exercise!.isSplit) {
+            if (!prevSeq.isRest && prevSeq.exercise?.isSplit) {
+                // Current activity is the second split
+                handleForward();
+                return;
+            }
+            pushSplit(updated);
+            singleSession.updateSequence.increment();
+            return;
+        }
+        handleForward();
+    };
+
+    const handleSplitSelect = (pick: "left" | "right") => {
+        singleSession.complexSetters.sessionData({
+            splitSide: pick,
+        });
     };
 
     const handleSessionComplete = () => {
-        handleExerciseComplete();
         markSessionComplete();
         router.push({
             pathname: "/",
         });
+    };
+
+    const disableNextButton = () => {
+        const current = singleSession.nestedSession!.sessionData!.find(
+            (sd) => sd.sequence === singleSession.currentSequence,
+        )!;
+        console.log("Current", current.splitSide);
+        if (!current.startTime)
+            return {
+                isDisabled: true,
+                showText: "Waiting...",
+            };
+        if (current.exercise!.isSplit) {
+            if (!current.splitSide) {
+                return {
+                    isDisabled: true,
+                    showText: "Choose a side",
+                };
+            }
+            return {
+                isDisabled: false,
+                showText: `${current.splitSide} done`,
+            };
+        }
+        return {
+            isDisabled: false,
+            showText: singleSession.nestedSession!.useTemplate
+                ? current.sequence ===
+                  singleSession!.nestedSession!.sessionData!.length
+                    ? "Done"
+                    : "Next"
+                : "Rest",
+        };
     };
 
     return (
@@ -401,6 +436,51 @@ export default function SessionExercise() {
                     </View>
                 </View>
                 <View style={{ marginTop: "auto" }}>
+                    {singleSession.nestedSession!.sessionData!.find(
+                        (sd) => sd.sequence === singleSession.currentSequence,
+                    )!.exercise!.isSplit && (
+                        <View
+                            style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                gap: 10,
+                                height: 40,
+                            }}
+                        >
+                            <TouchableOpacity
+                                onPress={() => handleSplitSelect("left")}
+                                style={{
+                                    flex: 1,
+                                    backgroundColor:
+                                        singleSession.nestedSession!.sessionData!.find(
+                                            (sd) =>
+                                                sd.sequence ===
+                                                singleSession.currentSequence,
+                                        )!.splitSide === "left"
+                                            ? "blue"
+                                            : "transparent",
+                                }}
+                            >
+                                <Text>Left</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => handleSplitSelect("right")}
+                                style={{
+                                    flex: 1,
+                                    backgroundColor:
+                                        singleSession.nestedSession!.sessionData!.find(
+                                            (sd) =>
+                                                sd.sequence ===
+                                                singleSession.currentSequence,
+                                        )!.splitSide === "right"
+                                            ? "blue"
+                                            : "transparent",
+                                }}
+                            >
+                                <Text>Right</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
                     <View
                         style={{
                             display: "flex",
@@ -437,15 +517,9 @@ export default function SessionExercise() {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            disabled={
-                                !singleSession.nestedSession!.sessionData?.find(
-                                    (sd) =>
-                                        sd.sequence ===
-                                        singleSession.currentSequence,
-                                )!.startTime
-                            }
+                            disabled={disableNextButton().isDisabled}
                             onPress={() => {
-                                handleComplete();
+                                handleExerciseComplete();
                             }}
                             style={[
                                 styles.stepButtons,
@@ -465,15 +539,7 @@ export default function SessionExercise() {
                             <Text
                                 style={[styles.buttonText, { color: "white" }]}
                             >
-                                {singleSession.nestedSession!.useTemplate
-                                    ? singleSession.nestedSession!.sessionData!.find(
-                                          (sd) => sd.sequence,
-                                      )!.sequence ===
-                                      singleSession.nestedSession!.sessionData!
-                                          .length
-                                        ? "Complete"
-                                        : "Next"
-                                    : "Rest"}
+                                {disableNextButton().showText}
                             </Text>
                         </TouchableOpacity>
                     </View>

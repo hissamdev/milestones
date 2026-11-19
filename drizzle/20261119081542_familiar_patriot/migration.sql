@@ -1,0 +1,1 @@
+ALTER TABLE `exercises` ADD `is_split` integer DEFAULT false NOT NULL;

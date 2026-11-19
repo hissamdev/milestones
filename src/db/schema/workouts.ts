@@ -26,6 +26,10 @@ export const exercises = s.sqliteTable("exercises", {
     name: s.text("name").notNull().unique(),
     displayName: s.text("display_name").notNull(),
     type: s.text("type").notNull(), // Duration or Reps
+    isSplit: s
+        .integer("is_split", { mode: "boolean" })
+        .notNull()
+        .default(false),
     icon: s.text("icon"),
     desc: s.text("desc"),
 });
@@ -78,6 +82,7 @@ export const sessionData = s.sqliteTable("session_data", {
     startTime: s.integer("start_time", { mode: "timestamp" }),
     endTime: s.integer("end_time", { mode: "timestamp" }),
     isRest: s.integer("is_rest", { mode: "boolean" }).notNull().default(false),
+    splitSide: s.text("split_side"),
     // Exercise
     amount: s.integer("amount").notNull().default(0),
     targetSets: s.integer("target_sets").notNull().default(1),

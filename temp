@@ -1,3 +1,17 @@
 Screen decision
 
 Separate tabs for workouts and milestones
+
+
+Completion handlers
+complete exercise
+- If duration, use available end time (safely), and recalculated amount
+- If reps use new end time and don't update amount
+- If split, do the above, and set splitSide, then push next split, and move sequence
+
+if session
+- Complete exercise, move seq
+if session and split
+- Complete one split, move seq
+if template
+-

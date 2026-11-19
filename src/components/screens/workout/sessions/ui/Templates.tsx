@@ -64,7 +64,7 @@ export default function Templates() {
                         router.push({
                             pathname: "/sessions/template-edit-screen",
                             params: {
-                                templateId: templateState!.id,
+                                templateId: templateState?.id,
                             },
                         });
                     }}
@@ -93,15 +93,6 @@ export default function Templates() {
                     {templates.map((t) => (
                         <View
                             key={t.id}
-                            // onPress={() => {
-                            //     actions.loadSingleTemplate(t);
-                            //     router.push({
-                            //         pathname: "/sessions/template-edit-screen",
-                            //         params: {
-                            //             templateId: t.id,
-                            //         },
-                            //     });
-                            // }}
                             style={{
                                 backgroundColor: "white",
                                 padding: 15,

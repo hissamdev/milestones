@@ -55,6 +55,9 @@ interface SessionState {
     loadOngoingSession: (sessionId: string) => void;
     createSession: (p: CreateSession) => void;
     setSessionEnd: () => void;
+    pushSecondSplit: (
+        currentActivity: NonNullable<NestedSession["sessionData"]>[0],
+    ) => void;
     allSessionsState: NestedSession[];
     loadSessions: () => void;
 }
@@ -110,6 +113,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     amount: 0,
                     targetSets: 1,
                     currentSetNum: 1,
+                    splitSide: null,
                     startTime: null,
                     endTime: null,
                     sequence: get().singleSession.currentSequence + 1,
@@ -128,6 +132,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     amount: 0,
                     targetSets: 1,
                     currentSetNum: 1,
+                    splitSide: null,
                     startTime: null,
                     endTime: null,
                     sequence: get().singleSession.currentSequence + 1,
@@ -339,6 +344,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 amount: 0,
                 targetSets: 1,
                 currentSetNum: 1,
+                splitSide: null,
                 startTime: null,
                 endTime: null,
                 sequence: get().singleSession.currentSequence,
@@ -395,6 +401,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     autoSets: true,
                     targetSets: te.targetSets,
                     currentSetNum: 1,
+                    splitSide: null,
                     startTime: null,
                     endTime: null,
                     isComplete: false,
@@ -419,6 +426,32 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 nestedSession: {
                     ...session,
                     sessionData: [...preparedSets],
+                },
+            },
+        }));
+    },
+    pushSecondSplit: (currentActivity) => {
+        const newData = {
+            ...currentActivity,
+            isComplete: false,
+            splitSide: currentActivity.splitSide === "right" ? "left" : "right",
+        };
+
+        set((prev) => ({
+            singleSession: {
+                ...prev.singleSession,
+                nestedSession: {
+                    ...prev.singleSession.nestedSession!,
+                    sessionData: prev.singleSession
+                        .nestedSession!.sessionData!.toSpliced(
+                            get().singleSession.currentSequence,
+                            0,
+                            newData,
+                        )
+                        .map((sd, idx) => ({
+                            ...sd,
+                            sequence: idx + 1,
+                        })),
                 },
             },
         }));

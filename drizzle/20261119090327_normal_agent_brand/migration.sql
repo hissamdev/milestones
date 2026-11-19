@@ -1,0 +1,1 @@
+ALTER TABLE `session_data` ADD `split_side` text;
