@@ -1,0 +1,1 @@
+ALTER TABLE `session_data` ADD `display_name` text;

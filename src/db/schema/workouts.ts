@@ -88,6 +88,7 @@ export const sessionData = s.sqliteTable("session_data", {
         .notNull()
         .default(false),
     // Exercise
+    displayName: s.text("display_name"),
     amount: s.integer("amount").notNull().default(0),
     targetSets: s.integer("target_sets").notNull().default(1),
     currentSetNum: s.integer("current_set_num").notNull().default(1),

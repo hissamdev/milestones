@@ -64,9 +64,6 @@ export default function SessionExercise() {
         const current = singleSession.nestedSession!.sessionData!.find(
             (sd) => sd.sequence === singleSession.currentSequence,
         )!;
-        const prevSeq = singleSession.nestedSession!.sessionData!.find(
-            (sd) => sd.sequence === singleSession.currentSequence - 1,
-        )!;
 
         const safeEnd = durStoppedSafely ? current.endTime! : new Date();
         const recalculateAmount = Math.round(
@@ -74,6 +71,9 @@ export default function SessionExercise() {
         );
         const updated = {
             ...current,
+            displayName: current.exercise!.isSplit
+                ? `${current.exercise!.displayName} (${current.splitSide?.charAt(0).toUpperCase()! + current.splitSide?.slice(1)}) `
+                : current.displayName,
             endTime: current.exercise!.type === "reps" ? new Date() : safeEnd,
             amount:
                 current.exercise!.type === "reps"
@@ -84,6 +84,7 @@ export default function SessionExercise() {
 
         singleSession.complexSetters.sessionData({
             endTime: updated.endTime,
+            displayName: updated.displayName,
             amount: updated.amount,
             isComplete: true,
             splitSide: updated.splitSide,
@@ -92,18 +93,6 @@ export default function SessionExercise() {
             console.error("Completion failed");
             return;
         });
-
-        // if (current.exercise!.isSplit) {
-        //     if (current.isSecondSplit) {
-        //         handleForward();
-        //         return;
-        //     }
-        //     pushSplit(updated);
-        //     singleSession.updateSequence.increment();
-        //     return;
-        // }
-        // handleForward();
-
         return updated;
     };
 
@@ -394,7 +383,9 @@ export default function SessionExercise() {
                                     >
                                         <View style={{ flex: 1 }}>
                                             <Text>
-                                                {sd.exercise?.displayName}
+                                                {sd.displayName
+                                                    ? sd.displayName
+                                                    : sd.exercise?.displayName}
                                             </Text>
                                         </View>
                                         <View

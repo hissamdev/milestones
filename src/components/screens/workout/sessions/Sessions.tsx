@@ -19,10 +19,6 @@ export default function Sessions() {
 
     useEffect(() => {
         loadSessions();
-        console.log(
-            "Loaded sessions, last",
-            JSON.stringify(allSessionsState?.[0]?.sessionData, null, 2),
-        );
     }, []);
 
     return (

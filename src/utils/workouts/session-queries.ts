@@ -8,8 +8,6 @@ import { eq } from "drizzle-orm";
 export async function markSessionActivityComplete(
     e: SessionData & { exercise: Exercise | null },
 ) {
-    console.log("Persisting activity", e);
-
     try {
         console.log("Saving");
         await db

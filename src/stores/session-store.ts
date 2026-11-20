@@ -113,6 +113,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     amount: 0,
                     targetSets: 1,
                     currentSetNum: 1,
+                    displayName: null,
                     isSecondSplit: false,
                     splitSide: null,
                     startTime: null,
@@ -133,6 +134,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     amount: 0,
                     targetSets: 1,
                     currentSetNum: 1,
+                    displayName: null,
                     isSecondSplit: false,
                     splitSide: null,
                     startTime: null,
@@ -346,6 +348,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 amount: 0,
                 targetSets: 1,
                 currentSetNum: 1,
+                displayName: null,
                 isSecondSplit: false,
                 splitSide: null,
                 startTime: null,
@@ -404,6 +407,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     autoSets: true,
                     targetSets: te.targetSets,
                     currentSetNum: 1,
+                    displayName: null,
                     isSecondSplit: false,
                     splitSide: null,
                     startTime: null,
@@ -421,6 +425,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
             )
             .map((ps, idx) => ({
                 ...ps,
+                id: randomUUID(),
                 sequence: idx + 1,
             }));
 
