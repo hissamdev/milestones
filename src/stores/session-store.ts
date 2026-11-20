@@ -53,7 +53,7 @@ interface SessionState {
         next: () => NonNullable<NestedSession["sessionData"]>[0] | undefined;
     };
     loadOngoingSession: (sessionId: string) => void;
-    createSession: (p: CreateSession) => void;
+    createSession: (p: CreateSession) => Promise<void>;
     setSessionEnd: () => void;
     pushSecondSplit: (
         currentActivity: NonNullable<NestedSession["sessionData"]>[0],
@@ -113,6 +113,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     amount: 0,
                     targetSets: 1,
                     currentSetNum: 1,
+                    isSecondSplit: false,
                     splitSide: null,
                     startTime: null,
                     endTime: null,
@@ -132,6 +133,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     amount: 0,
                     targetSets: 1,
                     currentSetNum: 1,
+                    isSecondSplit: false,
                     splitSide: null,
                     startTime: null,
                     endTime: null,
@@ -344,6 +346,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                 amount: 0,
                 targetSets: 1,
                 currentSetNum: 1,
+                isSecondSplit: false,
                 splitSide: null,
                 startTime: null,
                 endTime: null,
@@ -401,6 +404,7 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
                     autoSets: true,
                     targetSets: te.targetSets,
                     currentSetNum: 1,
+                    isSecondSplit: false,
                     splitSide: null,
                     startTime: null,
                     endTime: null,
@@ -433,8 +437,10 @@ export const useSessionStore = create<SessionState>()((set, get) => ({
     pushSecondSplit: (currentActivity) => {
         const newData = {
             ...currentActivity,
+            id: randomUUID(),
             isComplete: false,
             splitSide: currentActivity.splitSide === "right" ? "left" : "right",
+            isSecondSplit: true,
         };
 
         set((prev) => ({

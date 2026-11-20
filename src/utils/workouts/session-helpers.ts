@@ -12,6 +12,7 @@ export function formatSeconds(s: number) {
 
 export function initSessionActivity() {
     const singleSession = useSessionStore.getState().singleSession;
+
     const useStopwatch = true;
     const currentActivity = singleSession.nestedSession!.sessionData!.find(
         (sd) => sd.sequence === singleSession.currentSequence,
@@ -19,6 +20,10 @@ export function initSessionActivity() {
 
     const timestamp = new Date();
     if (!currentActivity.startTime) {
+        singleSession.complexSetters.sessionData({ startTime: timestamp });
+        return timestamp;
+    }
+    if (currentActivity.isSecondSplit) {
         singleSession.complexSetters.sessionData({ startTime: timestamp });
         return timestamp;
     }

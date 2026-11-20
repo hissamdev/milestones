@@ -53,7 +53,6 @@ export default function SessionExercise() {
             singleSession.currentSequence >=
             singleSession.nestedSession!.sessionData!.length
         ) {
-            console.log("Running session complete");
             handleSessionComplete();
             return;
         }
@@ -94,17 +93,18 @@ export default function SessionExercise() {
             return;
         });
 
-        if (current.exercise!.isSplit) {
-            if (!prevSeq.isRest && prevSeq.exercise?.isSplit) {
-                // Current activity is the second split
-                handleForward();
-                return;
-            }
-            pushSplit(updated);
-            singleSession.updateSequence.increment();
-            return;
-        }
-        handleForward();
+        // if (current.exercise!.isSplit) {
+        //     if (current.isSecondSplit) {
+        //         handleForward();
+        //         return;
+        //     }
+        //     pushSplit(updated);
+        //     singleSession.updateSequence.increment();
+        //     return;
+        // }
+        // handleForward();
+
+        return updated;
     };
 
     const handleSplitSelect = (pick: "left" | "right") => {
@@ -124,7 +124,6 @@ export default function SessionExercise() {
         const current = singleSession.nestedSession!.sessionData!.find(
             (sd) => sd.sequence === singleSession.currentSequence,
         )!;
-        console.log("Current", current.splitSide);
         if (!current.startTime)
             return {
                 isDisabled: true,
@@ -448,6 +447,13 @@ export default function SessionExercise() {
                             }}
                         >
                             <TouchableOpacity
+                                disabled={
+                                    singleSession.nestedSession!.sessionData!.find(
+                                        (sd) =>
+                                            sd.sequence ===
+                                            singleSession.currentSequence,
+                                    )!.isSecondSplit
+                                }
                                 onPress={() => handleSplitSelect("left")}
                                 style={{
                                     flex: 1,
@@ -457,13 +463,20 @@ export default function SessionExercise() {
                                                 sd.sequence ===
                                                 singleSession.currentSequence,
                                         )!.splitSide === "left"
-                                            ? "blue"
+                                            ? "#1952CC"
                                             : "transparent",
                                 }}
                             >
                                 <Text>Left</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
+                                disabled={
+                                    singleSession.nestedSession!.sessionData!.find(
+                                        (sd) =>
+                                            sd.sequence ===
+                                            singleSession.currentSequence,
+                                    )!.isSecondSplit
+                                }
                                 onPress={() => handleSplitSelect("right")}
                                 style={{
                                     flex: 1,
@@ -473,7 +486,7 @@ export default function SessionExercise() {
                                                 sd.sequence ===
                                                 singleSession.currentSequence,
                                         )!.splitSide === "right"
-                                            ? "blue"
+                                            ? "#1952CC"
                                             : "transparent",
                                 }}
                             >
@@ -519,7 +532,17 @@ export default function SessionExercise() {
                         <TouchableOpacity
                             disabled={disableNextButton().isDisabled}
                             onPress={() => {
-                                handleExerciseComplete();
+                                const current = handleExerciseComplete();
+                                if (current.exercise!.isSplit) {
+                                    if (current.isSecondSplit) {
+                                        handleForward();
+                                        return;
+                                    }
+                                    pushSplit(current);
+                                    singleSession.updateSequence.increment();
+                                    return;
+                                }
+                                handleForward();
                             }}
                             style={[
                                 styles.stepButtons,
@@ -542,6 +565,53 @@ export default function SessionExercise() {
                                 {disableNextButton().showText}
                             </Text>
                         </TouchableOpacity>
+                        {singleSession.nestedSession!.sessionData!.find(
+                            (sd) =>
+                                sd.sequence === singleSession.currentSequence,
+                        )!.exercise!.isSplit && (
+                            <TouchableOpacity
+                                disabled={disableNextButton().isDisabled}
+                                onPress={() => {
+                                    const current =
+                                        singleSession.nestedSession!.sessionData!.find(
+                                            (sd) =>
+                                                sd.sequence ===
+                                                singleSession.currentSequence,
+                                        )!;
+                                    if (current.isSecondSplit) {
+                                        handleExerciseComplete();
+                                        handleForward();
+                                        return;
+                                    }
+                                    handleExerciseComplete();
+                                    pushSplit(current);
+                                    handleForward();
+                                }}
+                                style={[
+                                    styles.stepButtons,
+                                    {
+                                        backgroundColor: "#1952CC",
+                                        flex: 1,
+                                    },
+                                ]}
+                            >
+                                <Text>
+                                    <CircleCheck
+                                        color="#1952CC"
+                                        fill="white"
+                                        size={17}
+                                    />
+                                </Text>
+                                <Text
+                                    style={[
+                                        styles.buttonText,
+                                        { color: "white" },
+                                    ]}
+                                >
+                                    Rest
+                                </Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
             </View>

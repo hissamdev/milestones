@@ -61,6 +61,7 @@ export default function Templates() {
                 <TouchableOpacity
                     onPress={() => {
                         actions.createTemplate("New template");
+                        if (!templateState?.id) return;
                         router.push({
                             pathname: "/sessions/template-edit-screen",
                             params: {
@@ -142,9 +143,9 @@ export default function Templates() {
                                 ))}
                             </View>
                             <TouchableOpacity
-                                onPress={() => {
+                                onPress={async () => {
                                     actions.loadSingleTemplate(t);
-                                    createSession({
+                                    await createSession({
                                         mode: "template",
                                         templateId: t.id,
                                     });

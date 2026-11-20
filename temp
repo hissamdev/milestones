@@ -15,3 +15,9 @@ if session and split
 - Complete one split, move seq
 if template
 -
+Button states
+- Regular session
+- Rest
+- Template
+- Duration and uninitiated, "Waiting"
+- Reps, "Next" or "Done"

@@ -83,6 +83,10 @@ export const sessionData = s.sqliteTable("session_data", {
     endTime: s.integer("end_time", { mode: "timestamp" }),
     isRest: s.integer("is_rest", { mode: "boolean" }).notNull().default(false),
     splitSide: s.text("split_side"),
+    isSecondSplit: s
+        .integer("is_second_split", { mode: "boolean" })
+        .notNull()
+        .default(false),
     // Exercise
     amount: s.integer("amount").notNull().default(0),
     targetSets: s.integer("target_sets").notNull().default(1),

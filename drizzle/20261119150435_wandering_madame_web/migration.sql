@@ -1,0 +1,1 @@
+ALTER TABLE `session_data` ADD `is_second_split` integer DEFAULT false NOT NULL;

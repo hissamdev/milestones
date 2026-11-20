@@ -11,7 +11,7 @@ export default function RepsControls() {
     );
     useEffect(() => {
         initSessionActivity();
-    }, []);
+    }, [singleSession.currentSequence]);
 
     return (
         <View>
