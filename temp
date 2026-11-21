@@ -17,7 +17,9 @@ if template
 -
 Button states
 - Regular session
-- Rest
+  - Rest
 - Template
-- Duration and uninitiated, "Waiting"
-- Reps, "Next" or "Done"
+  - Duration and uninitiated, "Waiting"
+  - Reps, "Next" or "Done"
+  - Split
+    - 

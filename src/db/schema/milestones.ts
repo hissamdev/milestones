@@ -1,49 +1,86 @@
 import * as s from "drizzle-orm/sqlite-core";
+import { sqliteTable } from "drizzle-orm/sqlite-core";
 
-export const milestones = s.sqliteTable("milestones", {
+export const milestonesTable = sqliteTable("milestones", {
     id: s.text("id").primaryKey(),
     name: s.text("name").notNull(),
-    emoji: s.text("emoji"),
-    desc: s.text("desc"),
-    type: s.text("type").notNull(),
+    enableCategories: s
+        .integer("enable_categories", { mode: "boolean" })
+        .notNull()
+        .default(false),
+    type: s.text("type").notNull(), // nested-counter, reset-timer, daily goals
+    useSingle: s
+        .integer("use_single", { mode: "boolean" })
+        .notNull()
+        .default(false),
 });
 
-export const milestoneData = s.sqliteTable("milestone_data", {
+export const activityCategories = sqliteTable("activity_categories", {
     id: s.text("id").primaryKey(),
     milestoneId: s
         .text("milestone_id")
         .notNull()
-        .references(() => milestones.id),
+        .references(() => milestonesTable.id, { onDelete: "cascade" }),
+    name: s.text("name"),
+    targetDuration: s.integer("target_duration"), // Seconds: For nested daily goals
+});
+
+export const nestedCounterData = sqliteTable("nested_counter_data", {
+    id: s.text("id").primaryKey(),
+    activity: s
+        .text("activity_category_id")
+        .references(() => activityCategories.id, { onDelete: "cascade" }),
+    title: s.text("title"),
+    desc: s.text("desc"),
+    timestamp: s
+        .integer("timestamp", { mode: "timestamp" })
+        .$defaultFn(() => new Date()),
+    startTime: s.integer("start_time", { mode: "timestamp" }),
+    endTime: s.integer("end_time", { mode: "timestamp" }),
+});
+
+export const dailyGoalsData = sqliteTable("daily_goals_data", {
+    id: s.text("id").primaryKey(),
+    activity: s
+        .text("activity_category_id")
+        .notNull()
+        .references(() => activityCategories.id, { onDelete: "cascade" }),
+    isGoalMet: s
+        .integer("is_goal_met", { mode: "boolean" })
+        .notNull()
+        .default(false),
+});
+
+export const subEntriesTemplate = sqliteTable("sub_entries_template", {
+    id: s.text("id").primaryKey(),
+    activity: s
+        .text("activity_category_id")
+        .notNull()
+        .references(() => activityCategories.id, { onDelete: "cascade" }),
+    name: s.text("name").notNull(),
+});
+
+export const subEntriesTable = sqliteTable("sub_entries_data", {
+    id: s.text("id").primaryKey(),
+    activity: s
+        .text("activity_category_id")
+        .notNull()
+        .references(() => activityCategories.id, { onDelete: "cascade" }),
+    timestamp: s
+        .integer("timestamp", { mode: "timestamp" })
+        .notNull()
+        .$defaultFn(() => new Date()),
+});
+
+// Fetch data with its correct data type
+export const milestonesData = sqliteTable("milestones_data", {
+    id: s.text("id").primaryKey(),
+    milestoneId: s
+        .text("milestone_id")
+        .notNull()
+        .references(() => milestonesTable.id, { onDelete: "cascade" }),
     createdAt: s
         .integer("created_at", { mode: "timestamp" })
         .notNull()
         .$defaultFn(() => new Date()),
-    updatedAt: s
-        .integer("updated_at", { mode: "timestamp" })
-        .notNull()
-        .$onUpdateFn(() => new Date()),
-    creationDay: s
-        .text("creation_day")
-        .notNull()
-        .$defaultFn(() => new Date().toDateString()),
-    device: s.text(),
-
-    // Duration Counter
-    start: s.integer("start", { mode: "timestamp" }),
-    stop: s.integer("stop", { mode: "timestamp" }),
-    duration: s.integer("duration"),
-
-    // Yes/No
-    switchToggle: s.text(),
-
-    // Memorables
-    note: s.text(),
-});
-
-export const images = s.sqliteTable("images", {
-    id: s.integer("id").primaryKey({ autoIncrement: true }),
-    dataId: s
-        .text("data_id")
-        .notNull()
-        .references(() => milestoneData.id),
 });

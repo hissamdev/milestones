@@ -1,5 +1,11 @@
 import { defineRelationsPart } from "drizzle-orm";
-import { images, milestoneData, milestones } from "./schema/milestones";
+import {
+    activityCategories,
+    dailyGoalsData,
+    milestonesData,
+    milestonesTable,
+    nestedCounterData,
+} from "./schema/milestones";
 import {
     daysOtw,
     exercises,
@@ -15,23 +21,21 @@ import {
 } from "./schema/workouts";
 
 export const milestoneRelations = defineRelationsPart(
-    { milestones, milestoneData, images },
+    {
+        milestonesTable,
+        milestonesData,
+        activityCategories,
+        nestedCounterData,
+        dailyGoalsData,
+    },
     (r) => ({
-        milestones: {
-            data: r.many.milestoneData(),
+        milestonesTable: {
+            categories: r.many.activityCategories(),
         },
-        milestoneData: {
-            milestone: r.one.milestones({
-                from: r.milestoneData.milestoneId,
-                to: r.milestones.id,
-            }),
-            image: r.many.images(),
-        },
-        images: {
-            data: r.one.milestoneData({
-                from: r.images.dataId,
-                to: r.milestoneData.id,
-            }),
+        activityCategories: {
+            data: r.many.nestedCounterData(),
+            nestedCounterData: r.many.nestedCounterData(),
+            dailyGoalsData: r.many.dailyGoalsData(),
         },
     }),
 );
