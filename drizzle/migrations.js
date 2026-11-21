@@ -9,6 +9,7 @@ import m0005 from './20261121101132_flat_george_stacy/migration.sql';
 import m0006 from './20261121101230_public_randall_flagg/migration.sql';
 import m0007 from './20261121122454_nappy_sunset_bain/migration.sql';
 import m0008 from './20261121122549_common_epoch/migration.sql';
+import m0009 from './20261121150616_normal_thaddeus_ross/migration.sql';
 
   export default {
     migrations: {
@@ -20,7 +21,8 @@ import m0008 from './20261121122549_common_epoch/migration.sql';
 "20261121101132_flat_george_stacy": m0005,
 "20261121101230_public_randall_flagg": m0006,
 "20261121122454_nappy_sunset_bain": m0007,
-"20261121122549_common_epoch": m0008
+"20261121122549_common_epoch": m0008,
+"20261121150616_normal_thaddeus_ross": m0009
 }
   }
   

@@ -17,6 +17,7 @@ export type NestedCounterData = typeof nestedCounterData.$inferSelect;
 export type DailyGoalsData = typeof dailyGoalsData.$inferSelect;
 
 export type NestedMilestone = Milestone & {
+    type: "nested-counter";
     categories: (MilestoneActivity & {
         nestedCounterData:
             | (NestedCounterData & {

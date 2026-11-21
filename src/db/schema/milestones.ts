@@ -8,7 +8,7 @@ export const milestonesTable = sqliteTable("milestones", {
         .integer("enable_categories", { mode: "boolean" })
         .notNull()
         .default(false),
-    type: s.text("type").notNull(), // nested-counter, reset-timer, daily goals
+    type: s.text("type", { enum: ["nested-counter"] }).notNull(), // nested-counter, reset-timer, daily goals
     useSingle: s
         .integer("use_single", { mode: "boolean" })
         .notNull()

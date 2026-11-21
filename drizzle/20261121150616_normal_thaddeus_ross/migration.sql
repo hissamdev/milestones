@@ -1,0 +1,1 @@
+ALTER TABLE `daily_goals_data` ADD `timestamp` integer;

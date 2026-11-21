@@ -1,6 +1,7 @@
+import NestedCounterHome from "@/components/screens/milestones/home/nested-counter";
 import { useMilestoneStore } from "@/stores/milestones-store/milestones-store";
 import { useEffect } from "react";
-import { ScrollView, Text } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
@@ -16,12 +17,22 @@ export default function MilestonesScreen() {
         actions.loadMilestones();
     }, []);
 
+    const components = {
+        "nested-counter": NestedCounterHome,
+    };
+
     return (
         <SafeAreaView>
             <ScrollView>
-                {milestones.map((m) => (
-                    <Text>{m.name}</Text>
-                ))}
+                {milestones.map((m) => {
+                    const Component = components[m.type];
+                    return (
+                        <View>
+                            <Text>{m.name}</Text>
+                            <Component />
+                        </View>
+                    );
+                })}
             </ScrollView>
         </SafeAreaView>
     );
