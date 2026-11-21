@@ -35,12 +35,40 @@ export const milestoneRelations = defineRelationsPart(
             categories: r.many.activityCategories(),
         },
         activityCategories: {
+            milestone: r.one.milestonesTable({
+                from: r.activityCategories.milestoneId,
+                to: r.milestonesTable.id,
+            }),
             nestedCounterData: r.many.nestedCounterData(),
             dailyGoalsData: r.many.dailyGoalsData(),
         },
         nestedCounterData: {
+            activity: r.one.activityCategories({
+                from: r.nestedCounterData.activityId,
+                to: r.activityCategories.id,
+            }),
             subEntriesTemplate: r.many.subEntriesTemplate(),
             subEntriesData: r.many.subEntriesData(),
+        },
+        dailyGoalsData: {
+            activity: r.one.activityCategories({
+                from: r.nestedCounterData.activityId,
+                to: r.activityCategories.id,
+            }),
+            subEntriesTemplate: r.many.subEntriesTemplate(),
+            subEntriesData: r.many.subEntriesData(),
+        },
+        subEntriesTemplate: {
+            nestedCounter: r.one.activityCategories({
+                from: r.subEntriesTemplate.activityId,
+                to: r.activityCategories.id,
+            }),
+        },
+        subEntriesData: {
+            nestedCounter: r.one.activityCategories({
+                from: r.subEntriesData.activityId,
+                to: r.activityCategories.id,
+            }),
         },
     }),
 );

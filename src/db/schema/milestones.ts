@@ -46,6 +46,9 @@ export const dailyGoalsData = sqliteTable("daily_goals_data", {
         .text("activity_id")
         .notNull()
         .references(() => activityCategories.id, { onDelete: "cascade" }),
+    timestamp: s
+        .integer("timestamp", { mode: "timestamp" })
+        .$defaultFn(() => new Date()),
     isGoalMet: s
         .integer("is_goal_met", { mode: "boolean" })
         .notNull()

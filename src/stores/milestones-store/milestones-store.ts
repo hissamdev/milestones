@@ -13,11 +13,54 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
     actions: {
         loadMilestones: async () => {
             try {
-                const res = await db.query.milestonesTable.findMany({
-                    with: {
-                        categories: {},
+                const nestedMilestone = await db.query.milestonesTable.findMany(
+                    {
+                        with: {
+                            categories: {
+                                orderBy: {
+                                    name: "asc",
+                                },
+                                with: {
+                                    nestedCounterData: {
+                                        orderBy: {
+                                            timestamp: "desc",
+                                        },
+                                        with: {
+                                            subEntriesTemplate: {
+                                                orderBy: {
+                                                    name: "asc",
+                                                },
+                                            },
+                                            subEntriesData: {
+                                                orderBy: {
+                                                    timestamp: "desc",
+                                                },
+                                            },
+                                        },
+                                    },
+                                    dailyGoalsData: {
+                                        orderBy: {
+                                            timestamp: "desc",
+                                        },
+                                        with: {
+                                            subEntriesTemplate: {
+                                                orderBy: {
+                                                    name: "asc",
+                                                },
+                                            },
+                                            subEntriesData: {
+                                                orderBy: {
+                                                    timestamp: "desc",
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
-                });
+                );
+                set({ milestones: nestedMilestone });
             } catch (err) {
                 console.error(err);
             }
