@@ -27,8 +27,9 @@ export const activityCategories = sqliteTable("activity_categories", {
 
 export const nestedCounterData = sqliteTable("nested_counter_data", {
     id: s.text("id").primaryKey(),
-    activity: s
-        .text("activity_category_id")
+    activityId: s
+        .text("activity_id")
+        .notNull()
         .references(() => activityCategories.id, { onDelete: "cascade" }),
     title: s.text("title"),
     desc: s.text("desc"),
@@ -41,8 +42,8 @@ export const nestedCounterData = sqliteTable("nested_counter_data", {
 
 export const dailyGoalsData = sqliteTable("daily_goals_data", {
     id: s.text("id").primaryKey(),
-    activity: s
-        .text("activity_category_id")
+    activityId: s
+        .text("activity_id")
         .notNull()
         .references(() => activityCategories.id, { onDelete: "cascade" }),
     isGoalMet: s
@@ -53,17 +54,17 @@ export const dailyGoalsData = sqliteTable("daily_goals_data", {
 
 export const subEntriesTemplate = sqliteTable("sub_entries_template", {
     id: s.text("id").primaryKey(),
-    activity: s
-        .text("activity_category_id")
+    activityId: s
+        .text("activity_id")
         .notNull()
         .references(() => activityCategories.id, { onDelete: "cascade" }),
     name: s.text("name").notNull(),
 });
 
-export const subEntriesTable = sqliteTable("sub_entries_data", {
+export const subEntriesData = sqliteTable("sub_entries_data", {
     id: s.text("id").primaryKey(),
-    activity: s
-        .text("activity_category_id")
+    activityId: s
+        .text("activity_id")
         .notNull()
         .references(() => activityCategories.id, { onDelete: "cascade" }),
     timestamp: s

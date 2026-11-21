@@ -2,9 +2,10 @@ import { defineRelationsPart } from "drizzle-orm";
 import {
     activityCategories,
     dailyGoalsData,
-    milestonesData,
     milestonesTable,
     nestedCounterData,
+    subEntriesData,
+    subEntriesTemplate,
 } from "./schema/milestones";
 import {
     daysOtw,
@@ -23,19 +24,23 @@ import {
 export const milestoneRelations = defineRelationsPart(
     {
         milestonesTable,
-        milestonesData,
         activityCategories,
         nestedCounterData,
         dailyGoalsData,
+        subEntriesData,
+        subEntriesTemplate,
     },
     (r) => ({
         milestonesTable: {
             categories: r.many.activityCategories(),
         },
         activityCategories: {
-            data: r.many.nestedCounterData(),
             nestedCounterData: r.many.nestedCounterData(),
             dailyGoalsData: r.many.dailyGoalsData(),
+        },
+        nestedCounterData: {
+            subEntriesTemplate: r.many.subEntriesTemplate(),
+            subEntriesData: r.many.subEntriesData(),
         },
     }),
 );

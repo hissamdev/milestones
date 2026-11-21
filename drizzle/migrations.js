@@ -7,6 +7,8 @@ import m0003 from './20261119150435_wandering_madame_web/migration.sql';
 import m0004 from './20261120082659_ordinary_risque/migration.sql';
 import m0005 from './20261121101132_flat_george_stacy/migration.sql';
 import m0006 from './20261121101230_public_randall_flagg/migration.sql';
+import m0007 from './20261121122454_nappy_sunset_bain/migration.sql';
+import m0008 from './20261121122549_common_epoch/migration.sql';
 
   export default {
     migrations: {
@@ -16,7 +18,9 @@ import m0006 from './20261121101230_public_randall_flagg/migration.sql';
 "20261119150435_wandering_madame_web": m0003,
 "20261120082659_ordinary_risque": m0004,
 "20261121101132_flat_george_stacy": m0005,
-"20261121101230_public_randall_flagg": m0006
+"20261121101230_public_randall_flagg": m0006,
+"20261121122454_nappy_sunset_bain": m0007,
+"20261121122549_common_epoch": m0008
 }
   }
   
