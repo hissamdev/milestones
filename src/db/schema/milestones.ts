@@ -27,6 +27,10 @@ export const activityCategories = sqliteTable("activity_categories", {
 
 export const nestedCounterData = sqliteTable("nested_counter_data", {
     id: s.text("id").primaryKey(),
+    milestoneId: s
+        .text("milestone_id")
+        .notNull()
+        .references(() => milestonesTable.id, { onDelete: "cascade" }),
     activityId: s
         .text("activity_id")
         .notNull()
@@ -42,6 +46,10 @@ export const nestedCounterData = sqliteTable("nested_counter_data", {
 
 export const dailyGoalsData = sqliteTable("daily_goals_data", {
     id: s.text("id").primaryKey(),
+    milestoneId: s
+        .text("milestone_id")
+        .notNull()
+        .references(() => milestonesTable.id, { onDelete: "cascade" }),
     activityId: s
         .text("activity_id")
         .notNull()
@@ -66,10 +74,12 @@ export const subEntriesTemplate = sqliteTable("sub_entries_template", {
 
 export const subEntriesData = sqliteTable("sub_entries_data", {
     id: s.text("id").primaryKey(),
-    activityId: s
-        .text("activity_id")
-        .notNull()
-        .references(() => activityCategories.id, { onDelete: "cascade" }),
+    nestedCounterDataId: s
+        .text("nested_counter_data_id")
+        .references(() => nestedCounterData.id, { onDelete: "cascade" }),
+    dailyGoalsDataId: s
+        .text("daily_goals_data_id")
+        .references(() => dailyGoalsData.id, { onDelete: "cascade" }),
     timestamp: s
         .integer("timestamp", { mode: "timestamp" })
         .notNull()

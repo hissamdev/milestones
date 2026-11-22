@@ -10,6 +10,8 @@ import m0006 from './20261121101230_public_randall_flagg/migration.sql';
 import m0007 from './20261121122454_nappy_sunset_bain/migration.sql';
 import m0008 from './20261121122549_common_epoch/migration.sql';
 import m0009 from './20261121150616_normal_thaddeus_ross/migration.sql';
+import m0010 from './20261122075152_wealthy_dorian_gray/migration.sql';
+import m0011 from './20261122075956_dear_darkhawk/migration.sql';
 
   export default {
     migrations: {
@@ -22,7 +24,9 @@ import m0009 from './20261121150616_normal_thaddeus_ross/migration.sql';
 "20261121101230_public_randall_flagg": m0006,
 "20261121122454_nappy_sunset_bain": m0007,
 "20261121122549_common_epoch": m0008,
-"20261121150616_normal_thaddeus_ross": m0009
+"20261121150616_normal_thaddeus_ross": m0009,
+"20261122075152_wealthy_dorian_gray": m0010,
+"20261122075956_dear_darkhawk": m0011
 }
   }
   

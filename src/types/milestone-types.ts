@@ -17,19 +17,17 @@ export type NestedCounterData = typeof nestedCounterData.$inferSelect;
 export type DailyGoalsData = typeof dailyGoalsData.$inferSelect;
 
 export type NestedMilestone = Milestone & {
-    type: "nested-counter";
     categories: (MilestoneActivity & {
-        nestedCounterData:
-            | (NestedCounterData & {
-                  subEntriesTemplate: SubEntryTemplate[];
-                  subEntriesData: SubEntryData[];
-              })[]
-            | null;
-        dailyGoalsData:
-            | (DailyGoalsData & {
-                  subEntriesTemplate: SubEntryTemplate[];
-                  subEntriesData: SubEntryData[];
-              })[]
-            | null;
+        subEntriesTemplate: SubEntryTemplate[];
     })[];
+    nestedCounters:
+        | (NestedCounterData & {
+              subEntriesData: SubEntryData[];
+          })[]
+        | null;
+    dailyGoals:
+        | (DailyGoalsData & {
+              subEntriesData: SubEntryData[];
+          })[]
+        | null;
 };

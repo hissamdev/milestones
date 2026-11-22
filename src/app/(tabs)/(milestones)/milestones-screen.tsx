@@ -28,8 +28,8 @@ export default function MilestonesScreen() {
                     const Component = components[m.type];
                     return (
                         <View>
-                            <Text>{m.name}</Text>
-                            <Component />
+                            <Text>hi</Text>
+                            <Component id={m.id} />
                         </View>
                     );
                 })}

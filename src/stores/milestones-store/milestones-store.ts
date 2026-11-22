@@ -21,38 +21,31 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                                     name: "asc",
                                 },
                                 with: {
-                                    nestedCounterData: {
+                                    subEntriesTemplate: {
+                                        orderBy: { name: "asc" },
+                                    },
+                                },
+                            },
+                            nestedCounters: {
+                                orderBy: {
+                                    timestamp: "desc",
+                                },
+                                with: {
+                                    subEntriesData: {
                                         orderBy: {
                                             timestamp: "desc",
-                                        },
-                                        with: {
-                                            subEntriesTemplate: {
-                                                orderBy: {
-                                                    name: "asc",
-                                                },
-                                            },
-                                            subEntriesData: {
-                                                orderBy: {
-                                                    timestamp: "desc",
-                                                },
-                                            },
                                         },
                                     },
-                                    dailyGoalsData: {
+                                },
+                            },
+                            dailyGoals: {
+                                orderBy: {
+                                    timestamp: "desc",
+                                },
+                                with: {
+                                    subEntriesData: {
                                         orderBy: {
                                             timestamp: "desc",
-                                        },
-                                        with: {
-                                            subEntriesTemplate: {
-                                                orderBy: {
-                                                    name: "asc",
-                                                },
-                                            },
-                                            subEntriesData: {
-                                                orderBy: {
-                                                    timestamp: "desc",
-                                                },
-                                            },
                                         },
                                     },
                                 },

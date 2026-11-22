@@ -33,41 +33,53 @@ export const milestoneRelations = defineRelationsPart(
     (r) => ({
         milestonesTable: {
             categories: r.many.activityCategories(),
+            nestedCounters: r.many.nestedCounterData(),
+            dailyGoals: r.many.dailyGoalsData(),
         },
         activityCategories: {
             milestone: r.one.milestonesTable({
                 from: r.activityCategories.milestoneId,
                 to: r.milestonesTable.id,
             }),
+            subEntriesTemplate: r.many.subEntriesTemplate(),
             nestedCounterData: r.many.nestedCounterData(),
             dailyGoalsData: r.many.dailyGoalsData(),
+        },
+        subEntriesTemplate: {
+            activity: r.one.activityCategories({
+                from: r.subEntriesTemplate.activityId,
+                to: r.activityCategories.id,
+            }),
         },
         nestedCounterData: {
             activity: r.one.activityCategories({
                 from: r.nestedCounterData.activityId,
                 to: r.activityCategories.id,
             }),
-            subEntriesTemplate: r.many.subEntriesTemplate(),
-            subEntriesData: r.many.subEntriesData(),
+            subEntriesData: r.many.subEntriesData({
+                alias: "nc-sub-entries-data",
+            }),
         },
         dailyGoalsData: {
             activity: r.one.activityCategories({
-                from: r.nestedCounterData.activityId,
+                from: r.dailyGoalsData.activityId,
                 to: r.activityCategories.id,
             }),
-            subEntriesTemplate: r.many.subEntriesTemplate(),
-            subEntriesData: r.many.subEntriesData(),
-        },
-        subEntriesTemplate: {
-            nestedCounter: r.one.activityCategories({
-                from: r.subEntriesTemplate.activityId,
-                to: r.activityCategories.id,
+            subEntriesData: r.many.subEntriesData({
+                alias: "dg-sub-entries-data",
             }),
         },
+
         subEntriesData: {
-            nestedCounter: r.one.activityCategories({
-                from: r.subEntriesData.activityId,
-                to: r.activityCategories.id,
+            nestedCounter: r.one.nestedCounterData({
+                from: r.subEntriesData.nestedCounterDataId,
+                to: r.nestedCounterData.id,
+                alias: "nc-sub-entries-data",
+            }),
+            dailyGoal: r.one.dailyGoalsData({
+                from: r.subEntriesData.dailyGoalsDataId,
+                to: r.dailyGoalsData.id,
+                alias: "dg-sub-entries-data",
             }),
         },
     }),

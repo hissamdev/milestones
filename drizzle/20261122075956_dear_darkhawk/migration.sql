@@ -1,0 +1,2 @@
+ALTER TABLE `daily_goals_data` ADD `milestone_id` text NOT NULL REFERENCES milestones(id) ON DELETE CASCADE;--> statement-breakpoint
+ALTER TABLE `nested_counter_data` ADD `milestone_id` text NOT NULL REFERENCES milestones(id) ON DELETE CASCADE;
