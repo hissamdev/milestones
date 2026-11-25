@@ -10,6 +10,7 @@ import {
 export type Milestone = typeof milestonesTable.$inferSelect;
 export type MilestoneActivity = typeof activityCategories.$inferSelect;
 
+// Nested values
 export type SubEntryTemplate = typeof subEntriesTemplate.$inferSelect;
 export type SubEntryData = typeof subEntriesData.$inferSelect;
 // Property types
@@ -22,11 +23,13 @@ export type NestedMilestone = Milestone & {
     })[];
     nestedCounters:
         | (NestedCounterData & {
+              activity: MilestoneActivity | null;
               subEntriesData: SubEntryData[];
           })[]
         | null;
     dailyGoals:
         | (DailyGoalsData & {
+              activity: MilestoneActivity | null;
               subEntriesData: SubEntryData[];
           })[]
         | null;

@@ -31,6 +31,7 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                                     timestamp: "desc",
                                 },
                                 with: {
+                                    activity: true,
                                     subEntriesData: {
                                         orderBy: {
                                             timestamp: "desc",
@@ -43,6 +44,7 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                                     timestamp: "desc",
                                 },
                                 with: {
+                                    activity: true,
                                     subEntriesData: {
                                         orderBy: {
                                             timestamp: "desc",

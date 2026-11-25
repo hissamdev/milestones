@@ -28,6 +28,13 @@ const exerciseList: Exercise[] = [
         isSplit: false,
     },
     {
+        name: "decline-pullups",
+        displayName: "Decline Pull-ups",
+        desc: "A pullup progression",
+        type: "reps",
+        isSplit: false,
+    },
+    {
         name: "ledge-pullups",
         displayName: "Ledge Pull-ups",
         desc: "Targets the upper back, lats, and biceps. Develops pulling strength and grip.",

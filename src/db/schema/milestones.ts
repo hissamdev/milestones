@@ -39,6 +39,7 @@ export const nestedCounterData = sqliteTable("nested_counter_data", {
     desc: s.text("desc"),
     timestamp: s
         .integer("timestamp", { mode: "timestamp" })
+        .notNull()
         .$defaultFn(() => new Date()),
     startTime: s.integer("start_time", { mode: "timestamp" }),
     endTime: s.integer("end_time", { mode: "timestamp" }),

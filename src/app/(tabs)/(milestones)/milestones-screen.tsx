@@ -1,4 +1,4 @@
-import NestedCounterHome from "@/components/screens/milestones/home/nested-counter";
+import NestedCounterHome from "@/components/screens/milestones/home-variants/nested-counter";
 import { useMilestoneStore } from "@/stores/milestones-store/milestones-store";
 import { useEffect } from "react";
 import { ScrollView, Text, View } from "react-native";

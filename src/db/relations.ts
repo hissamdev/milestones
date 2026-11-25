@@ -52,6 +52,10 @@ export const milestoneRelations = defineRelationsPart(
             }),
         },
         nestedCounterData: {
+            milestone: r.one.milestonesTable({
+                from: r.nestedCounterData.milestoneId,
+                to: r.milestonesTable.id,
+            }),
             activity: r.one.activityCategories({
                 from: r.nestedCounterData.activityId,
                 to: r.activityCategories.id,
@@ -61,6 +65,10 @@ export const milestoneRelations = defineRelationsPart(
             }),
         },
         dailyGoalsData: {
+            milestone: r.one.milestonesTable({
+                from: r.dailyGoalsData.milestoneId,
+                to: r.milestonesTable.id,
+            }),
             activity: r.one.activityCategories({
                 from: r.dailyGoalsData.activityId,
                 to: r.activityCategories.id,
