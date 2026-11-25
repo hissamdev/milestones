@@ -1,7 +1,8 @@
 import NestedCounterHome from "@/components/screens/milestones/home-variants/nested-counter";
 import { useMilestoneStore } from "@/stores/milestones-store/milestones-store";
+import { createMilestoneDummy } from "@/utils/milestones/milestone-helpers";
 import { useEffect } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
@@ -23,6 +24,11 @@ export default function MilestonesScreen() {
 
     return (
         <SafeAreaView>
+            <View>
+                <TouchableOpacity onPress={() => createMilestoneDummy()}>
+                    <Text>Create dummy milestone</Text>
+                </TouchableOpacity>
+            </View>
             <ScrollView>
                 {milestones.map((m) => {
                     const Component = components[m.type];

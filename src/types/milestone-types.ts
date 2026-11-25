@@ -21,16 +21,12 @@ export type NestedMilestone = Milestone & {
     categories: (MilestoneActivity & {
         subEntriesTemplate: SubEntryTemplate[];
     })[];
-    nestedCounters:
-        | (NestedCounterData & {
-              activity: MilestoneActivity | null;
-              subEntriesData: SubEntryData[];
-          })[]
-        | null;
-    dailyGoals:
-        | (DailyGoalsData & {
-              activity: MilestoneActivity | null;
-              subEntriesData: SubEntryData[];
-          })[]
-        | null;
+    nestedCounters: (NestedCounterData & {
+        activity: MilestoneActivity | null;
+        subEntriesData: SubEntryData[];
+    })[];
+    dailyGoals: (DailyGoalsData & {
+        activity: MilestoneActivity | null;
+        subEntriesData: SubEntryData[];
+    })[];
 };

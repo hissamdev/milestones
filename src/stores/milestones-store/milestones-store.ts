@@ -1,11 +1,12 @@
 import { db } from "@/db/client";
-import { NestedMilestone } from "@/types/milestone-types";
+import { Milestone, NestedMilestone } from "@/types/milestone-types";
 import { create } from "zustand";
 
 interface MilestoneState {
     milestones: NestedMilestone[];
     actions: {
         loadMilestones: () => void;
+        insertMilestone: (milestone: Milestone) => void;
     };
 }
 export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
@@ -59,6 +60,20 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
             } catch (err) {
                 console.error(err);
             }
+        },
+        insertMilestone: (m) => {
+            set((prev) => ({
+                ...prev,
+                milestones: [
+                    {
+                        ...m,
+                        categories: [],
+                        dailyGoals: [],
+                        nestedCounters: [],
+                    },
+                    ...prev.milestones,
+                ],
+            }));
         },
     },
 }));
