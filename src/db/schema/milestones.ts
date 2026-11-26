@@ -75,6 +75,10 @@ export const subEntriesTemplate = sqliteTable("sub_entries_template", {
 
 export const subEntriesData = sqliteTable("sub_entries_data", {
     id: s.text("id").primaryKey(),
+    subEntriesTemplateId: s
+        .text("sub_entries_template_id")
+        .notNull()
+        .references(() => subEntriesTemplate.id, { onDelete: "cascade" }),
     nestedCounterDataId: s
         .text("nested_counter_data_id")
         .references(() => nestedCounterData.id, { onDelete: "cascade" }),

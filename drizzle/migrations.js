@@ -12,6 +12,7 @@ import m0008 from './20261121122549_common_epoch/migration.sql';
 import m0009 from './20261121150616_normal_thaddeus_ross/migration.sql';
 import m0010 from './20261122075152_wealthy_dorian_gray/migration.sql';
 import m0011 from './20261122075956_dear_darkhawk/migration.sql';
+import m0012 from './20261126211108_spooky_piledriver/migration.sql';
 
   export default {
     migrations: {
@@ -26,7 +27,8 @@ import m0011 from './20261122075956_dear_darkhawk/migration.sql';
 "20261121122549_common_epoch": m0008,
 "20261121150616_normal_thaddeus_ross": m0009,
 "20261122075152_wealthy_dorian_gray": m0010,
-"20261122075956_dear_darkhawk": m0011
+"20261122075956_dear_darkhawk": m0011,
+"20261126211108_spooky_piledriver": m0012
 }
   }
   

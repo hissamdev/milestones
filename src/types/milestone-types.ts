@@ -19,14 +19,18 @@ export type DailyGoalsData = typeof dailyGoalsData.$inferSelect;
 
 export type NestedMilestone = Milestone & {
     categories: (MilestoneActivity & {
-        subEntriesTemplate: SubEntryTemplate[];
+        templates: SubEntryTemplate[];
     })[];
     nestedCounters: (NestedCounterData & {
         activity: MilestoneActivity | null;
-        subEntriesData: SubEntryData[];
+        subEntriesData: (SubEntryData & {
+            template: SubEntryTemplate;
+        })[];
     })[];
     dailyGoals: (DailyGoalsData & {
         activity: MilestoneActivity | null;
-        subEntriesData: SubEntryData[];
+        subEntriesData: (SubEntryData & {
+            template: SubEntryTemplate;
+        })[];
     })[];
 };

@@ -1,5 +1,10 @@
 import { db } from "@/db/client";
-import { Milestone, NestedMilestone } from "@/types/milestone-types";
+import {
+    Milestone,
+    MilestoneActivity,
+    NestedCounterData,
+    NestedMilestone,
+} from "@/types/milestone-types";
 import { create } from "zustand";
 
 interface MilestoneState {
@@ -7,6 +12,14 @@ interface MilestoneState {
     actions: {
         loadMilestones: () => void;
         insertMilestone: (milestone: Milestone) => void;
+        insertCategory: (milestoneId: string, c: MilestoneActivity) => void;
+        dataInsertions: {
+            nestedCounter: (
+                milestoneId: string,
+                activity: MilestoneActivity,
+                data: NestedCounterData,
+            ) => void;
+        };
     };
 }
 export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
@@ -22,7 +35,7 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                                     name: "asc",
                                 },
                                 with: {
-                                    subEntriesTemplate: {
+                                    templates: {
                                         orderBy: { name: "asc" },
                                     },
                                 },
@@ -36,6 +49,9 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                                     subEntriesData: {
                                         orderBy: {
                                             timestamp: "desc",
+                                        },
+                                        with: {
+                                            template: true,
                                         },
                                     },
                                 },
@@ -74,6 +90,53 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                     ...prev.milestones,
                 ],
             }));
+        },
+        insertCategory: (milestoneId, c) => {
+            set((prev) => ({
+                ...prev,
+                milestones: prev.milestones.map((m) =>
+                    m.id === milestoneId
+                        ? {
+                              ...m,
+                              categories: [
+                                  {
+                                      ...c,
+                                      templates: [],
+                                  },
+                                  ...m.categories,
+                              ],
+                          }
+                        : {
+                              ...m,
+                          },
+                ),
+            }));
+        },
+        dataInsertions: {
+            nestedCounter: (mId, a, data) => {
+                set((prev) => ({
+                    ...prev,
+                    milestones: prev.milestones.map((m) =>
+                        m.id === mId
+                            ? {
+                                  ...m,
+                                  nestedCounters: [
+                                      {
+                                          ...data,
+                                          subEntriesData: [],
+                                          activity: {
+                                              ...a,
+                                          },
+                                      },
+                                      ...m.nestedCounters,
+                                  ],
+                              }
+                            : {
+                                  ...m,
+                              },
+                    ),
+                }));
+            },
         },
     },
 }));
