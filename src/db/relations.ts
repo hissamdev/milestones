@@ -33,8 +33,8 @@ export const milestoneRelations = defineRelationsPart(
     (r) => ({
         milestonesTable: {
             categories: r.many.activityCategories(),
-            nestedCounters: r.many.nestedCounterData(),
-            dailyGoals: r.many.dailyGoalsData(),
+            nestedCounterData: r.many.nestedCounterData(),
+            dailyGoalData: r.many.dailyGoalsData(),
         },
         activityCategories: {
             milestone: r.one.milestonesTable({
@@ -85,7 +85,7 @@ export const milestoneRelations = defineRelationsPart(
                 alias: "nc-sub-entries-data",
             }),
             dailyGoal: r.one.dailyGoalsData({
-                from: r.subEntriesData.dailyGoalsDataId,
+                from: r.subEntriesData.dailyGoalDataId,
                 to: r.dailyGoalsData.id,
                 alias: "dg-sub-entries-data",
             }),

@@ -55,7 +55,7 @@ export default function NestedCounterHome({ id }: Props) {
                     display: "flex",
                 }}
             >
-                {milestone["nestedCounters"]?.map((nc, idx) => (
+                {milestone["nestedCounterData"]?.map((nc, idx) => (
                     <TouchableOpacity
                         onPress={() => {
                             router.push({

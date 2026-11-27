@@ -3,9 +3,11 @@ import {
     activityCategories,
     milestonesTable,
     nestedCounterData,
+    subEntriesData,
+    subEntriesTemplate,
 } from "@/db/schema/milestones";
 import { useMilestoneStore } from "@/stores/milestones-store/milestones-store";
-import { MilestoneActivity } from "@/types/milestone-types";
+import { MilestoneActivity, SubEntryTemplate } from "@/types/milestone-types";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "expo-crypto";
 
@@ -24,6 +26,33 @@ export async function insertNCData(
     useMilestoneStore
         .getState()
         .actions.dataInsertions.nestedCounter(milestoneId, activity, res);
+}
+
+export type MilestoneDataKeys = "nestedCounterData" | "dailyGoalData";
+export async function insertSubEntryData(
+    milestoneId: string,
+    dataId: string,
+    template: SubEntryTemplate,
+    property: MilestoneDataKeys,
+) {
+    const [subEntry] = await db
+        .insert(subEntriesData)
+        .values({
+            id: randomUUID(),
+            [property + "Id"]: dataId,
+            subEntriesTemplateId: template.id,
+        })
+        .returning();
+
+    useMilestoneStore
+        .getState()
+        .actions.insertSubEntry(
+            milestoneId,
+            template,
+            dataId,
+            subEntry,
+            property,
+        );
 }
 
 export async function createMilestoneDummy() {
@@ -72,7 +101,20 @@ export async function createDummyCategory(milestoneId: string) {
     useMilestoneStore.getState().actions.insertCategory(milestoneId, res);
 }
 
-export async function createDummyData() {
-    // const [data] = db.insert(nestedCounterData).values({
-    // })
+export async function createDummyTemplate(
+    milestoneId: string,
+    activityId: string,
+) {
+    const tName = "Valorant";
+    const [template] = await db
+        .insert(subEntriesTemplate)
+        .values({
+            id: randomUUID(),
+            activityId,
+            name: tName,
+        })
+        .returning();
+    useMilestoneStore
+        .getState()
+        .actions.insertTemplate(milestoneId, activityId, template);
 }

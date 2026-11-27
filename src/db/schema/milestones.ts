@@ -82,7 +82,7 @@ export const subEntriesData = sqliteTable("sub_entries_data", {
     nestedCounterDataId: s
         .text("nested_counter_data_id")
         .references(() => nestedCounterData.id, { onDelete: "cascade" }),
-    dailyGoalsDataId: s
+    dailyGoalDataId: s
         .text("daily_goals_data_id")
         .references(() => dailyGoalsData.id, { onDelete: "cascade" }),
     timestamp: s

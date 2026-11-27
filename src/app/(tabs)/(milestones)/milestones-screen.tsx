@@ -1,9 +1,6 @@
 import NestedCounterHome from "@/components/screens/milestones/home-variants/nested-counter";
 import { useMilestoneStore } from "@/stores/milestones-store/milestones-store";
-import {
-    createDummyData,
-    createMilestoneDummy,
-} from "@/utils/milestones/milestone-helpers";
+import { createMilestoneDummy } from "@/utils/milestones/milestone-helpers";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -33,9 +30,6 @@ export default function MilestonesScreen() {
             <View>
                 <TouchableOpacity onPress={() => createMilestoneDummy()}>
                     <Text>Create dummy milestone</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => createDummyData()}>
-                    <Text>Create dummy data</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => {

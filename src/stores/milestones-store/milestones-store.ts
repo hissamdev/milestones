@@ -4,7 +4,10 @@ import {
     MilestoneActivity,
     NestedCounterData,
     NestedMilestone,
+    SubEntryData,
+    SubEntryTemplate,
 } from "@/types/milestone-types";
+import { MilestoneDataKeys } from "@/utils/milestones/milestone-helpers";
 import { create } from "zustand";
 
 interface MilestoneState {
@@ -20,6 +23,18 @@ interface MilestoneState {
                 data: NestedCounterData,
             ) => void;
         };
+        insertTemplate: (
+            milestoneId: string,
+            activityId: string,
+            data: SubEntryTemplate,
+        ) => void;
+        insertSubEntry: (
+            milestoneId: string,
+            template: SubEntryTemplate,
+            dataId: string,
+            data: SubEntryData,
+            key: MilestoneDataKeys,
+        ) => void;
     };
 }
 export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
@@ -40,7 +55,7 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                                     },
                                 },
                             },
-                            nestedCounters: {
+                            nestedCounterData: {
                                 orderBy: {
                                     timestamp: "desc",
                                 },
@@ -56,7 +71,7 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                                     },
                                 },
                             },
-                            dailyGoals: {
+                            dailyGoalData: {
                                 orderBy: {
                                     timestamp: "desc",
                                 },
@@ -84,8 +99,8 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                     {
                         ...m,
                         categories: [],
-                        dailyGoals: [],
-                        nestedCounters: [],
+                        dailyGoalData: [],
+                        nestedCounterData: [],
                     },
                     ...prev.milestones,
                 ],
@@ -112,6 +127,7 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                 ),
             }));
         },
+
         dataInsertions: {
             nestedCounter: (mId, a, data) => {
                 set((prev) => ({
@@ -120,7 +136,7 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                         m.id === mId
                             ? {
                                   ...m,
-                                  nestedCounters: [
+                                  nestedCounterData: [
                                       {
                                           ...data,
                                           subEntriesData: [],
@@ -128,7 +144,7 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                                               ...a,
                                           },
                                       },
-                                      ...m.nestedCounters,
+                                      ...m.nestedCounterData,
                                   ],
                               }
                             : {
@@ -137,6 +153,65 @@ export const useMilestoneStore = create<MilestoneState>()((set, get) => ({
                     ),
                 }));
             },
+        },
+        insertTemplate: (mId, aId, data) => {
+            set((prev) => ({
+                ...prev,
+                milestones: prev.milestones.map((m) =>
+                    m.id === mId
+                        ? {
+                              ...m,
+                              categories: m.categories.map((c) =>
+                                  c.id === aId
+                                      ? {
+                                            ...c,
+                                            templates: [
+                                                {
+                                                    ...data,
+                                                },
+                                                ...c.templates,
+                                            ],
+                                        }
+                                      : {
+                                            ...c,
+                                        },
+                              ),
+                          }
+                        : {
+                              ...m,
+                          },
+                ),
+            }));
+        },
+        insertSubEntry: (mId, template, dataId, data, key) => {
+            set((prev) => ({
+                ...prev,
+                milestones: prev.milestones.map((m) =>
+                    m.id === mId
+                        ? {
+                              ...m,
+                              [key]: m.nestedCounterData.map((entryKey) =>
+                                  entryKey.id === dataId
+                                      ? {
+                                            ...entryKey,
+                                            subEntriesData: [
+                                                {
+                                                    ...data,
+                                                    template,
+                                                },
+                                                ...entryKey.subEntriesData,
+                                            ],
+                                        }
+                                      : {
+                                            ...entryKey,
+                                        },
+                              ),
+                          }
+                        : {
+                              ...m,
+                          },
+                ),
+            }));
         },
     },
 }));
