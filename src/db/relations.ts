@@ -92,6 +92,7 @@ export const milestoneRelations = defineRelationsPart(
             template: r.one.subEntriesTemplate({
                 from: r.subEntriesData.subEntriesTemplateId,
                 to: r.subEntriesTemplate.id,
+                optional: false,
             }),
         },
     }),

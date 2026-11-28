@@ -1,9 +1,8 @@
 import NestedCounterHome from "@/components/screens/milestones/home-variants/nested-counter";
 import { useMilestoneStore } from "@/stores/milestones-store/milestones-store";
-import { createMilestoneDummy } from "@/utils/milestones/milestone-helpers";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
@@ -27,24 +26,21 @@ export default function MilestonesScreen() {
 
     return (
         <SafeAreaView>
-            <View>
-                <TouchableOpacity onPress={() => createMilestoneDummy()}>
-                    <Text>Create dummy milestone</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => {
-                        router.navigate(
-                            "/milestone-screens/nested-counter-focus-screen",
-                        );
+            <ScrollView
+                contentContainerStyle={{
+                    paddingHorizontal: 15,
+                    minHeight: "100%",
+                }}
+            >
+                <Text style={{ fontSize: 22, fontWeight: 800 }}>
+                    Milestones
+                </Text>
+                <Text>Track your daily activities and habits</Text>
+                <View
+                    style={{
+                        marginTop: 30,
                     }}
                 >
-                    <Text>Go to smt</Text>
-                </TouchableOpacity>
-            </View>
-
-            <ScrollView contentContainerStyle={{ paddingHorizontal: 15 }}>
-                <Text style={{ fontSize: 18 }}>Milestones</Text>
-                <View style={{ marginTop: 10 }}>
                     {milestones.map((m) => {
                         const Component = components[m.type];
                         return (

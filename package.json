@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
-    "@expo/ui": "~58.0.28",
+    "@expo/ui": "~58.0.30",
     "babel-plugin-inline-import": "^3.0.0",
     "babel-preset-expo": "~58.0.25",
     "drizzle-orm": "1.0.0-rc.5",
